@@ -117,7 +117,7 @@
     box-sizing: border-box;
     overflow: scroll;
     mat-chip:not(.mat-basic-chip) {
-        margin: 4px;
+        margin: 4px !important;
         white-space: nowrap;
         cursor: pointer;
     }
@@ -130,19 +130,32 @@
     position: absolute;
     top: 192px;
     left: 0;
-    right: 0;
+    right: 12px;
     height: 40px;
     z-index: 6;
     overflow: hidden;
-    border-radius: 36px 36px 0 0;
+    border-radius: 12px 24px 24px 0px;
     background: white;
     box-shadow: 0 6px 10px 1px rgba(0, 0, 0, 0.2), 0 6px 10px 1px rgba(0, 0, 0, 0.14), 0 1px 18px 0 rgba(0, 0, 0, 0.12);
     mat-icon {
-        padding: 8px 0 8px 26px;
+        padding: 8px;
+        pointer-events: none;
+        color: #757575;
+    }
+    button.dense-button {
+        position: absolute;
+        right: 4px;
+        top:4px;
+        padding: 0 18px;
+        border-radius: 20px;
+    line-height: 32px;
+    background: white;
+    //margin: 4px 0px 4px 4px;
+    //vertical-align: top;
     }
     input {
         position: absolute;
-        padding-left: 60px;
+        padding-left: 40px;
         top: 0;
         left: 0;
         bottom: 0;
@@ -166,7 +179,8 @@
     z-index: 3;
     border-radius: 30px 0 0 30px;
     background: white;
-    transition: border-radius 225ms cubic-bezier(0.4, 0, 0.2, 1);
+    transition: transform 225ms cubic-bezier(0.4, 0, 0.2, 1);
+    //transition: border-radius 225ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .expand-button {
@@ -185,10 +199,11 @@
 .post-card-labels-container.expanded {
     height: 232px;
     .expand-button-container {
-        border-radius: 0 0 30px 30px;
+        transform: translateX(60px)
+        //border-radius: 0 0 30px 30px;
     }
     .expand-button {
-        transform: rotate(180deg);
+       // transform: rotate(180deg);
     }
     .label-selector-area {
     padding-bottom: 40px;
@@ -254,4 +269,16 @@ button.formatting-button:hover {
     width: 1px;
     height: 28px;
     background-color: rgba(0, 0, 0, 0.1);
+}
+
+.post-card-labels-container .mat-chip-list-wrapper {
+    height: 100%;
+    white-space: nowrap;
+    align-items: center;
+    flex-wrap: nowrap;
+}
+
+.post-card-labels-container.expanded .mat-chip-list-wrapper {
+    height: auto;
+    flex-wrap: wrap;
 }

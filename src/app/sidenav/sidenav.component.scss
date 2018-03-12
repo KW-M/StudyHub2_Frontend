@@ -115,6 +115,7 @@
 // ----------------------------------<
 // Sidenav Innards
 // -----------------------<
+.side-nav{
 mat-nav-list {
     padding-top: 0;
 }
@@ -242,4 +243,5 @@ mat-list-item.route-active {
 
 .expand-arrow.expanded mat-icon{
     transform: rotate(90deg);
+}
 }

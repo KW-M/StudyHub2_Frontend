@@ -27,6 +27,8 @@ import { PostCardMiniComponent } from './post-card-mini/post-card-mini.component
 import { NewPostBarComponent } from './new-post-bar/new-post-bar.component'
 
 import { ScrollToElementDirective } from './directives/scroll-to-element.directive';
+import { FeedPageComponent } from './pages/feed-page/feed-page.component';
+import { ClassPageComponent } from './pages/class-page/class-page.component';
 
 @NgModule({
   declarations: [
@@ -40,6 +42,8 @@ import { ScrollToElementDirective } from './directives/scroll-to-element.directi
     PostCardMiniComponent,
     NewPostBarComponent,
     ScrollToElementDirective,
+    FeedPageComponent,
+    ClassPageComponent,
   ],
   imports: [
     BrowserModule,
@@ -48,7 +52,7 @@ import { ScrollToElementDirective } from './directives/scroll-to-element.directi
     HttpClientModule,
     BrowserAnimationsModule,
     AngularMaterialModule,
-    ServiceWorkerModule.register('/ngsw-worker.js', { enabled: environment.production })
+    ServiceWorkerModule.register('/ngsw-worker.js', { enabled: false }) //environment.production
   ],
   providers: [
     WindowService,

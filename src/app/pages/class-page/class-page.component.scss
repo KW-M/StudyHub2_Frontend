@@ -1,0 +1,13 @@
+.class-preview-posts-grid-container {
+    display: flex;
+    margin: 0 6px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.class-preview-posts {
+    display: block;
+    margin: 0 6px;
+    min-width: 312px;
+    flex: 1 1 300px;
+}

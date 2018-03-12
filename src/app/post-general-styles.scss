@@ -170,3 +170,7 @@ top: 0;
         transform: translateY(1px);
     }
 }
+
+.mat-button-ripple.mat-ripple {
+    border-radius: inherit;
+}

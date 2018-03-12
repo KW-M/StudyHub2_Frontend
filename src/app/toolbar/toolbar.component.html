@@ -1,3 +1,47 @@
-<p>
-  toolbar works!
-</p>
+<mat-toolbar color="primary" class="studyhub-toolbar mat-elevation-z6">
+    <button mat-icon-button (click)="toggleSideMenu()" style="margin-right:8px">
+        <mat-icon class="mat-24">menu</mat-icon>
+    </button>
+    <span>My Feed</span>
+    <div class="searchbar-container" [ngClass]="{'mobile-search-open':mobileSearchOpen}">
+        <button mat-icon-button class="mobile-search-close-button" *ngIf="windowSize.xs" (click)="setMobileSearchOpen(false)">
+            <mat-icon>arrow_back</mat-icon>
+        </button>
+        <mat-icon class="searchbar-search-icon">search</mat-icon>
+        <input class="searchbar-input" placeholder="Search" [(ngModel)]="searchText" (ngModelChange)="updateSearch(searchText)">
+        <button mat-icon-button class="searchbar-clear-button">
+            <mat-icon>close</mat-icon>
+        </button>
+    </div>
+    <span style="flex:1"></span>
+    <!-- <app-achevements-menu style="display: flex;flex: 1;align-items: center;"></app-achevements-menu> -->
+    <button mat-icon-button *ngIf="windowSize.xs" (click)="setMobileSearchOpen(true)">
+        <mat-icon>search</mat-icon>
+    </button>
+    <button mat-icon-button (click)="signIn()">
+        <mat-icon>refresh</mat-icon>
+    </button>
+    <button mat-icon-button [matMenuTriggerFor]="userMenu" class="toolbar-button-spacing">
+        <mat-icon *ngIf="windowSize.sm || windowSize.xs">more_vert</mat-icon>
+        <img class="avatar-circle" *ngIf="windowSize.gtsm" [src]="user.profilePhoto">
+    </button>
+    <mat-menu #userMenu class="user-menu" style="padding: 4px 0 0 0;">
+        <div style="display:flex;">
+            <img class="avatar-circle" style="margin: 8px 16px 8px 16px" [src]="user.profilePhoto">
+            <span style="margin: 8px 8px 8px 0;font-size: 14px;color: #757575;white-space: nowrap; max-width: 170px;">
+                <p style="margin: 2px 0;font-size: 16px;">{{user?.name}}</p>
+                <p style="margin: 0 0 2px; overflow: inherit; font-size: 14px; text-overflow: ellipsis;overflow:hidden">{{user?.email}}</p>
+            </span>
+        </div>
+        <div mat-menu-item>
+            <mat-icon>exit_to_app</mat-icon>Settings</div>
+        <div class="divider"></div>
+        <div mat-menu-item>
+            <mat-icon>settings</mat-icon>Settings</div>
+        <div mat-menu-item>
+            <mat-icon>help_circle</mat-icon>Help</div>
+        <div mat-menu-item>
+            <mat-icon>feedback</mat-icon>Feedback</div>
+    </mat-menu>
+    <!-- <mat-toolbar-row color="primary" class="studyhub-toolbar mobile-search-toolbar" *ngIf="windowSize.xs">hi</mat-toolbar-row> -->
+</mat-toolbar>

@@ -5,6 +5,7 @@ import { NgModule } from '@angular/core';
 import { AppRoutingModule } from './modules/app-routing.module';
 import { ServiceWorkerModule } from '@angular/service-worker';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { AngularMaterialModule } from './modules/angular-material.module';
 import { HttpClientModule } from '@angular/common/http';
 import { FormsModule } from '@angular/forms'
 
@@ -32,7 +33,7 @@ import { SpeeddialComponent } from './speeddial/speeddial.component'
     FormsModule,
     HttpClientModule,
     BrowserAnimationsModule,
-    //AngularMaterialModule,
+    AngularMaterialModule,
     ServiceWorkerModule.register('/ngsw-worker.js', { enabled: environment.production })
   ],
   providers: [

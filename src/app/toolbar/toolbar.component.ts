@@ -14,6 +14,7 @@ import { Router, NavigationEnd } from '@angular/router';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ToolbarComponent implements OnInit {
+  mobileSearchOpen:boolean = false;
   windowSize;
   searchText;
   user = {
@@ -36,6 +37,7 @@ export class ToolbarComponent implements OnInit {
     WindowFrame.mdWindowSize$.subscribe(sizes => {
       console.log(sizes);
       this.windowSize = sizes;
+      if (this.windowSize.sm) this.mobileSearchOpen = false;
       ChangeDetector.detectChanges()
     });
     DataHolder.currentUserState$.subscribe((userObj: any) => {
@@ -59,6 +61,11 @@ export class ToolbarComponent implements OnInit {
 
   clearSearch() {
 
+  }
+
+  setMobileSearchOpen(open) {
+    this.mobileSearchOpen = open
+    this.ChangeDetector.detectChanges()
   }
 
   toggleSideMenu() {

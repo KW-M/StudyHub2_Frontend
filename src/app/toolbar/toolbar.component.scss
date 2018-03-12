@@ -1,0 +1,78 @@
+.mat-toolbar.studyhub-toolbar {
+    padding: 0 12px;
+    background-color: rgb(161, 10, 25);
+    .searchbar-container {
+        position: relative;
+        display: flex;
+        margin: 0 10px 0 24px;
+        width: 100%;
+        max-width: 720px;
+        align-items: center;
+    }
+    .searchbar-input {
+        position: relative;
+        display: block;
+        padding: 0 40px 0 52px;
+        height: 40px; //width: 100%;
+        flex: 1;
+        outline: none;
+        border: none;
+        border-radius: 4px;
+        background-color: white;
+        font-size: 14px;
+    }
+    .searchbar-search-icon {
+        margin-right: -40px;
+        margin-left: 16px;
+        z-index: 2;
+        color: #757575;
+        pointer-events: none;
+    }
+    .searchbar-clear-button {
+        position: absolute;
+        margin: 0;
+        right: 0;
+        color: #757575;
+        opacity: 1;
+        transform: scale(1);
+        transition: opacity ease 200ms, transform ease 200ms;
+        pointer-events: inherit;
+    }
+    .mobile-search-close-button{
+        margin-right: 8px;
+    }
+    .divider {
+        display: block;
+        margin: 0;
+        border-top-width: 1px;
+        border-top-style: solid;
+        border-top-color: rgba(0, 0, 0, 0.12);
+    }
+    @media (min-width: 960px) {
+        .toolbar-button-spacing {
+            margin-left: 12px;
+        }
+    }
+    @media (max-width: 599px) {
+        .searchbar-container {
+            position: absolute;
+            margin: 0;
+            left: 12px;
+            right: 12px;
+            width: auto;
+            max-width: auto;
+            z-index: 10;
+            background-color: rgb(161, 10, 25);
+            transform: translateY(-54px);
+        }
+        .searchbar-container.mobile-search-open {
+            transform: translateY(0);
+        }
+    }
+}
+.avatar-circle {
+    width: 36px;
+    height: 36px;
+    overflow: hidden;
+    border-radius: 50%;
+}

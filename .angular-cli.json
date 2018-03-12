@@ -62,7 +62,12 @@
     "component": {
       "inlineStyle": true,
       "inlineTemplate": true,
-      "spec": false
+      "spec": false,
+      "changeDetection": "OnPush",
+      "viewEncapsulation": "None"
+    },
+    "serve": {
+      "host":"192.168.0.25"
     },
     "directive": {
       "spec": false

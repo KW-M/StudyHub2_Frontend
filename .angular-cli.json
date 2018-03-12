@@ -67,7 +67,7 @@
       "viewEncapsulation": "None"
     },
     "serve": {
-      "host":"192.168.0.25"
+      "host":"localhost"
     },
     "directive": {
       "spec": false

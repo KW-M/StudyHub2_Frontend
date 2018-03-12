@@ -1,6 +1,7 @@
 import { Injectable, NgZone } from "@angular/core";
 import { Subject } from "rxjs/Subject";
 import { HttpClient } from "@angular/common/http";
+import { timeout } from "rxjs/operator/timeout";
 
 
 @Injectable()
@@ -12,11 +13,16 @@ export class GoogleSigninService {
   signinState$ = this.signinStateSource.asObservable();
 
   constructor(private http: HttpClient, private zone: NgZone) {
-    gapi.load("client:auth2", () => {
-      console.log('auth2 loaded')
-      this.googleAuthInit();
-    })
-    console.log('constructor loaded')
+    setTimeout(() => {
+      gapi.load("client:auth2", () => {
+        console.log('auth2 loaded')
+        setTimeout(() => {
+          console.log(gapi, gapi.client)
+          this.googleAuthInit();
+        }, 3)
+      })
+      console.log('constructor loaded')
+    }, 3)
   }
 
   googleAuthInit() {
@@ -27,7 +33,6 @@ export class GoogleSigninService {
       scope: "profile"
     }).then(() => {
       console.log('gauth innited');
-
       //Handle the initial sign-in state.
       this.updateSigninStatus(gapi.auth2.getAuthInstance().isSignedIn.get());
       //Listen for sign-in state changes.
@@ -51,7 +56,7 @@ export class GoogleSigninService {
   getProfilePhoto() {
     return gapi.auth2.getAuthInstance().currentUser.get().getBasicProfile()['Paa'];
   }
-  
+
   handleSignInClick() {
     gapi.auth2.getAuthInstance().signIn();
     // Ideally the button should only show up after gapi.client.init finishes, so that this handler won't be called before OAuth is initialized.

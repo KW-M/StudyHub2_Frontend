@@ -39,6 +39,7 @@ export class ToolbarComponent implements OnInit {
       ChangeDetector.detectChanges()
     });
     DataHolder.currentUserState$.subscribe((userObj: any) => {
+      console.log(userObj);
       this.user = userObj || { profilePhoto: 'http://studyhub.york.org/images/accountPic.jpg', name: 'York Student', email: ' . . . @york.org' };
       ChangeDetector.detectChanges()
     });

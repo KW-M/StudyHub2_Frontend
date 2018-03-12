@@ -97,10 +97,4 @@ export class StudyhubServerApisService {
       'idtoken': gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse().id_token
     })
   }
-
-
-
-  // getUser(gauthToken) {
-  //   this.http.post(this.serverURLBase + "/usersignin", { idtoken: userId })
-  // }
 }

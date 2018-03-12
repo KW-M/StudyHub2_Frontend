@@ -4,7 +4,7 @@ import { Component, ViewChild, ChangeDetectionStrategy, ChangeDetectorRef } from
   selector: 'app-root',
   template: `
     <app-toolbar></app-toolbar>
-    <app-speeddial></app-speedial>
+    <app-speeddial></app-speeddial>
     <router-outlet></router-outlet>
   `,
   styleUrls: ['./app.component.scss'],

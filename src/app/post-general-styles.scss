@@ -1,0 +1,172 @@
+.post-styles {
+    outline: none;
+    color: rgba(0, 0, 0, 0.87);
+    text-decoration: inherit;
+    text-transform: inherit;
+    letter-spacing: normal;
+    font-weight: 400;
+    font-family: Roboto, sans-serif;
+    line-height: 2rem;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-font-smoothing: antialiased;
+}
+
+.post-card-header {
+    position: relative;
+    display: flex;
+    //padding-top: 56.25%;
+    width: 100%;
+    z-index: 5;
+    overflow: hidden;
+    flex: 0 0 auto;
+    background: url(https://material-components-web.appspot.com/images/16-9.jpg);
+    background-size: cover;
+    background-repeat: no-repeat; //height: 12.313rem;
+    cursor: pointer;
+    user-select: none;
+}
+
+.post-header-preview-image {
+    position: absolute;
+top: 0;
+    width: 100%;
+}
+
+.post-header-ripple {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+}
+
+.post-header-overlay {
+    position: absolute;
+    display: flex;
+    left: 0;
+    right: 0;
+    height: 56px;
+    flex-direction: column;
+    color: white;
+    pointer-events: none;
+    align-items: center;
+    justify-content: center;
+}
+
+.post-header-overlay.top-overlay {
+    top: 0;
+    background: linear-gradient( to bottom, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0));
+}
+
+.post-header-overlay.bottom-overlay {
+    bottom: 0;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0));
+}
+
+.post-card-header .link-chip {
+    display: flex;
+    margin: 0 6px;
+    max-width: calc(100% - 12px);
+    height: 32px;
+    border-radius: 16px;
+    background: rgba(224, 224, 224, 0.80);
+    color: rgb(66, 66, 66);
+    font-size: 13px;
+    line-height: 32px;
+}
+
+.post-card-header .link-name {
+    display: inline-block;
+    margin: 0 10px;
+    overflow: hidden;
+    flex: 1 1 0;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: inherit;
+}
+
+.post-card-header .link-favicon {
+    margin: 8px 0 8px 12px;
+    width: 16px;
+    height: 16px;
+}
+
+.post-card-header .link-chip-remove {
+    margin: 6px 6px 6px 0;
+    width: 1em;
+    height: 1em;
+    color: rgba(0, 0, 0, 0.87);
+    font-size: 20px;
+    opacity: 0.4;
+    cursor: pointer;
+}
+
+.post-card-header .link-chip-remove:hover {
+    opacity: 1;
+}
+
+.post-card-title {
+    margin: 0;
+    padding: 24px 16px 0 16px;
+    width: 100%;
+    box-sizing: border-box;
+    border: 0;
+    letter-spacing: normal;
+    font-weight: 400;
+    font-size: 1.5rem;
+    line-height: 2rem;
+}
+
+.post-card-subtitle {
+    margin: -0.063rem 0;
+    padding: 0 16px 16px 16px;
+    color: rgba(0, 0, 0, 0.54);
+    letter-spacing: 0.04em;
+    font-weight: 400;
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+}
+
+// .post-card-body-text-container {
+//     position: relative;
+//     box-sizing: border-box;
+//     padding: 0 16px;
+//     transition: padding 225ms cubic-bezier(.4, 0, .2, 1);
+// }
+.post-card-body-text {
+    margin: 0;
+    padding: 0 16px;
+    min-height: 100px;
+    box-sizing: border-box;
+    flex: 1;
+    outline: none;
+    letter-spacing: 0.04em;
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+}
+
+.post-card-actions {
+    display: flex;
+    padding: 8px;
+    box-sizing: border-box;
+    align-items: center;
+}
+
+.post-card-actions .mat-icon-button {
+    width: 36px;
+    height: 36px;
+    line-height: 35px;
+}
+
+.post-card-actions .like-button {
+    width: 54px;
+    border-radius: 50px;
+    mat-icon {
+        transform: translateY(-2px);
+    }
+    .like-counter {
+        display: inline-block;
+        color: red;
+        transform: translateY(1px);
+    }
+}

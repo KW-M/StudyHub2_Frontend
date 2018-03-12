@@ -1,0 +1,65 @@
+.modal-container {
+    position: fixed;
+    display: flex;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    pointer-events: none;
+    align-items: center;
+    justify-content: center;
+}
+
+.post-modal-frame {
+    position: fixed;
+    display: flex;
+    width: 420px;
+    min-height: 104px;
+    max-height: calc(100vh - 109px);
+    z-index: 50;
+    overflow: hidden;
+    flex-direction: column;
+    flex: 0 0 auto;
+    outline: none;
+    background: white;
+    pointer-events: all;
+    will-change: opacity;
+}
+
+.modal-bg {
+    position: absolute;
+    display: block;
+    background: black;
+    opacity: 0;
+    transition: opacity 350ms ease;
+    pointer-events: none;
+    will-change: opacity;
+}
+
+.modal-container.open-docked .post-modal-frame {
+    right: 20px;
+}
+
+.modal-container.open-centered .modal-bg {
+    opacity: 0.5;
+    pointer-events: all;
+}
+
+app-post-edit-view {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+@media (max-width: 599px) {
+    .modal-container .post-modal-frame {
+        margin: 0;
+        top: 0;
+        left: 0;
+        right: 0 !important;
+        bottom: 0;
+        width: auto;
+        max-height: 100%;
+        border-radius: 0 !important;
+    }
+}

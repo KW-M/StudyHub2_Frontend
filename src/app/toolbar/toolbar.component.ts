@@ -69,7 +69,7 @@ export class ToolbarComponent implements OnInit {
   }
 
   toggleSideMenu() {
-    this.EventBoard.toggleSideMenuOpen();
+    this.EventBoard.toggleSideNavOpen();
   }
 
   signIn() {

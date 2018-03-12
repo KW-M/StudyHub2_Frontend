@@ -1,0 +1,38 @@
+<div class="post-card mat-elevation-z3" [ngStyle]="{'background-color':'white'}">
+  <section class="post-card-header" matRipple>
+    <img src="https://material-components-web.appspot.com/images/16-9.jpg" style="width:100%;height:100%">
+    <div class="post-header-overlay bottom-overlay">
+      <div class="link-chip">
+        <img [src]="currentPost?.attachmentIcon || 'https://drive-thirdparty.googleusercontent.com/16/type/application/pdf'" class="link-favicon">
+        <span class="link-name">{{currentPost?.attachmentName}}</span>
+      </div>
+    </div>
+  </section>
+  <section class="post-card-title-container">
+    <h1 class="post-card-title">{{currentPost?.title}}</h1>
+    <h2 class="post-card-subtitle">{{currentPost?.creator.name}}</h2>
+  </section>
+  <section class="post-card-body-text-container over-actions" onclick="alert('hi')">
+    <p class="post-card-body-text">{{currentPost?.description}}<div class="post-card-overflow-indicator">
+      <mat-icon style="float:right">more_horiz</mat-icon>
+    </div>
+  </section>
+  <section class="post-card-actions">
+    <button mat-icon-button class="like-button">
+      <span class="like-counter">12</span>
+      <mat-icon>thumb_up</mat-icon>
+    </button>
+    <button mat-icon-button>
+      <mat-icon>more_vert</mat-icon>
+    </button>
+    <button mat-icon-button class="expand-button" (click)="postBodyTextShown = !postBodyTextShown" [ngClass]="{'expanded':postBodyTextShown}">
+      <mat-icon>keyboard_arrow_down</mat-icon>
+    </button>
+  </section>
+  <section class="post-card-body-text-container under-actions" [ngClass]="{'expanded':postBodyTextShown}" onclick="alert('hi')">
+    <p class="post-card-body-text">{{currentPost?.description}}</p>
+    <div class="post-card-overflow-indicator">
+      <mat-icon style="float:right">more_horiz</mat-icon>
+    </div>
+  </section>
+</div>

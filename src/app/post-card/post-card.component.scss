@@ -1,0 +1,49 @@
+.post-card {
+    display: block;
+    margin: 12px 0;
+    overflow: hidden;
+    border-radius: 3px;
+    background: white;
+}
+
+.post-card {
+    .post-card-title-container {
+        cursor: pointer;
+    }
+    .post-card-body-text-container {
+        position: relative;
+        max-height: 9rem;
+        box-sizing: border-box;
+        overflow: hidden;
+        cursor: pointer;
+        transition: max-height 225ms cubic-bezier(0.4, 0, 0.2, 1);
+        user-select: none;
+    }
+    .post-card-body-text-container.under-actions {
+       margin-bottom: 24px;
+    }
+    .post-card-body-text-container:not(.expanded) {
+        margin-bottom: 0;
+        max-height: 0;
+    }
+    .post-card-overflow-indicator {
+        position: absolute;
+        right: 16px;
+        bottom: 4px;
+        width: 100px;
+        height: 1.25rem;
+        background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.83), white, white);
+    }
+    .post-card-actions .expand-button {
+        margin-left: auto;
+        mat-icon {
+            width: 30px;
+            font-size: 30px;
+            transition: transform 225ms cubic-bezier(0.4, 0, 0.2, 1);
+            transform: none;
+        }
+    }
+    .post-card-actions .expand-button.expanded mat-icon {
+        transform: rotate(180deg);
+    }
+}

@@ -6,20 +6,18 @@ import { Subject } from "rxjs/Subject";
 @Injectable()
 export class EventBoardService {
   constructor(private router: Router) {
-    // router.events.filter(event => event instanceof NavigationEnd).subscribe((newRoute) => {
-
-    // });
+    // router.events.filter(event => event instanceof NavigationEnd).subscribe((newRoute) => {});
   }
-  private sideMenuOpen: boolean = true;
-  private sideMenuOpenSource = new Subject<boolean>();
-  sideMenuOpen$ = this.sideMenuOpenSource.asObservable();
-  setSideMenuOpen(open: boolean) {
-      this.sideMenuOpen = open;
-      this.sideMenuOpenSource.next(open);
+  private sideNavOpen: boolean = true;
+  private sideNavOpenSource = new Subject<boolean>();
+  sideNavOpen$ = this.sideNavOpenSource.asObservable();
+  setSideNavOpen(open: boolean) {
+      this.sideNavOpen = open;
+      this.sideNavOpenSource.next(open);
   }
-  toggleSideMenuOpen() {
-    this.sideMenuOpen = !this.sideMenuOpen;
-    this.sideMenuOpenSource.next(this.sideMenuOpen);
+  toggleSideNavOpen() {
+    this.sideNavOpen = !this.sideNavOpen;
+    this.sideNavOpenSource.next(this.sideNavOpen);
   }
   private postModalSource = new Subject<any>();
   postModal$ = this.postModalSource.asObservable();
@@ -29,10 +27,4 @@ export class EventBoardService {
   closePostModal() {
     this.postModalSource.next({'action':'close'});
   }
-
-  // private appLoadedSource = new Subject<boolean>();
-  // appLoaded$ = this.appLoadedSource.asObservable();
-  // setAppLoaded(appLoaded: boolean) {
-  //   this.appLoadedSource.next(appLoaded);
-  // }
 }

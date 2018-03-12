@@ -4,8 +4,14 @@ import { Component, ViewChild, ChangeDetectionStrategy, ChangeDetectorRef } from
   selector: 'app-root',
   template: `
     <app-toolbar></app-toolbar>
+    <app-sidenav></app-sidenav>
     <app-speeddial></app-speeddial>
-    <router-outlet></router-outlet>
+    <app-post-modal-frame style="z-index: 11;"></app-post-modal-frame>
+    <div class="main-content">
+      <app-new-post-bar></app-new-post-bar>
+      <app-post-card></app-post-card>
+      <router-outlet></router-outlet>
+    </div>
   `,
   styleUrls: ['./app.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,

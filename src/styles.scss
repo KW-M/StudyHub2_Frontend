@@ -17,7 +17,6 @@ $app-theme: mat-light-theme($angular-material-primary, $angular-material-accent,
 // Alternatively, you can import and @include the theme mixins for each component
 // that you are using.
 @include angular-material-theme($app-theme);
-
 html {
     outline: none;
     user-select: none;
@@ -30,4 +29,18 @@ body {
 
 app-root {
     display: flex;
+}
+
+*,
+*:before,
+*:after {
+    //box-sizing: inherit;
+    outline: inherit;
+    user-select: inherit;
+    -webkit-tap-highlight-color: transparent;
+}
+
+input,
+textarea {
+    user-select: text;
 }

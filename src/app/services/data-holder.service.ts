@@ -68,11 +68,11 @@ export class DataHolderService {
             if (this.yorkClasses && this.signedinUser === undefined) this.classAndGroupStateSource.next(response);
         })
 
-        // Router.events.filter(event => event instanceof NavigationEnd).subscribe((newRoute) => {
-        //     this.currentPage = this.Router.routerState.snapshot.root.firstChild.url[0].path;
-        //     this.searchQuery = this.Router.routerState.snapshot.root.queryParams.query;
-        //     if (this.currentPage && this.signedinUser) this.updateVisiblePosts();
-        // });
+        Router.events.filter(event => event instanceof NavigationEnd).subscribe((newRoute) => {
+            this.currentPage = this.Router.routerState.snapshot.root.firstChild.url[0].path;
+            this.searchQuery = this.Router.routerState.snapshot.root.queryParams.query;
+            if (this.currentPage && this.signedinUser) this.updateVisiblePosts();
+        });
         // this.ServerAPIs.getLabels().toPromise().then((labelsResponse: any) => {
         //     this.labelsStateSource.next(labelsResponse);
         //     console.log('labels:', labelsResponse)

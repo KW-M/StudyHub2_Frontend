@@ -134,6 +134,7 @@ top: 0;
 //     transition: padding 225ms cubic-bezier(.4, 0, .2, 1);
 // }
 .post-card-body-text {
+    user-select: text;
     margin: 0;
     padding: 0 16px;
     min-height: 100px;

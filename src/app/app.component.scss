@@ -25,6 +25,10 @@ app-post-modal-frame {
     z-index: 11;
 }
 
+app-class-page {
+    display: block;
+}
+
 @media (max-width: 600px) {
     .main-content {
         margin-top: 56px;

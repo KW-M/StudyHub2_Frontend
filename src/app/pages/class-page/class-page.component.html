@@ -10,14 +10,14 @@
       </button>
     </mat-basic-chip> -->
     <!-- <span class="formatting-divider" style="order:-1;flex:none"></span> -->
-    <mat-chip color="primary" (click)="toggleChipSelect(chipIndex,false);" [value]="label.class.name" *ngFor="let label of posts; let chipIndex = index;">
+    <!-- <mat-chip color="primary" (click)="toggleChipSelect(chipIndex,false);" [value]="label.title" *ngFor="let label of posts; let chipIndex = index;">
       {{label.class.name}}
-    </mat-chip>
+    </mat-chip> -->
   </mat-chip-list>
 </div>
 <div class="class-preview-posts-grid-container">
   <div class="class-preview-posts" *ngFor="let column of gridColumns; let i = index">
-    <app-post-card *ngFor="let post of postsGrid[i]; let indexy = index" [input-post]="post"></app-post-card>
+    <app-post-card *ngFor="let post of postsGrid[i]; let indexy = index" [input-post]="post" (preview-loaded)="setLinkPreview($event,post)" ></app-post-card>
   </div>
   <!-- spacer grid items at the end keep the other grid items equal width -->
   <div class="class-preview-posts"></div>

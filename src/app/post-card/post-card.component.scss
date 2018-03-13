@@ -21,6 +21,9 @@
     }
     .post-card-body-text-container.under-actions {
        margin-bottom: 24px;
+       .post-card-body-text {
+           min-height: unset;
+       }
     }
     .post-card-body-text-container:not(.expanded) {
         margin-bottom: 0;

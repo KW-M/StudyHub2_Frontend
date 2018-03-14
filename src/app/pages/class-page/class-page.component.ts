@@ -26,8 +26,9 @@ export class ClassPageComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.visiblePostsObserver = this.DataHolder.visiblePostsState$.subscribe((posts) => {
-      this.posts = posts;
       console.log("posts from server", posts);
+      this.posts = posts;
+
       if (this.posts.length > 0) {
         this.postsGrid = this.getPostsGrid(this.posts, true);
       } else {
@@ -43,6 +44,7 @@ export class ClassPageComponent implements OnInit, OnDestroy {
       }
     };
     this.sideNavOpenObserver = this.EventBoard.sideNavOpen$.subscribe(() => {
+      console.log('nav');
       if (this.posts.length > 0) {
         this.postsGrid = this.getPostsGrid(this.posts, false) || this.postsGrid;
         this.ChangeDetector.detectChanges();
@@ -78,7 +80,7 @@ export class ClassPageComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    // this.ChangeDetector.detach(); // try this
+    //  this.ChangeDetector.detach(); // try this
     console.log('classDestoryed')
     // for me I was detecting changes inside "subscribe" so was enough for me to just unsubscribe;
     this.visiblePostsObserver.unsubscribe();

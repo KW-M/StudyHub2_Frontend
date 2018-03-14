@@ -130,7 +130,7 @@ export class DataHolderService {
                 }, null)
                 break;
             case 'feed':
-                //this.getFeed()
+                this.getFeedPosts()
                 break;
             default:
                 this.updateSearchFilters({
@@ -183,6 +183,10 @@ export class DataHolderService {
 
     getAllPosts() {
         this.ServerAPIs.getAllPosts(this.currentSortMethod).then((posts: any) => { this.allLoadedPosts = posts; this.visiblePostsStateSource.next(posts) }, console.warn)
+    }
+
+    getFeedPosts() {
+        this.ServerAPIs.getFeedPosts().then((posts: any) => { this.allLoadedPosts = posts; this.visiblePostsStateSource.next(posts) }, console.warn)
     }
 
     setCachedLinkPreview(postId, linkPreview) {

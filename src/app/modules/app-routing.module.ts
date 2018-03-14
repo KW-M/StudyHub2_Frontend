@@ -7,7 +7,7 @@ import { ClassPageComponent } from '../pages/class-page/class-page.component';
 const routes: Routes = [
   {
     path: '',
-    redirectTo: 'feed',
+    redirectTo: '/feed',
     pathMatch: 'full'
   },
   {

@@ -14,25 +14,32 @@ import { StudyhubServerApisService } from '../../services/studyhub-server-apis.s
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class FeedPageComponent implements OnDestroy {
+  visiblePostsObserver: any;
   windowSize: any;
   windowSizeObserver;
   classAndGroupObserver;
   currentPostsGrid;
 
-  constructor(public EventBoard: EventBoardService, private dataHolder: DataHolderService, public ServerAPIs: StudyhubServerApisService, public WindowFrame: WindowService) {
-    // this.windowSize = this.WindowFrame.getMediaQueries(null);
+  constructor(public EventBoard: EventBoardService, private DataHolder: DataHolderService, public WindowFrame: WindowService, private ChangeDetector: ChangeDetectorRef) {
+    this.windowSize = this.WindowFrame.getMediaQueries(null);
     this.windowSizeObserver = WindowFrame.mdWindowSize$.subscribe((sizes) => {
       this.windowSize = sizes;
     });
     //this.classAndGroupObserver = this.dataHolder.classAndGroupState$.subscribe((classAndGroup) => { })
-    ServerAPIs.getFeedPosts().then((postsGrid) => {
-      console.log(postsGrid);
-      this.currentPostsGrid = postsGrid
-    });
+    // this.visiblePostsObserver = this.DataHolder.visiblePostsState$.subscribe((posts) => {
+    //   console.log("feed posts from server", posts);
+    //   this.currentPostsGrid = posts;
+    //   this.ChangeDetector.detectChanges();
+    // })
+  }
+
+  trackByPostIdFn(index, post) {
+    return post.id
   }
 
   ngOnDestroy() {
     this.windowSizeObserver.unsubscribe();
+    // this.visiblePostsObserver.unsubscribe();
     //  this.classAndGroupObserver.unsubscribe()
   }
 

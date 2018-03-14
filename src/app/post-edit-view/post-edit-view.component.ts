@@ -10,11 +10,12 @@ import { StudyhubServerApisService } from '../services/studyhub-server-apis.serv
 @Component({
   selector: 'app-post-edit-view',
   templateUrl: './post-edit-view.component.html',
-  styleUrls: ['./post-edit-view.component.scss','../post-general-styles.scss'],
+  styleUrls: ['./post-edit-view.component.scss', '../post-general-styles.scss'],
   encapsulation: ViewEncapsulation.None,
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class PostEditViewComponent implements OnDestroy {
+  websitePreviewObserver;
   @Input('input-post') inputPost;
   @ViewChildren('labelChip') labelChip;
   @ViewChild('descriptionHTML') descriptionElm: ElementRef;
@@ -65,7 +66,7 @@ export class PostEditViewComponent implements OnDestroy {
       "flagged": false,
       "creationDate": new Date(),
       "updateDate": new Date(),
-    },this.inputPost)
+    }, this.inputPost)
     console.log(this.currentPost)
     this.classAndGroupObserver = DataHolder.classAndGroupState$.subscribe((classesAndGroups) => {
       console.log(classesAndGroups)
@@ -119,13 +120,13 @@ export class PostEditViewComponent implements OnDestroy {
         if (linkurl.match(/(?:(?:\/(?:d|s|file|folder|folders)\/)|(?:id=)|(?:open=))([-\w]{25,})/)) {
           console.log('driveURL')
         } else {
-          this.ExternalAPIs.getWebsitePreview(linkurl).then((websitePreview) => {
+          this.websitePreviewObserver = this.ExternalAPIs.getWebsitePreview(linkurl).subscribe((websitePreview) => {
             this.currentPost.link = linkurl;
             this.currentPost.attachmentName = websitePreview['title'];
             this.currentLinkPreview.thumbnail = websitePreview['image'];
             this.currentLinkPreview.icon = websitePreview['icon'];
             this.changeDetector.detectChanges();
-          }).catch((err) => {
+          }, (err) => {
             console.warn(err);
             this.linkURL = '';
             this.currentSnackBarRef = this.snackBar.open('Can\'t reach attached link:', linkurl, {
@@ -190,6 +191,7 @@ export class PostEditViewComponent implements OnDestroy {
   ngOnDestroy() {
     this.classAndGroupObserver.unsubscribe()
     this.signedinUserObserver.unsubscribe()
+    if (this.websitePreviewObserver) this.websitePreviewObserver.unsubscribe();
     if (this.currentSnackBarRef) this.currentSnackBarRef.dismiss()
     clearInterval(this.backupSetIntervalRef);
   }

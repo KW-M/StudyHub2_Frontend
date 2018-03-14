@@ -30,7 +30,7 @@
       </mat-list-item>
     </mat-nav-list>
     <section #stickyHeader class="sticky-header">
-    <div class="sidenav-buttons-header" style="height: 48px;">
+      <div class="sidenav-buttons-header" style="height: 48px;">
         <button mat-icon-button class="expand-arrow" [ngClass]="{'expanded': showAllClasses === true}" (click)="showAllClasses = !showAllClasses; showAllGroups = (editingFavorites && showAllGroups)">
           <mat-icon>keyboard_arrow_right</mat-icon>
         </button>
@@ -40,16 +40,17 @@
       </div>
       <div class="class-and-group-searchbox sidenav-buttons-header">
         <mat-icon>search</mat-icon>
-        <input placeholder="Search Classes and Groups" [(ngModel)]="classSearch" appScrollToElement="center">
+        <input placeholder="Search Classes and Groups" (input)="onClassSearchInput($event)" appScrollToElement="center">
       </div>
     </section>
     <mat-nav-list class="class-list" [ngClass]="{'all-shown': showAllClasses === true}">
-        <ng-container *ngFor="let class of yorkClasses; let classIndex = index; trackBy: trackByClassNameFn">
+      <ng-container *ngFor="let class of filteredClasses; let classIndex = index; trackBy: trackByClassNameFn">
         <div class="sidenav-class-catagory-header" [ngStyle]="{'background': 'linear-gradient(152deg,hsl('+class?.color.h+','+class?.color.s+'%,'+class?.color.l+'%), white)'}"
-          *ngIf="(class?.category != yorkClasses[classIndex - 1]?.category) && classSearch === ''">
+          *ngIf="!classSearchText && (class?.category != filteredClasses[classIndex - 1]?.category)">
           <h3 mat-subheader style="margin-top: 0;">{{class.category}}</h3>
         </div>
-        <mat-list-item [ngClass]="{'not-favorite': !class?.userFavorite}" (click)="setFavorite(class)" routerLinkActive="route-active" [routerLink]="editingFavorites ? null : class.name">
+        <mat-list-item [ngClass]="{'not-favorite': !class?.userFavorite}" (click)="setFavorite(class)" routerLinkActive="route-active"
+          [routerLink]="editingFavorites ? null : class.name">
           <h4 mat-line [ngStyle]="{'color': 'hsl('+class?.color.h+','+class?.color.s+'%,'+(40)+'%)'}">{{class.name}}</h4>
           <mat-icon *ngIf="editingFavorites">{{class.userFavorite ? 'star' : 'star_outline'}}</mat-icon>
         </mat-list-item>
@@ -66,7 +67,7 @@
       </button>
     </div>
     <mat-nav-list class="group-list" [ngClass]="{'all-shown': showAllGroups === true }">
-      <mat-list-item *ngFor="let group of yorkGroups">
+      <mat-list-item *ngFor="let group of filteredGroups">
         <h4 mat-line>{{group.name}}</h4>
         <mat-icon *ngIf="editingFavorites">{{group.userFavorite ? 'star' : 'star_outline'}}</mat-icon>
       </mat-list-item>

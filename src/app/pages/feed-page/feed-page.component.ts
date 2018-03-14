@@ -17,19 +17,23 @@ export class FeedPageComponent implements OnDestroy {
   windowSize: any;
   windowSizeObserver;
   classAndGroupObserver;
-  currentPosts;
+  currentPostsGrid;
 
-  constructor(public EventBoard: EventBoardService, private dataHolder: DataHolderService, private GSignin: GoogleSigninService, public ServerAPIs: StudyhubServerApisService, public WindowFrame: WindowService) {
+  constructor(public EventBoard: EventBoardService, private dataHolder: DataHolderService, public ServerAPIs: StudyhubServerApisService, public WindowFrame: WindowService) {
     // this.windowSize = this.WindowFrame.getMediaQueries(null);
     this.windowSizeObserver = WindowFrame.mdWindowSize$.subscribe((sizes) => {
       this.windowSize = sizes;
     });
-    this.classAndGroupObserver = this.dataHolder.classAndGroupState$.subscribe((classAndGroup) => { })
+    //this.classAndGroupObserver = this.dataHolder.classAndGroupState$.subscribe((classAndGroup) => { })
+    ServerAPIs.getFeedPosts().then((postsGrid) => {
+      console.log(postsGrid);
+      this.currentPostsGrid = postsGrid
+    });
   }
 
   ngOnDestroy() {
     this.windowSizeObserver.unsubscribe();
-     this.classAndGroupObserver.unsubscribe()
+    //  this.classAndGroupObserver.unsubscribe()
   }
 
 }

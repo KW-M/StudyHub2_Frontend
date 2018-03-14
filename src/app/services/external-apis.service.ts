@@ -11,7 +11,6 @@ export class ExternalApisService {
   getWebsitePreview(url) {
     let promise = new Promise((resolve, reject) => {
       this.http.get("https://www.googleapis.com/pagespeedonline/v2/runPagespeed?url=" + url + "&rule=AvoidLandingPageRedirects&screenshot=true&strategy=desktop&fields=screenshot(data%2Cmime_type)%2Ctitle&key=AIzaSyCFXAknC9Fza_lsQBlRCAJJZbzQGDYr6mo").subscribe((previewJSON: any) => {
-        console.log(previewJSON)
         resolve({
           title: previewJSON.title,
           image: this.sanitizer.bypassSecurityTrustUrl('data:' + previewJSON.screenshot.mime_type + ';base64,' + previewJSON.screenshot.data.replace(/_/g, "/").replace(/-/g, '+')),

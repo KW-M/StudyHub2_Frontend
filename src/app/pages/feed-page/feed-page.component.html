@@ -8,17 +8,15 @@
 </div>
 <app-new-post-bar></app-new-post-bar>
 <div class="class-preview-posts-grid-container">
-  <div class="class-preview-posts" *ngFor="let item of [1,2,3,4,6,7,8,6,9,8]; let i = index">
+  <div class="class-preview-posts" *ngFor="let classBlock of currentPostGrid; let i = index">
     <span class="class-preview-title">Class Name {{i}}</span>
-    <app-post-card></app-post-card>
-    <app-post-card></app-post-card>
-    <app-post-card></app-post-card>
+    <app-post-card *ngFor="let post of classBlock[i]; let indexy = index; trackBy:trackByPostIdFn" [input-post]="post"></app-post-card>
     <div class="class-preview-more-button">
       <button color="accent" mat-button>MORE</button>
     </div>
+    <!-- spacer grid items at the end keep the other grid items equal width -->
+    <div class="class-preview-posts"></div>
+    <div class="class-preview-posts"></div>
+    <div class="class-preview-posts"></div>
   </div>
-<!-- spacer grid items at the end keep the other grid items equal width -->
-<div class="class-preview-posts"></div>
-  <div class="class-preview-posts"></div>
-  <div class="class-preview-posts"></div>
 </div>

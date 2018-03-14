@@ -1,10 +1,10 @@
-<div class="post-card mat-elevation-z3" [ngStyle]="{'background-color':'white'}">
-  <section class="post-card-header" matRipple>
+<div class="post-card mat-elevation-z3" [ngStyle]="{'background-color':'hsl('+currentPost?.color?.h+','+currentPost?.color?.s+'%,'+currentPost?.color?.l+'%)'}">
+  <section class="post-card-header" matRipple *ngIf="currentPost?.link">
     <img src="https://material-components-web.appspot.com/images/16-9.jpg" style="width:100%;height:100%">
-    <img [src]="currentPost?.linkPreview?.thumbnail" *ngIf="currentPost?.linkPreview?.thumbnail" class="post-header-preview-image">
+    <img [src]="currentLinkPreview?.thumbnail" *ngIf="currentLinkPreview?.thumbnail" class="post-header-preview-image">
     <div class="post-header-overlay bottom-overlay">
       <div class="link-chip">
-        <img [src]="currentPost?.linkPreview?.icon || 'https://drive-thirdparty.googleusercontent.com/16/type/application/pdf'" class="link-favicon">
+        <img [src]="currentLinkPreview?.icon || 'https://drive-thirdparty.googleusercontent.com/16/type/application/pdf'" class="link-favicon">
         <span class="link-name">{{currentPost?.attachmentName}}</span>
       </div>
     </div>
@@ -13,9 +13,10 @@
     <h1 class="post-card-title">{{currentPost?.title}}</h1>
     <h2 class="post-card-subtitle">{{currentPost?.creator.name}}</h2>
   </section>
-  <section class="post-card-body-text-container over-actions" onclick="alert('hi')">
-    <p class="post-card-body-text" [innerHTML]="currentPost?.description"><div class="post-card-overflow-indicator">
-      <mat-icon style="float:right">more_horiz</mat-icon>
+  <section class="post-card-body-text-container over-actions" *ngIf="!currentPost?.link" onclick="alert('hi')">
+    <p class="post-card-body-text" [innerHTML]="currentPost?.description"></p>
+    <div class="post-card-overflow-indicator"  [ngStyle]="{'background-color':'hsl('+currentPost?.color?.h+','+currentPost?.color?.s+'%,'+currentPost?.color?.l+'%)','box-shadow':'-20px 3px 40px 19px hsl('+currentPost?.color?.h+','+currentPost?.color?.s+'%,'+currentPost?.color?.l+'%)'}">
+      <mat-icon style="    margin-left: 12px; line-height: 20px;">more_horiz</mat-icon>
     </div>
   </section>
   <section class="post-card-actions">
@@ -23,17 +24,25 @@
       <span class="like-counter">12</span>
       <mat-icon>thumb_up</mat-icon>
     </button>
-    <button mat-icon-button>
+    <button mat-icon-button [matMenuTriggerFor]="postActionsMenu">
       <mat-icon>more_vert</mat-icon>
     </button>
-    <button mat-icon-button class="expand-button"  *ngIf="currentPost?.description" (click)="postBodyTextShown = !postBodyTextShown" [ngClass]="{'expanded':postBodyTextShown}">
+    <mat-menu #postActionsMenu>
+        <div mat-menu-item (click)="editPost(currentPost)">
+            <mat-icon>edit</mat-icon>Edit</div>
+        <div mat-menu-item (click)="deletePost(currentPost)">
+            <mat-icon>trash</mat-icon>Delete</div>
+            <div mat-menu-item (click)="debugPost(currentPost)">
+                <mat-icon>debug</mat-icon>Debug</div>
+    </mat-menu>
+    <button mat-icon-button class="expand-button"  *ngIf="currentPost?.description && currentPost?.link" (click)="postBodyTextShown = !postBodyTextShown" [ngClass]="{'expanded':postBodyTextShown}">
       <mat-icon>keyboard_arrow_down</mat-icon>
     </button>
   </section>
-  <section class="post-card-body-text-container under-actions" *ngIf="currentPost?.description" [ngClass]="{'expanded':postBodyTextShown}" onclick="alert('hi')">
+  <section class="post-card-body-text-container under-actions" *ngIf="currentPost?.description && currentPost?.link" [ngClass]="{'expanded':postBodyTextShown}" onclick="alert('hi')">
     <p class="post-card-body-text" [innerHTML]="currentPost?.description"></p>
-    <div class="post-card-overflow-indicator" >
-      <mat-icon style="float:right">more_horiz</mat-icon>
+    <div class="post-card-overflow-indicator" [ngStyle]="{'background-color':'hsl('+currentPost?.color?.h+','+currentPost?.color?.s+'%,'+currentPost?.color?.l+'%)','box-shadow':'-20px 3px 40px 19px hsl('+currentPost?.color?.h+','+currentPost?.color?.s+'%,'+currentPost?.color?.l+'%)'}" >
+      <mat-icon style="    margin-left: 12px; line-height: 20px;">more_horiz</mat-icon>
     </div>
   </section>
 </div>

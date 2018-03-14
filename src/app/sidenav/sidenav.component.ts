@@ -26,11 +26,11 @@ export class SidenavComponent implements OnInit {
   showAllGroups: boolean = false;
   editingFavorites: boolean = false;
   stickyHeaderOffset: number = null;
-  classSearch: string = '';
+  classSearchText: string;
 
   signedinUser: any;
-  yorkClasses: Array<any> = [];
-  yorkGroups: Array<any> = [];
+  filteredClasses: Array<any> = [];
+  filteredGroups: Array<any> = [];
   favoriteClasses: Array<any> = [];
   throttleTimer = {
 
@@ -39,17 +39,17 @@ export class SidenavComponent implements OnInit {
   constructor(private EventBoard: EventBoardService, private ServerAPIs: StudyhubServerApisService, private DataHolder: DataHolderService, public sideNavComponentElem: ElementRef, private zone: NgZone, private changeDetector: ChangeDetectorRef) {
     //Get notified by the event board service of the sideNavOpen Observable and set it to the local variable sidenavOpen.
     EventBoard.sideNavOpen$.subscribe((open) => {
-      console.log(open)
       this.sidenavOpen = open;
       this.changeDetector.detectChanges();
     });
 
     DataHolder.classAndGroupState$.subscribe((classesAndGroups) => {
-      this.yorkClasses = classesAndGroups['classes'];
-      this.yorkGroups = classesAndGroups['groups'];
+      if (this.filteredClasses.length === 0) {
+        this.showAllClasses = false;
+        this.filteredClasses = classesAndGroups['classes'];
+        this.filteredGroups = classesAndGroups['groups'];
+      }
       this.favoriteClasses = classesAndGroups['favorites'];
-      this.showAllClasses = false;
-      console.log(this.favoriteClasses)
       this.changeDetector.detectChanges();
     });
   }
@@ -154,6 +154,22 @@ export class SidenavComponent implements OnInit {
       clearTimeout(this.throttleTimer['onFavorite']);
       this.throttleTimer['onFavorite'] = setTimeout(serverSync, 1000)
     }
+  }
+
+  onClassSearchInput(event) {
+    const searchText = event.target.value;
+    if (searchText !== this.classSearchText) {
+      this.classSearchText = searchText;
+      if (this.showAllClasses === false) this.showAllClasses = true
+      if (this.showAllGroups === false) this.showAllGroups = true
+      this.filteredClasses = this.DataHolder.yorkClasses.filter(function (classObj) {
+        return !(classObj.name.toLowerCase().indexOf(searchText.toLowerCase()) === -1)
+      })
+      this.filteredGroups = this.DataHolder.yorkGroups.filter(function (group) {
+        return !(group.toLowerCase().indexOf(searchText.toLowerCase()) === -1)
+      })
+    }
+    //clearTimeout(this.throttleTimer['onLabelAndClassSearchInput']);
   }
 
   closeSideNav() {

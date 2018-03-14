@@ -53,7 +53,6 @@ export class PostEditViewComponent implements OnDestroy {
       "id": null,
       "title": "",
       "link": "",
-      "type": "noLink",
       "description": "",
       "likes": [],
       "labels": [],
@@ -111,7 +110,6 @@ export class PostEditViewComponent implements OnDestroy {
     if (linkurl.length > 4 && linkurl.substring(0, 3) != 'htt') linkurl = 'http://' + linkurl;
     this.linkURL = linkurl;
     if (linkurl == '') {
-      this.currentPost.type = "NoLink"
       this.currentPost.link = '';
       this.currentPost.attachmentName = null;
       this.currentLinkPreview.thumbnail = null;
@@ -119,11 +117,9 @@ export class PostEditViewComponent implements OnDestroy {
     } else if (linkurl.length > 10) {
       this.throttleTimer['onLinkInput'] = setTimeout(() => {
         if (linkurl.match(/(?:(?:\/(?:d|s|file|folder|folders)\/)|(?:id=)|(?:open=))([-\w]{25,})/)) {
-          this.currentPost.type = "GDrive"
           console.log('driveURL')
         } else {
           this.ExternalAPIs.getWebsitePreview(linkurl).then((websitePreview) => {
-            this.currentPost.type = "Link"
             this.currentPost.link = linkurl;
             this.currentPost.attachmentName = websitePreview['title'];
             this.currentLinkPreview.thumbnail = websitePreview['image'];

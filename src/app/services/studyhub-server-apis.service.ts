@@ -52,22 +52,21 @@ export class StudyhubServerApisService {
     return this.http.get(this.serverURLBase + "/search", { 'params': params }).toPromise();
   }
 
-  getClassPosts(className, sortBy) {
-    const params = new HttpParams({
-      fromObject: {
-        class: className,
-        sortingOrder: sortBy,
-        idtoken: gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse().id_token
-      }
-    });
-    let promise = new Promise((resolve, reject) => {
-      this.http.get(this.serverURLBase + "/classPosts", { 'params': params }).subscribe(resolve, reject);
-    });
-    return promise;
-  }
+  // getClassPosts(className, sortBy) {
+  //   const params = new HttpParams({
+  //     fromObject: {
+  //       class: className,
+  //       sortingOrder: sortBy,
+  //       idtoken: gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse().id_token
+  //     }
+  //   });
+  //   let promise = new Promise((resolve, reject) => {
+  //     this.http.get(this.serverURLBase + "/classPosts", { 'params': params }).subscribe(resolve, reject);
+  //   });
+  //   return promise;
+  // }
 
   getPosts(postFilters, sortBy) {
-
     const params = new HttpParams({
       fromObject: {
         filters: JSON.stringify(postFilters),
@@ -81,6 +80,15 @@ export class StudyhubServerApisService {
       idtoken: gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse().id_token
     }))
     return this.http.get(this.serverURLBase + "/filteredPosts", { 'params': params }).toPromise()
+  }
+
+  getFeedPosts() {
+    const params = new HttpParams().append('idtoken', gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse().id_token)
+    return this.http.get(this.serverURLBase + "/feedPosts", { 'params': params }).toPromise()
+  }
+
+  getTopPosts() {
+
   }
 
   getClassAndGroupList() {

@@ -1,5 +1,7 @@
-import { Component, OnInit, ViewEncapsulation, Input, ChangeDetectionStrategy, ChangeDetectorRef, EventEmitter, Output } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation, Input, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { ExternalApisService } from '../services/external-apis.service';
+import { DataHolderService } from '../services/data-holder.service';
+import { EventBoardService } from '../services/event-board.service';
 
 @Component({
   selector: 'app-post-card',
@@ -10,10 +12,17 @@ import { ExternalApisService } from '../services/external-apis.service';
 })
 export class PostCardComponent implements OnInit {
   @Input('input-post') inputPost;
-  @Output('preview-loaded') linkPreview = new EventEmitter();
   postBodyTextShown: boolean = false;
+  currentLinkPreview = {
+    thumbnail: null,
+    icon: null
+  };
   currentPost;
-  constructor(private changeDetector: ChangeDetectorRef, private ExternalAPIs: ExternalApisService) {
+
+  constructor(private changeDetector: ChangeDetectorRef,
+     private ExternalAPIs: ExternalApisService,
+      private dataHolder: DataHolderService,
+       private eventBoard:EventBoardService) {
   }
 
   ngOnInit() {
@@ -21,15 +30,9 @@ export class PostCardComponent implements OnInit {
       "id": null,
       "title": "",
       "link": "",
-      "type": "noLink",
       "description": "",
       "likes": [],
       "labels": [],
-      "linkPreview":{
-        thumbnail:null,
-        icon:null
-      },
-      // "teachers": [],
       "classes": [],//<-
       "creator": {
         "email": null,
@@ -39,22 +42,35 @@ export class PostCardComponent implements OnInit {
       "creationDate": new Date().getSeconds(),
       "updateDate": new Date().getSeconds(),
     }, this.inputPost);
-    console.log(this.currentPost.linkPreview.thumbnail);
-    if (this.currentPost.link && this.currentPost.linkPreview.thumbnail === null) {
-      if (this.currentPost.link.match(/(?:(?:\/(?:d|s|file|folder|folders)\/)|(?:id=)|(?:open=))([-\w]{25,})/)) {
-        console.log('driveURL')
-      } else {
-        this.ExternalAPIs.getWebsitePreview(this.currentPost.link).then((websitePreview) => {
-          if(this.changeDetector) {
-          this.currentPost.attachmentName = websitePreview['title'] || this.currentPost.attachmentName;
-          this.currentPost.linkPreview.thumbnail = websitePreview['image'];
-          this.currentPost.linkPreview.icon = websitePreview['icon'];
-          this.linkPreview.emit(this.currentPost.linkPreview)
-          console.log('emmiting',this.currentPost.linkPreview);
-          this.changeDetector.detectChanges();
-          }
-        }).catch((err) => { console.warn(err) })
+    this.currentPost['color'] = this.dataHolder.getClassColor(this.currentPost.classes[0]);
+    console.log(this.dataHolder.getClassColor(this.currentPost.classes[0]));
+
+    if (this.currentPost.link) {
+      this.currentLinkPreview = this.dataHolder.getCachedLinkPreview(this.currentPost.id) || this.currentLinkPreview
+      console.log("gotLinkPreview",this.currentLinkPreview);
+      if (this.currentLinkPreview.thumbnail === null) {
+        if (this.currentPost.link.match(/(?:(?:\/(?:d|s|file|folder|folders)\/)|(?:id=)|(?:open=))([-\w]{25,})/)) {
+          console.log('driveURL')
+        } else {
+          this.ExternalAPIs.getWebsitePreview(this.currentPost.link).then((websitePreview) => {
+              this.currentLinkPreview['thumbnail'] = websitePreview['image'];
+              this.currentLinkPreview['icon'] = websitePreview['icon'];
+              this.dataHolder.setCachedLinkPreview(this.currentPost.id, this.currentLinkPreview)
+              this.currentPost.attachmentName = websitePreview['title'] || this.currentPost.attachmentName;
+              this.changeDetector.detectChanges();
+          }).catch((err) => { console.warn(err) })
+        }
       }
     }
   }
+  deletePost(post) {
+    
+  }
+  editPost(post){
+    this.eventBoard.openPostModal(post,'edit')
+  };
+  debugPost(post){
+    console.log(post);
+  };
+
 }

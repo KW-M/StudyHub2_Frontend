@@ -14,6 +14,7 @@ export class DataHolderService {
     yorkGroups;
     labelList;
     searchQuery;
+    linkPreviewCache = {};
     allLoadedPosts;
     currentPage;
     currentPosts;
@@ -23,7 +24,6 @@ export class DataHolderService {
         userEmail: null,
         tags: [],
         date: null,
-        type: null,
         usersBookmarks: false,
         fancySearch: false,
     };
@@ -52,7 +52,7 @@ export class DataHolderService {
                     this.signedinUser.profilePhoto = GSignin.getProfilePhoto()
                     this.currentUserStateSource.next(this.signedinUser)
                     console.log(this.signedinUser);
-                    console.log(this.yorkClasses,this.currentPage);
+                    console.log(this.yorkClasses, this.currentPage);
                     if (this.yorkClasses && this.signedinUser) this.updateFavorites(this.signedinUser.favorites);
                     if (this.currentPage && this.signedinUser) this.updateVisiblePosts();
                 }).catch(console.warn)
@@ -117,7 +117,6 @@ export class DataHolderService {
                     userEmail: this.signedinUser['email'] || null,
                     tags: [],
                     date: null,
-                    type: null,
                     usersBookmarks: false
                 }, null)
                 break;
@@ -127,7 +126,6 @@ export class DataHolderService {
                     userEmail: null,
                     tags: [],
                     date: null,
-                    type: null,
                     usersBookmarks: true,
                 }, null)
                 break;
@@ -140,7 +138,6 @@ export class DataHolderService {
                     userEmail: null,
                     tags: [],
                     date: null,
-                    type: null,
                     usersBookmarks: false
                 }, null)
                 break;
@@ -174,7 +171,7 @@ export class DataHolderService {
         this.currentSortMethod = sortMethod || this.currentSortMethod;
         this.currentPostFilters = Object.assign(this.currentPostFilters, postFilters)
         if (this.signedinUser) {
-            let gotResponse = (posts: any) => { this.currentPosts = posts; this.visiblePostsStateSource.next(posts) }
+            let gotResponse = (posts: any) => { this.currentPosts = posts; console.log(posts); this.visiblePostsStateSource.next(posts) }
             if (this.currentPostFilters.searchQuery) {
                 this.ServerAPIs.getQueryPosts(this.currentPostFilters).then(gotResponse, console.warn)
             } else {
@@ -186,5 +183,19 @@ export class DataHolderService {
 
     getAllPosts() {
         this.ServerAPIs.getAllPosts(this.currentSortMethod).then((posts: any) => { this.allLoadedPosts = posts; this.visiblePostsStateSource.next(posts) }, console.warn)
+    }
+
+    setCachedLinkPreview(postId, linkPreview) {
+        this.linkPreviewCache[postId] = linkPreview;
+    }
+    getCachedLinkPreview(postId) {
+        console.log("linkPreviewData", this.linkPreviewCache);
+        return this.linkPreviewCache[postId];
+    }
+    getClassColor(className: string) {
+        for (let classIndex = 0; classIndex < this.yorkClasses.length; classIndex++) {
+            if (this.yorkClasses[classIndex].name === className) return this.yorkClasses[classIndex].color;
+        }
+        return null;
     }
 }

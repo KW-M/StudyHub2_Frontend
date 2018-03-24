@@ -6,6 +6,10 @@ import { AppRoutingModule } from './modules/app-routing.module';
 import { ServiceWorkerModule } from '@angular/service-worker';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { AngularMaterialModule } from './modules/angular-material.module';
+import { AngularFireModule } from 'angularfire2';
+import { AngularFirestoreModule } from 'angularfire2/firestore';
+import { AngularFireStorageModule } from 'angularfire2/storage';
+import { AngularFireAuthModule } from 'angularfire2/auth';
 import { HttpClientModule } from '@angular/common/http';
 import { FormsModule } from '@angular/forms'
 
@@ -24,7 +28,7 @@ import { PostModalFrameComponent } from './post-modal-frame/post-modal-frame.com
 import { PostEditViewComponent } from './post-edit-view/post-edit-view.component';
 import { PostCardComponent } from './post-card/post-card.component';
 import { PostCardMiniComponent } from './post-card-mini/post-card-mini.component';
-import { NewPostBarComponent } from './new-post-bar/new-post-bar.component'
+import { NewPostBarComponent } from './new-post-bar/new-post-bar.component';
 
 import { ScrollToElementDirective } from './directives/scroll-to-element.directive';
 import { FeedPageComponent } from './pages/feed-page/feed-page.component';
@@ -52,7 +56,11 @@ import { ClassPageComponent } from './pages/class-page/class-page.component';
     HttpClientModule,
     BrowserAnimationsModule,
     AngularMaterialModule,
-    ServiceWorkerModule.register('/ngsw-worker.js', { enabled: false }) //environment.production
+    ServiceWorkerModule.register('/ngsw-worker.js', { enabled: false }), //environment.production
+    AngularFireModule.initializeApp(environment.firebase), // imports firebase/app needed for everything
+    AngularFirestoreModule, // imports firebase/firestore, only needed for database features
+    AngularFireAuthModule, // imports firebase/auth, only needed for auth features,
+    AngularFireStorageModule // imports firebase/storage only needed for storage features
   ],
   providers: [
     WindowService,

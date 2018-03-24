@@ -25,12 +25,14 @@ export class FeedPageComponent implements OnDestroy {
     this.windowSizeObserver = WindowFrame.mdWindowSize$.subscribe((sizes) => {
       this.windowSize = sizes;
     });
-    //this.classAndGroupObserver = this.dataHolder.classAndGroupState$.subscribe((classAndGroup) => { })
-    // this.visiblePostsObserver = this.DataHolder.visiblePostsState$.subscribe((posts) => {
-    //   console.log("feed posts from server", posts);
-    //   this.currentPostsGrid = posts;
-    //   this.ChangeDetector.detectChanges();
-    // })
+    // this.classAndGroupObserver = this.DataHolder.classAndGroupState$.subscribe((classAndGroup) => { })
+    this.visiblePostsObserver = this.DataHolder.feedPostsState$.subscribe((posts) => {
+      console.log("feed posts from server", posts);
+      if (posts[0][0]) {
+        this.currentPostsGrid = posts;
+        this.ChangeDetector.detectChanges();
+      }
+    })
   }
 
   trackByPostIdFn(index, post) {
@@ -39,8 +41,8 @@ export class FeedPageComponent implements OnDestroy {
 
   ngOnDestroy() {
     this.windowSizeObserver.unsubscribe();
-    // this.visiblePostsObserver.unsubscribe();
-    //  this.classAndGroupObserver.unsubscribe()
+    this.visiblePostsObserver.unsubscribe();
+    // this.classAndGroupObserver.unsubscribe()
   }
 
 }

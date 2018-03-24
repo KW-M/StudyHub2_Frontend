@@ -49,8 +49,9 @@ app-new-post-bar {
 .label-chips {
     .mat-chip-list-wrapper {
         position: absolute;
-        left: 12px;
-        right: 12px;
+        margin: 0 12px;
+        left: 0;
+        right: 0;
         height: 42px;
         white-space: nowrap;
         align-items: center;

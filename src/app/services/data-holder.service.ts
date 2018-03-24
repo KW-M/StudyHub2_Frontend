@@ -33,6 +33,8 @@ export class DataHolderService {
     currentUserState$ = this.currentUserStateSource.asObservable();
     private visiblePostsStateSource = new ReplaySubject(1);
     visiblePostsState$ = this.visiblePostsStateSource.asObservable();
+    private feedPostsStateSource = new ReplaySubject(1);
+    feedPostsState$ = this.visiblePostsStateSource.asObservable();
     private classAndGroupStateSource = new ReplaySubject(1);
     classAndGroupState$ = this.classAndGroupStateSource.asObservable();
     private labelsStateSource = new ReplaySubject(1);
@@ -130,6 +132,7 @@ export class DataHolderService {
                 }, null)
                 break;
             case 'feed':
+                //this.getRecentlyViewedPosts()
                 this.getFeedPosts()
                 break;
             default:
@@ -177,7 +180,6 @@ export class DataHolderService {
             } else {
                 this.ServerAPIs.getPosts(this.currentPostFilters, this.currentSortMethod).then(gotResponse, console.warn)
             }
-
         }
     }
 
@@ -186,7 +188,11 @@ export class DataHolderService {
     }
 
     getFeedPosts() {
-        this.ServerAPIs.getFeedPosts().then((posts: any) => { this.allLoadedPosts = posts; this.visiblePostsStateSource.next(posts) }, console.warn)
+        this.ServerAPIs.getFeedPosts().then((posts: any) => { this.allLoadedPosts = posts; this.feedPostsStateSource.next({ feed: posts }) }, console.warn)
+    }
+
+    getRecentlyViewedPosts() {
+        this.ServerAPIs.getRecentlyViewedPosts().then((posts: any) => { this.allLoadedPosts = posts; this.feedPostsStateSource.next({ feed: posts }) }, console.warn)
     }
 
     setCachedLinkPreview(postId, linkPreview) {

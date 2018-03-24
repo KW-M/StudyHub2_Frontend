@@ -128,30 +128,28 @@
 
 .class-label-search-area {
     position: absolute;
-    top: 192px;
-    left: 0;
-    right: 12px;
+    top: 189px;
+    left: 3px;
+    right: 96px;
     height: 40px;
     z-index: 6;
     overflow: hidden;
-    border-radius: 12px 24px 24px 0px;
+    border-radius: 8px 24px 24px 6px;
     background: white;
     box-shadow: 0 6px 10px 1px rgba(0, 0, 0, 0.2), 0 6px 10px 1px rgba(0, 0, 0, 0.14), 0 1px 18px 0 rgba(0, 0, 0, 0.12);
     mat-icon {
         padding: 8px;
-        pointer-events: none;
         color: #757575;
+        pointer-events: none;
     }
     button.dense-button {
         position: absolute;
-        right: 4px;
-        top:4px;
         padding: 0 18px;
+        top: 4px;
+        right: 4px;
         border-radius: 20px;
-    line-height: 32px;
-    background: white;
-    //margin: 4px 0px 4px 4px;
-    //vertical-align: top;
+        background: white; //margin: 4px 0px 4px 4px;
+        line-height: 32px; //vertical-align: top;
     }
     input {
         position: absolute;
@@ -163,9 +161,8 @@
         box-sizing: border-box;
         z-index: -1;
         outline: none;
-        border: none;
-       // border-radius: 0 0 36px 36px;
-        background-color: white;// #e0e0e0;
+        border: none; // border-radius: 0 0 36px 36px;
+        background-color: white; // #e0e0e0;
         font-size: 16px;
     }
 }
@@ -179,8 +176,7 @@
     z-index: 3;
     border-radius: 30px 0 0 30px;
     background: white;
-    transition: transform 225ms cubic-bezier(0.4, 0, 0.2, 1);
-    //transition: border-radius 225ms cubic-bezier(0.4, 0, 0.2, 1);
+    transition: transform 225ms cubic-bezier(0.4, 0, 0.2, 1); //transition: border-radius 225ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .expand-button {
@@ -199,14 +195,14 @@
 .post-card-labels-container.expanded {
     height: 232px;
     .expand-button-container {
-        transform: translateX(60px)
-        //border-radius: 0 0 30px 30px;
+        display: none;
+        transform: translateX(60px); //border-radius: 0 0 30px 30px;
     }
     .expand-button {
-       // transform: rotate(180deg);
+        // transform: rotate(180deg);
     }
     .label-selector-area {
-    padding-bottom: 40px;
+        padding-bottom: 40px;
     }
 }
 

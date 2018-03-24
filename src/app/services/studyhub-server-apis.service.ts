@@ -87,8 +87,10 @@ export class StudyhubServerApisService {
     return this.http.get(this.serverURLBase + "/feedPosts", { 'params': params }).toPromise()
   }
 
-  getTopPosts() {
-
+  getRecentlyViewedPosts() {
+    ///////////not done
+    const params = new HttpParams().append('idtoken', gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse().id_token)
+    return this.http.get(this.serverURLBase + "/lastviewedPosts", { 'params': params }).toPromise()
   }
 
   getClassAndGroupList() {
@@ -97,6 +99,14 @@ export class StudyhubServerApisService {
 
   getLabels() {
     return this.http.get(this.serverURLBase + "/labels")
+  }
+
+  createLabel(labelText, classes) {
+    return this.http.post(this.serverURLBase + "/createLabel", {
+      label: labelText,
+      classes: classes,
+      idtoken: gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse().id_token
+    }).toPromise()
   }
 
   setFavorites(favoritesArray) {

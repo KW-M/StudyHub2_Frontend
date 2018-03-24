@@ -43,13 +43,12 @@
     </div>
     <div class="class-selector-backdrop" (click)="classChooserExpanded = false"></div>
     <div class="class-selector-area">
-
       <mat-selection-list #shoes1 style="padding-top:0;" [(ngModel)]="currentPost.classes" *ngIf="labelAndClassSearchText == ''">
-        <mat-list-option [value]="class" *ngFor="let class of userFavorites">
+        <mat-list-option [value]="class" *ngFor="let class of userFavorites" (keydown)="$event.stopPropagation()">
           <h4 mat-line>{{class}}</h4>
         </mat-list-option>
       </mat-selection-list>
-      <mat-selection-list #shoes style="padding-top:0;" [(ngModel)]="currentPost.classes">
+      <mat-selection-list #shoes style="padding-top:0;" [(ngModel)]="currentPost.classes" (keydown)="$event.stopPropagation()">
         <ng-container *ngFor="let class of filteredClasses; let classIndex = index">
           <div class="class-catagory-header" *ngIf="(class?.category != filteredClasses[classIndex - 1]?.category)">
             <h3 mat-subheader [ngStyle]="{'background': 'linear-gradient(152deg,hsl('+class?.color.h+','+class?.color.s+'%,'+class?.color.l+'%), white)'}"
@@ -62,13 +61,14 @@
       </mat-selection-list>
     </div>
     <div class="class-label-search-area">
-      <button mat-button color="accent" class="dense-button" (click)="labelAreaExpanded = false;classChooserExpanded = false">Done</button>
       <mat-icon>search</mat-icon>
-      <input placeholder="Search Classes and Groups" appScrollToElement="end" (input)="onLabelAndClassSearchInput($event)">
+      <input placeholder="Search Classes and Groups" appScrollToElement="end" (input)="onLabelAndClassSearchInput($event.target.value)"
+        [(ngModel)]="labelAndClassSearchText">
+      <button mat-button color="accent" class="dense-button" (click)="labelAreaExpanded = false;classChooserExpanded = false;onLabelAndClassSearchInput('')">Done</button>
     </div>
     <div class="label-selector-area">
       <mat-chip-list [multiple]="true" [(ngModel)]="currentPost.labels">
-        <mat-basic-chip [selectable]="false" class="class-expand-button">
+        <mat-basic-chip [selectable]="false" class="class-expand-button" (keydown)="$event.stopPropagation()">
           <button mat-button color="primary" *ngIf="!classChooserExpanded" (click)="labelAreaExpanded = true;classChooserExpanded = true">
             <span>{{currentPost.classes.join(', ') || 'CLASS'}}</span>
             <mat-icon *ngIf="currentPost.classes.length === 0" style="padding-bottom: 4px">arrow_drop_down</mat-icon>
@@ -80,6 +80,12 @@
         <mat-chip color="primary" #labelChip="matChip" (click)="toggleChipSelect(chipIndex,false);" [value]="label.name" *ngFor="let label of filteredLabels; let chipIndex = index;">{{label.name}}
           <mat-icon *ngIf="labelChipList[chipIndex]?.selected" class="mat-chip-remove">cancel</mat-icon>
         </mat-chip>
+        <mat-basic-chip [selectable]="false" *ngIf="filteredLabels.length === currentPost.labels.length">
+          <button mat-button (click)="createLabel(labelAndClassSearchText)">
+            Create Label:
+            <mat-chip color="primary" style="pointer-events: none">{{labelAndClassSearchText}}</mat-chip>
+          </button>
+        </mat-basic-chip>
       </mat-chip-list>
     </div>
   </section>

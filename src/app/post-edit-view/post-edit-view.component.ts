@@ -15,6 +15,7 @@ import { StudyhubServerApisService } from '../services/studyhub-server-apis.serv
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class PostEditViewComponent implements OnDestroy {
+  visibleLabels: any;
   websitePreviewObserver;
   @Input('input-post') inputPost;
   @ViewChildren('labelChip') labelChip;
@@ -142,19 +143,17 @@ export class PostEditViewComponent implements OnDestroy {
     //https://www.google.com/s2/favicons?domain_url=https://drive.google.com/drive/u/0/folders/0B5NVuDykezpkZVhzV3QzVDhhTXM
   }
 
-  onLabelAndClassSearchInput(event) {
-    const searchText = event.target.value;
-    if (searchText !== this.labelAndClassSearchText) {
-      this.labelAndClassSearchText = searchText;
-      console.log(searchText, this.yorkClasses)
-      this.filteredLabels = this.yorkClasses.filter(function (label) {
-        console.log(label)
-        return !(label.name.toLowerCase().indexOf(searchText.toLowerCase()) === -1)
-      })
-      if (this.classChooserExpanded === true) this.filteredClasses = this.yorkClasses.filter(function (label) {
-        return !(label.name.toLowerCase().indexOf(searchText.toLowerCase()) === -1)
-      })
-    }
+  onLabelAndClassSearchInput(searchText) {
+    this.labelAndClassSearchText = searchText;
+    let currentPostLabels = this.currentPost.labels;
+    let currentPostClasses = this.currentPost.classes;
+    this.filteredLabels = this.yorkClasses.filter(function (label) {
+      console.log(label, currentPostLabels)
+      return (currentPostLabels.includes(label.name) || !(label.name.toLowerCase().indexOf(searchText.toLowerCase()) === -1))
+    })
+    if (this.classChooserExpanded === true) this.filteredClasses = this.yorkClasses.filter(function (classObj) {
+      return (currentPostClasses.includes(classObj.name) || !(classObj.name.toLowerCase().indexOf(searchText.toLowerCase()) === -1))
+    })
     //clearTimeout(this.throttleTimer['onLabelAndClassSearchInput']);
   }
 
@@ -173,6 +172,13 @@ export class PostEditViewComponent implements OnDestroy {
         chip._elementRef.nativeElement.scrollIntoView({ behavior: "smooth", block: "center", inline: "center" });
       }, 10);
     }
+  }
+
+  createLabel(newLabelText) {
+    // this.visibleLabels.push(newLabelText)
+    this.currentPost.labels.push(newLabelText)
+    this.ServerAPIs.createLabel(newLabelText, this.currentPost.classes).then(console.log);
+    this.changeDetector.detectChanges()
   }
 
   submitPost() {

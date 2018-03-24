@@ -28,7 +28,6 @@ export class ClassPageComponent implements OnInit, OnDestroy {
     this.visiblePostsObserver = this.DataHolder.visiblePostsState$.subscribe((posts) => {
       console.log("posts from server", posts);
       this.posts = posts;
-
       if (this.posts.length > 0) {
         this.postsGrid = this.getPostsGrid(this.posts, true);
       } else {

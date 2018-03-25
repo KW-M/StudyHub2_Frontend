@@ -33,6 +33,7 @@ import { NewPostBarComponent } from './new-post-bar/new-post-bar.component';
 import { ScrollToElementDirective } from './directives/scroll-to-element.directive';
 import { FeedPageComponent } from './pages/feed-page/feed-page.component';
 import { ClassPageComponent } from './pages/class-page/class-page.component';
+import { SigninPromptComponent } from './signin-prompt/signin-prompt.component';
 
 @NgModule({
   declarations: [
@@ -48,6 +49,7 @@ import { ClassPageComponent } from './pages/class-page/class-page.component';
     ScrollToElementDirective,
     FeedPageComponent,
     ClassPageComponent,
+    SigninPromptComponent,
   ],
   imports: [
     BrowserModule,

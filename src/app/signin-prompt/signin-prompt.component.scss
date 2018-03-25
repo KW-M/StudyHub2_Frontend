@@ -1,0 +1,114 @@
+ /*------------ login dialog styles ----------- */
+
+ #overlay_background {
+     position: fixed;
+     top: 0;
+     left: 0;
+     right: 0;
+     bottom: 0;
+     z-index: 75;
+     background-color: rgba(0, 0, 0, 0.7);
+     transition: opacity 0.3s;
+ }
+
+ #welcome_dialog {
+     position: fixed;
+     display: flex;
+     margin: auto;
+     top: 6px;
+     left: 6px;
+     right: 6px;
+     min-height: 0;
+     z-index: 76;
+     flex-direction: row;
+     border-radius: 6px;
+     background-color: #ffffff;
+     box-shadow: 0 7px 8px -4px rgba(0, 0, 0, 0.2), 0 13px 19px 2px rgba(0, 0, 0, 0.14), 0 5px 24px 4px rgba(0, 0, 0, 0.12);
+     font-weight: 400;
+     font-size: 14px;
+     opacity: 100;
+     flex-wrap: wrap-reverse;
+ }
+
+ .signin-dialog-padding {
+     display: flex;
+     padding: 24px;
+     flex-direction: column;
+     flex: 1;
+ }
+
+ .signin-dialog-tip {
+     position: relative;
+     padding: 0 24px;
+     overflow: hidden;
+     flex: initial;
+     border-top: 1px rgba(0, 0, 0, 0.2) solid;
+ }
+
+ .signin-button-container {
+     position: relative;
+     display: flex;
+     min-height: 200px;
+     flex: 1 0 420px;
+ }
+
+ .signin-button {
+     position: absolute;
+     display: inline-block;
+     margin: auto;
+     padding-right: 6px;
+     padding-left: 7px;
+     top: 0;
+     left: 0;
+     right: 0;
+     bottom: 0;
+     width: 86px;
+     height: 36px;
+     border-radius: 2px;
+     background-color: #af001a;
+     box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.26);
+     cursor: pointer;
+     transition: box-shadow 0.2s, background-color 0.2;
+ }
+
+ .signin-button:hover {
+     background-color: #a20019;
+     box-shadow: 0 0 6px rgba(0, 0, 0, 0.16), 0 6px 12px rgba(0, 0, 0, 0.32);
+ }
+
+ .signin-button:active {
+     box-shadow: 0 7px 8px -4px rgba(0, 0, 0, 0.2);
+ }
+
+ .signin-icon {
+     padding-top: 7px;
+     padding-right: 7px;
+     padding-bottom: 7px;
+     width: 1.5em;
+     height: 1.5em;
+     border-right: #960017 2px solid;
+     color: white;
+ }
+
+ .signin-text {
+     margin-top: -26px;
+     margin-left: 39px;
+     color: white;
+     cursor: pointer;
+ }
+
+ #welcome_dialog ul {
+     margin-top: 0;
+ }
+
+ #dat_button {
+     position: absolute;
+     margin: 0;
+     padding: 0;
+     top: 0;
+     right: 6px;
+     min-height: 2em;
+     font-size: 13px;
+     line-height: inherit;
+     opacity: 0.5;
+ }

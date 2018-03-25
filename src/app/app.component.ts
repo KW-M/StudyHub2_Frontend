@@ -9,6 +9,7 @@ import { Component, ViewChild, ViewEncapsulation, ChangeDetectionStrategy, Chang
     <app-post-modal-frame></app-post-modal-frame>
     <div class="main-content">
       <router-outlet></router-outlet>
+      <app-signin-prompt></app-signin-prompt>
     </div>
   `,
   styleUrls: ['./app.component.scss'],

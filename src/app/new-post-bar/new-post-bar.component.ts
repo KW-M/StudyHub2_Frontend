@@ -1,4 +1,5 @@
 import { Component, OnInit, ViewEncapsulation, ChangeDetectionStrategy } from '@angular/core';
+import { ExternalApisService } from "../services/external-apis.service";
 
 @Component({
   selector: 'app-new-post-bar',
@@ -7,11 +8,16 @@ import { Component, OnInit, ViewEncapsulation, ChangeDetectionStrategy } from '@
   encapsulation: ViewEncapsulation.None,
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class NewPostBarComponent implements OnInit {
+export class NewPostBarComponent {
 
-  constructor() { }
+  constructor(private ExternalAPIs: ExternalApisService, ) {
 
-  ngOnInit() {
   }
 
+  openDrivePicker() {
+    this.ExternalAPIs.openDriveFilePicker().then(console.log)
+  }
+  openShareDialog(fileid) {
+    this.ExternalAPIs.openShareDialog(fileid).then(console.log)
+  }
 }

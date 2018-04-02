@@ -15,6 +15,7 @@ import { StudyhubServerApisService } from '../services/studyhub-server-apis.serv
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class PostEditViewComponent implements OnDestroy {
+  labelMissing: boolean = false;
   visibleLabels: any;
   websitePreviewObserver;
   @Input('input-post') inputPost;
@@ -31,11 +32,10 @@ export class PostEditViewComponent implements OnDestroy {
   classChooserExpanded: boolean = false;
   linkURL: string = '';
   labelAndClassSearchText: string = '';
+  yorkLabels;
   yorkGroups;
   yorkClasses;
   userFavorites;
-  filteredLabels;
-  filteredClasses;
   classAndGroupObserver;
   signedinUserObserver;
   backupSetIntervalRef;
@@ -71,8 +71,7 @@ export class PostEditViewComponent implements OnDestroy {
     console.log(this.currentPost)
     this.classAndGroupObserver = DataHolder.classAndGroupState$.subscribe((classesAndGroups) => {
       console.log(classesAndGroups)
-      this.filteredLabels = classesAndGroups['classes'];
-      this.filteredClasses = classesAndGroups['classes'];
+      this.yorkLabels = classesAndGroups['classes'];
       this.yorkClasses = classesAndGroups['classes'];
       this.yorkGroups = classesAndGroups['groups'];
       this.userFavorites = classesAndGroups['favorites'];
@@ -86,12 +85,15 @@ export class PostEditViewComponent implements OnDestroy {
     let backupPost = window.localStorage.getItem("postDraftBackup")
     let snackBarAction = null
     if (backupPost) {
-      let snackBar = this.snackBar.open('Unsaved Draft Found', 'Restore', {
-        duration: 20000,
-        horizontalPosition: "start"
-      })
+      let backupPostObj = JSON.parse(backupPost);
+      if (backupPostObj.title || backupPostObj.description || backupPostObj.link) {
+        let snackBar = this.snackBar.open('Unsaved Draft Found', 'Restore', {
+          duration: 20000,
+          horizontalPosition: "start"
+        })
+      }
       this.currentSnackBarRef = snackBar;
-      snackBar.afterDismissed().toPromise().then((action) => {
+      snackBar['afterDismissed']().toPromise().then((action) => {
         snackBarAction = action;
         if (action.dismissedByAction === true) {
           this.currentPost = JSON.parse(backupPost);
@@ -118,8 +120,10 @@ export class PostEditViewComponent implements OnDestroy {
       this.currentLinkPreview.icon = null;
     } else if (linkurl.length > 10) {
       this.throttleTimer['onLinkInput'] = setTimeout(() => {
-        if (linkurl.match(/(?:(?:\/(?:d|s|file|folder|folders)\/)|(?:id=)|(?:open=))([-\w]{25,})/)) {
-          console.log('driveURL')
+        let driveFileId = this.currentPost.link.match(/(?:(?:\/(?:d|s|file|folder|folders)\/)|(?:id=)|(?:open=))([-\w]{25,})/)
+        if (driveFileId) {
+          console.log('driveURL', driveFileId)
+          // this.ExternalAPIs.getDrivePreview(driveFileId[0])
         } else {
           this.websitePreviewObserver = this.ExternalAPIs.getWebsitePreview(linkurl).subscribe((websitePreview) => {
             this.currentPost.link = linkurl;
@@ -147,12 +151,15 @@ export class PostEditViewComponent implements OnDestroy {
     this.labelAndClassSearchText = searchText;
     let currentPostLabels = this.currentPost.labels;
     let currentPostClasses = this.currentPost.classes;
-    this.filteredLabels = this.yorkClasses.filter(function (label) {
-      console.log(label, currentPostLabels)
-      return (currentPostLabels.includes(label.name) || !(label.name.toLowerCase().indexOf(searchText.toLowerCase()) === -1))
+    this.labelMissing = true
+    this.yorkLabels = this.yorkClasses.map(function (label) {
+      label.hidden = !(currentPostLabels.includes(label.name) || !(label.name.toLowerCase().indexOf(searchText.toLowerCase()) === -1)) || undefined;
+      if (label.hidden === undefined) this.labelMissing = false;
+      return label;
     })
-    if (this.classChooserExpanded === true) this.filteredClasses = this.yorkClasses.filter(function (classObj) {
-      return (currentPostClasses.includes(classObj.name) || !(classObj.name.toLowerCase().indexOf(searchText.toLowerCase()) === -1))
+    if (this.classChooserExpanded === true) this.yorkClasses = this.yorkClasses.map(function (classObj) {
+      classObj.hidden = !(currentPostClasses.includes(classObj.name) || !(classObj.name.toLowerCase().indexOf(searchText.toLowerCase()) === -1)) || undefined;
+      return classObj;
     })
     //clearTimeout(this.throttleTimer['onLabelAndClassSearchInput']);
   }

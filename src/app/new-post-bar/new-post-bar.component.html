@@ -9,16 +9,17 @@
         <!-- <span class="create-post-bar-button square-button" mat-ripple>
           <mat-icon>camera</mat-icon>
         </span> -->
-        <span class="create-post-bar-button square-button" mat-ripple>
+        <span class="create-post-bar-button square-button" mat-ripple (click)="openDrivePicker()">
           <img style="width:22px; height:22px;" src="http://studyhub.york.org/images/drive_icon.svg">
         </span>
-        <span class="create-post-bar-button square-button" mat-ripple>
+        <span class="create-post-bar-button square-button" mat-ripple (click)="openShareDialog('0B5NVuDykezpkYml4Wlc0Q3pldUU')">
           <mat-icon>cloud_upload</mat-icon>
         </span>
       </span>
     </div>
     <span class="sort-buttons" mat-ripple [matRippleColor]="'#ffffff4a'">
-      <mat-icon>sort</mat-icon><mat-icon>arrow_drop_down</mat-icon>
+      <mat-icon>sort</mat-icon>
+      <mat-icon>arrow_drop_down</mat-icon>
     </span>
   </div>
 </div>

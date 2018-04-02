@@ -54,7 +54,7 @@
             <h3 mat-subheader [ngStyle]="{'background': 'linear-gradient(152deg,hsl('+class?.color.h+','+class?.color.s+'%,'+class?.color.l+'%), white)'}"
               style="margin-top: 0;">{{class.category}}</h3>
           </div>
-          <mat-list-option [value]="class.name">
+          <mat-list-option [value]="class.name" [hidden]="class.hidden">
             <h4 mat-line [ngStyle]="{'color': 'hsl('+class?.color.h+','+class?.color.s+'%,40%)'}">{{class.name}}</h4>
           </mat-list-option>
         </ng-container>
@@ -77,10 +77,11 @@
           </button>
         </mat-basic-chip>
         <span class="formatting-divider" style="order:-1;flex:none"></span>
-        <mat-chip color="primary" #labelChip="matChip" (click)="toggleChipSelect(chipIndex,false);" [value]="label.name" *ngFor="let label of filteredLabels; let chipIndex = index;">{{label.name}}
+        <mat-chip color="primary" #labelChip="matChip" (click)="toggleChipSelect(chipIndex,false);" [value]="label.name" *ngFor="let label of filteredLabels; let chipIndex = index;"
+          [hidden]="label.hidden">{{label.name}}
           <mat-icon *ngIf="labelChipList[chipIndex]?.selected" class="mat-chip-remove">cancel</mat-icon>
         </mat-chip>
-        <mat-basic-chip [selectable]="false" *ngIf="filteredLabels.length === currentPost.labels.length">
+        <mat-basic-chip [selectable]="false" [hidden]="labelMissing">
           <button mat-button (click)="createLabel(labelAndClassSearchText)">
             Create Label:
             <mat-chip color="primary" style="pointer-events: none">{{labelAndClassSearchText}}</mat-chip>

@@ -11,33 +11,30 @@ import * as firebase from 'firebase/app';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class SigninPromptComponent implements OnInit {
-  gauthLoaded: boolean = false;
-  yoloFailed: boolean = false;
-  dialogShown: boolean = false;
+  dialogShown: boolean = true;
   buttonShown: boolean = false;
   bgShown: boolean = true;
   constructor(private GSignin: GoogleSigninService, private FireAuth: AngularFireAuth, ChangeDetector: ChangeDetectorRef) {
-    GSignin.signinProgress$.subscribe((message) => {
-      switch (message) {
-        case 'gauthLoaded':
-          this.gauthLoaded = true
-          break;
-        case 'yoloFailed':
-          this.yoloFailed = true;
-          break;
-        case 'notSignedIn':
-          console.log('not');
-          this.dialogShown = true; this.buttonShown = true;
-          break;
-        case 'showDialog':
-          this.dialogShown = true;
-          break;
+    // GSignin.signinProgress$.subscribe((message) => {
+    GSignin.signinState$.subscribe((isGSignedIn) => {
+      console.log("is", isGSignedIn);
+      if (isGSignedIn) {
+        this.bgShown = false;
+        this.buttonShown = false;
+      } else {
+        this.bgShown = true;
+        this.buttonShown = true;
       }
-      if (this.gauthLoaded && this.yoloFailed) this.dialogShown = true; this.buttonShown = true;
       ChangeDetector.detectChanges()
-    })
+    });
     FireAuth.authState.subscribe((authState) => {
       console.log(authState);
+      if (authState['email']) {
+        this.bgShown = false; this.buttonShown = true;
+      } else {
+        this.bgShown = true; this.dialogShown = true; this.buttonShown = true;
+      }
+      ChangeDetector.detectChanges()
     })
   }
 

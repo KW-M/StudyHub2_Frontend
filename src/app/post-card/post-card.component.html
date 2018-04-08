@@ -15,7 +15,7 @@
   </section>
   <section class="post-card-body-text-container over-actions" *ngIf="!currentPost?.link" onclick="alert('hi')">
     <p class="post-card-body-text" [innerHTML]="currentPost?.description"></p>
-    <div class="post-card-overflow-indicator"  [ngStyle]="{'background-color':'hsl('+currentPost?.color?.h+','+currentPost?.color?.s+'%,'+currentPost?.color?.l+'%)','box-shadow':'-20px 3px 40px 19px hsl('+currentPost?.color?.h+','+currentPost?.color?.s+'%,'+currentPost?.color?.l+'%)'}">
+    <div class="post-card-overflow-indicator" [ngStyle]="{'background-color':'hsl('+currentPost?.color?.h+','+currentPost?.color?.s+'%,'+currentPost?.color?.l+'%)','box-shadow':'-20px 3px 40px 19px hsl('+currentPost?.color?.h+','+currentPost?.color?.s+'%,'+currentPost?.color?.l+'%)'}">
       <mat-icon style="    margin-left: 12px; line-height: 20px;">more_horiz</mat-icon>
     </div>
   </section>
@@ -27,21 +27,29 @@
     <button mat-icon-button [matMenuTriggerFor]="postActionsMenu">
       <mat-icon>more_vert</mat-icon>
     </button>
-    <mat-menu #postActionsMenu>
-        <div mat-menu-item (click)="editPost(currentPost)">
-            <mat-icon>edit</mat-icon>Edit</div>
-        <div mat-menu-item (click)="deletePost(currentPost)">
-            <mat-icon>trash</mat-icon>Delete</div>
-            <div mat-menu-item (click)="debugPost(currentPost)">
-                <mat-icon>debug</mat-icon>Debug</div>
+    <mat-menu #postActionsMenu="matMenu">
+      <button mat-menu-item (click)="editPost(currentPost)">
+        <mat-icon>edit</mat-icon>
+        <span>Edit</span>
+      </button>
+      <button mat-menu-item (click)="deletePost(currentPost)">
+        <mat-icon>delete</mat-icon>
+        <span>Delete</span>
+      </button>
+      <button mat-menu-item (click)="debugPost(currentPost)">
+        <mat-icon>bug_report</mat-icon>
+        <span>Debug</span>
+      </button>
     </mat-menu>
-    <button mat-icon-button class="expand-button"  *ngIf="currentPost?.description && currentPost?.link" (click)="postBodyTextShown = !postBodyTextShown" [ngClass]="{'expanded':postBodyTextShown}">
+    <button mat-icon-button class="expand-button" *ngIf="currentPost?.description && currentPost?.link" (click)="postBodyTextShown = !postBodyTextShown"
+      [ngClass]="{'expanded':postBodyTextShown}">
       <mat-icon>keyboard_arrow_down</mat-icon>
     </button>
   </section>
-  <section class="post-card-body-text-container under-actions" *ngIf="currentPost?.description && currentPost?.link" [ngClass]="{'expanded':postBodyTextShown}" onclick="alert('hi')">
+  <section class="post-card-body-text-container under-actions" *ngIf="currentPost?.description && currentPost?.link" [ngClass]="{'expanded':postBodyTextShown}"
+    onclick="alert('hi')">
     <p class="post-card-body-text" [innerHTML]="currentPost?.description"></p>
-    <div class="post-card-overflow-indicator" [ngStyle]="{'background-color':'hsl('+currentPost?.color?.h+','+currentPost?.color?.s+'%,'+currentPost?.color?.l+'%)','box-shadow':'-20px 3px 40px 19px hsl('+currentPost?.color?.h+','+currentPost?.color?.s+'%,'+currentPost?.color?.l+'%)'}" >
+    <div class="post-card-overflow-indicator" [ngStyle]="{'background-color':'hsl('+currentPost?.color?.h+','+currentPost?.color?.s+'%,'+currentPost?.color?.l+'%)','box-shadow':'-20px 3px 40px 19px hsl('+currentPost?.color?.h+','+currentPost?.color?.s+'%,'+currentPost?.color?.l+'%)'}">
       <mat-icon style="    margin-left: 12px; line-height: 20px;">more_horiz</mat-icon>
     </div>
   </section>

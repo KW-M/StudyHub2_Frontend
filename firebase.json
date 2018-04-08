@@ -1,10 +1,13 @@
 {
-  "database": {
-    "rules": "realtimedb.rules.json"
-  },
+  // "database": {
+  //   "rules": "realtimedb.rules.json"
+  // },
   "firestore": {
-    "rules": "firestore.rules.json",
-    "indexes": "firestore.indexes.json"
+    "rules": "firestoredb.rules",
+    "indexes": "firestoredb.indexes.json"
+  },
+  "storage": {
+    "rules": "storage.rules"
   },
   "functions": {
     "predeploy": [
@@ -13,6 +16,8 @@
   },
   "hosting": {
     "public": "dist",
+    "cleanUrls": true,
+    "trailingSlash": false,
     "ignore": [
       "firebase.json",
       "**/.*",
@@ -23,9 +28,17 @@
         "source": "**",
         "destination": "/index.html"
       }
+    ],
+    "headers": [
+      {
+        "source": "**/*.@(jpg|jpeg|gif|png)",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "only-if-cached"
+          }
+        ]
+      }
     ]
-  },
-  "storage": {
-    "rules": "storage.rules"
   }
 }

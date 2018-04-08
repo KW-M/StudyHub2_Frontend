@@ -32,7 +32,7 @@ export class GoogleSigninService {
         gapi.auth2.init({
           client_id: "191304458473-pkjgflqvuk0n7u7q3smb5r7ul6l3cevn.apps.googleusercontent.com",
           hosted_domain: "york.org",
-          scope: "profile https://www.googleapis.com/auth/drive.readonly"
+          scope: "profile https://www.googleapis.com/auth/drive"
         }).then(() => {
           console.log('gauth innited');
           //Handle the initial sign-in state.
@@ -52,9 +52,6 @@ export class GoogleSigninService {
     this.zone.run(() => { //need to get back into angular's detection zone since this function was called from outside (gapi context)
       this.signinStateSource.next(isSignedIn);
       if (isSignedIn) {
-        console.log(this.getGUserToken());
-        //headers: for gapps script
-        //authorization: 'Bearer ' + gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse().access_token
         // We need to register an Observer on Firebase Auth to make sure auth is initialized.
         var authStateUnsubscribe = this.FirebaseAuth.auth.onAuthStateChanged((firebaseUser) => {
           authStateUnsubscribe()
@@ -64,16 +61,7 @@ export class GoogleSigninService {
             var credential = firebase.auth.GoogleAuthProvider.credential(this.getGUserToken());
             // Sign in with credential from the Google user.
             firebase.auth().signInWithCredential(credential).catch(function (error) {
-              // Handle Errors here.
-              var errorCode = error.code;
-              var errorMessage = error.message;
-              // The email of the user's account used.
-              var email = error.email;
-              // The firebase.auth.AuthCredential type that was used.
-              var credential = error.credential;
-              // ...
               console.log(error);
-
             });
           } else {
             console.log('User already signed-in Firebase.');

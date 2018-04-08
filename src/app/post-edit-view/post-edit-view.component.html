@@ -43,20 +43,23 @@
     </div>
     <div class="class-selector-backdrop" (click)="classChooserExpanded = false"></div>
     <div class="class-selector-area">
-      <mat-selection-list #shoes1 style="padding-top:0;" [(ngModel)]="currentPost.classes" *ngIf="labelAndClassSearchText == ''">
-        <mat-list-option [value]="class" *ngFor="let class of userFavorites" (keydown)="$event.stopPropagation()">
-          <h4 mat-line>{{class}}</h4>
+      <mat-selection-list style="padding-top:0;" [(ngModel)]="currentPost.classes" *ngIf="labelAndClassSearchText == ''">
+        <mat-list-option [value]="favClass" *ngFor="let favClass of signedinUser.favorites | objKeys" [ngStyle]="{'color': getClassColorString(favClass)}"
+          (keydown)="$event.stopPropagation()">
+          <h4 mat-line>{{favClass}}</h4>
         </mat-list-option>
       </mat-selection-list>
-      <mat-selection-list #shoes style="padding-top:0;" [(ngModel)]="currentPost.classes" (keydown)="$event.stopPropagation()">
-        <ng-container *ngFor="let class of filteredClasses; let classIndex = index">
-          <div class="class-catagory-header" *ngIf="(class?.category != filteredClasses[classIndex - 1]?.category)">
-            <h3 mat-subheader [ngStyle]="{'background': 'linear-gradient(152deg,hsl('+class?.color.h+','+class?.color.s+'%,'+class?.color.l+'%), white)'}"
-              style="margin-top: 0;">{{class.category}}</h3>
+      <mat-selection-list style="padding-top:0;" [(ngModel)]="currentPost.classes">
+        <ng-container *ngFor="let category of formattedYorkClasses">
+          <div class="class-category-header" *ngIf="labelAndClassSearchText == ''">
+            <h3 mat-subheader [ngStyle]="{'background': 'linear-gradient(152deg,hsl('+category?.color.h+','+category?.color.s+'%,'+category?.color.l+'%), white)'}"
+              style="margin-top: 0;">{{category.category}}</h3>
           </div>
-          <mat-list-option [value]="class.name" [hidden]="class.hidden">
-            <h4 mat-line [ngStyle]="{'color': 'hsl('+class?.color.h+','+class?.color.s+'%,40%)'}">{{class.name}}</h4>
-          </mat-list-option>
+          <ng-container *ngFor="let class of category.classes">
+            <mat-list-option [value]="class.name" *ngIf="class.hidden != true">
+              <h4 mat-line [ngStyle]="{'color': 'hsl('+category?.color.h+','+category?.color.s+'%,40%)'}">{{class.name}}</h4>
+            </mat-list-option>
+          </ng-container>
         </ng-container>
       </mat-selection-list>
     </div>
@@ -67,32 +70,35 @@
       <button mat-button color="accent" class="dense-button" (click)="labelAreaExpanded = false;classChooserExpanded = false;onLabelAndClassSearchInput('')">Done</button>
     </div>
     <div class="label-selector-area">
-      <mat-chip-list [multiple]="true" [(ngModel)]="currentPost.labels">
-        <mat-basic-chip [selectable]="false" class="class-expand-button" (keydown)="$event.stopPropagation()">
-          <button mat-button color="primary" *ngIf="!classChooserExpanded" (click)="labelAreaExpanded = true;classChooserExpanded = true">
-            <span>{{currentPost.classes.join(', ') || 'CLASS'}}</span>
-            <mat-icon *ngIf="currentPost.classes.length === 0" style="padding-bottom: 4px">arrow_drop_down</mat-icon>
-            <mat-icon *ngIf="currentPost.classes.length !== 0" style="padding: 6px 0 6px 6px;font-size: 18px;height: 18px;width: 18px;color:black;opacity:0.6"
-              (click)="currentPost.classes = []">cancel</mat-icon>
-          </button>
-        </mat-basic-chip>
-        <span class="formatting-divider" style="order:-1;flex:none"></span>
-        <mat-chip color="primary" #labelChip="matChip" (click)="toggleChipSelect(chipIndex,false);" [value]="label.name" *ngFor="let label of filteredLabels; let chipIndex = index;"
-          [hidden]="label.hidden">{{label.name}}
-          <mat-icon *ngIf="labelChipList[chipIndex]?.selected" class="mat-chip-remove">cancel</mat-icon>
-        </mat-chip>
-        <mat-basic-chip [selectable]="false" [hidden]="labelMissing">
+      <div class="label-chips">
+        <button id="class_expand_button" mat-button color="primary" *ngIf="!classChooserExpanded" (click)="labelAreaExpanded = true;classChooserExpanded = true">
+          <span>{{currentPost.classes.join(', ') || 'CLASS'}}</span>
+          <mat-icon *ngIf="currentPost.classes.length === 0" style="padding-bottom: 4px">arrow_drop_down</mat-icon>
+          <mat-icon *ngIf="currentPost.classes.length !== 0" style="padding: 6px 0 6px 6px;font-size: 18px;height: 18px;width: 18px;color:black;opacity:0.6"
+            (click)="currentPost.classes = []">cancel</mat-icon>
+        </button>
+        <span id="class_label_chips" *ngFor="let label of currentPost.labels | objKeys">
+          <mat-chip color="primary" (click)="toggleLabel(label)" selected="true">
+            {{label}}
+            <mat-icon class="mat-chip-remove">cancel</mat-icon>
+          </mat-chip>
+        </span>
+        <span class="formatting-divider" style="flex:none"></span>
+        <ng-container *ngFor="let label of labels;">
+          <mat-chip color="primary" #labelChip="matChip" (click)="toggleLabel(label.label)" [value]="label.label" selected="false"
+            *ngIf="!currentPost.labels[label.label] && !label.hidden">{{label?.label}}</mat-chip>
+        </ng-container>
+        <span *ngIf="labelMissing">
           <button mat-button (click)="createLabel(labelAndClassSearchText)">
             Create Label:
             <mat-chip color="primary" style="pointer-events: none">{{labelAndClassSearchText}}</mat-chip>
           </button>
-        </mat-basic-chip>
-      </mat-chip-list>
+        </span>
+      </div>
     </div>
   </section>
   <input class="post-card-title" Placeholder="Title" appScrollToElement="center" [(ngModel)]="currentPost.title">
   <p class="post-card-body-text" #descriptionHTML contenteditable="true" appScrollToElement="center" [innerHTML]="currentPost.description"></p>
-  {{currentPost.labels}}
 </section>
 <section class="post-card-actions">
   <button mat-raised-button color="accent" raised="true" (click)="submitPost()" style="margin-right: 6px">SAVE</button>

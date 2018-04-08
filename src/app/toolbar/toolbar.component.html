@@ -23,11 +23,11 @@
     </button>
     <button mat-icon-button [matMenuTriggerFor]="userMenu" class="toolbar-button-spacing">
         <mat-icon *ngIf="windowSize.sm || windowSize.xs">more_vert</mat-icon>
-        <img class="avatar-circle" *ngIf="windowSize.gtsm" [src]="user.profilePhoto">
+        <img class="avatar-circle" *ngIf="windowSize.gtsm" [src]="user.photoURL">
     </button>
     <mat-menu #userMenu class="user-menu" style="padding: 4px 0 0 0;">
         <div style="display:flex;">
-            <img class="avatar-circle" style="margin: 8px 16px 8px 16px" [src]="user.profilePhoto">
+            <img class="avatar-circle" style="margin: 8px 16px 8px 16px" [src]="user.photoURL">
             <span style="margin: 8px 8px 8px 0;font-size: 14px;color: #757575;white-space: nowrap; max-width: 170px;">
                 <p style="margin: 2px 0;font-size: 16px;">{{user?.name}}</p>
                 <p style="margin: 0 0 2px; overflow: inherit; font-size: 14px; text-overflow: ellipsis;overflow:hidden">{{user?.email}}</p>

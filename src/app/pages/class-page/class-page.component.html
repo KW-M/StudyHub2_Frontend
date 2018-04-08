@@ -1,17 +1,8 @@
 <app-new-post-bar></app-new-post-bar>
 <div class="label-bar-container">
   <mat-chip-list [multiple]="true" class="label-chips">
-    <!-- <mat-basic-chip [selectable]="false" class="class-expand-button">
-      <button mat-button color="primary" *ngIf="!classChooserExpanded" (click)="labelAreaExpanded = true;classChooserExpanded = true">
-        <span>Filter: up</span>
-        <mat-icon *ngIf="currentPost.classes.length === 0" style="padding-bottom: 4px">arrow_drop_down</mat-icon>
-        <mat-icon *ngIf="currentPost.classes.length !== 0" style="padding: 6px 0 6px 6px;font-size: 18px;height: 18px;width: 18px;color:black;opacity:0.6"
-          (click)="currentPost.classes = []">cancel</mat-icon>
-      </button>
-    </mat-basic-chip> -->
-    <!-- <span class="formatting-divider" style="order:-1;flex:none"></span> -->
-    <mat-chip color="accent" *ngFor="let label of posts; let chipIndex = index;">
-      {{label}}
+    <mat-chip color="accent" *ngFor="let label of labels;">
+      {{label?.label}}
     </mat-chip>
   </mat-chip-list>
 </div>

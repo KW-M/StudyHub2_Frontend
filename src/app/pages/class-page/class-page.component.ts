@@ -11,11 +11,13 @@ import { EventBoardService } from '../../services/event-board.service';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ClassPageComponent implements OnInit, OnDestroy {
+  labels: any = [];
   posts: any = [];
   postsGrid;
   gridColumns;
   numOfColumns;
   columnWidth;
+  labelsObserver;
   visiblePostsObserver;
   sideNavOpenObserver;
   findTags;
@@ -36,18 +38,27 @@ export class ClassPageComponent implements OnInit, OnDestroy {
       console.log("final Postgrid", this.postsGrid);
       this.ChangeDetector.detectChanges();
     })
+
     window.onresize = () => {
       if (this.posts.length > 0) {
         this.postsGrid = this.getPostsGrid(this.posts, false) || this.postsGrid;
         this.ChangeDetector.detectChanges();
       }
     };
+
     this.sideNavOpenObserver = this.EventBoard.sideNavOpen$.subscribe(() => {
-      console.log('nav');
       if (this.posts.length > 0) {
         this.postsGrid = this.getPostsGrid(this.posts, false) || this.postsGrid;
         this.ChangeDetector.detectChanges();
       }
+    })
+
+    this.labelsObserver = this.DataHolder.labelsState$.subscribe((labels) => {
+      for (var key in labels) {
+        labels[key].label = key;
+        this.labels.push(labels[key]);
+      }
+      this.ChangeDetector.detectChanges();
     })
   }
 

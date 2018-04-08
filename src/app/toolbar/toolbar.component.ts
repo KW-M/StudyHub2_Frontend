@@ -14,7 +14,7 @@ import { Router, NavigationEnd } from '@angular/router';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ToolbarComponent implements OnInit {
-  mobileSearchOpen:boolean = false;
+  mobileSearchOpen: boolean = false;
   windowSize;
   searchText;
   user = {
@@ -35,14 +35,12 @@ export class ToolbarComponent implements OnInit {
   ) {
     this.windowSize = this.WindowFrame.getMediaQueries(null);
     WindowFrame.mdWindowSize$.subscribe(sizes => {
-      console.log(sizes);
       this.windowSize = sizes;
       if (this.windowSize.sm) this.mobileSearchOpen = false;
       ChangeDetector.detectChanges()
     });
     DataHolder.currentUserState$.subscribe((userObj: any) => {
-      console.log(userObj);
-      this.user = userObj || { profilePhoto: 'http://studyhub.york.org/images/accountPic.jpg', name: 'York Student', email: ' . . . @york.org' };
+      this.user = userObj || { photoURL: 'http://studyhub.york.org/images/accountPic.jpg', name: 'York Student', email: ' . . . @york.org' };
       ChangeDetector.detectChanges()
     });
     router.events.filter(event => event instanceof NavigationEnd).subscribe((newRoute) => {

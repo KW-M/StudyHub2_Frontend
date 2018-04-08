@@ -19,6 +19,7 @@ export class SidenavComponent implements OnInit {
   sideNavElm;
   sideNavOverlayElm;
   sideNavContainerElm;
+
   sideNavDimensions;
   @ViewChild('stickyHeader') stickyHeaderElm: ElementRef;
 
@@ -29,8 +30,8 @@ export class SidenavComponent implements OnInit {
   classSearchText: string;
 
   signedinUser: any;
-  filteredClasses: Array<any> = [];
-  filteredGroups: Array<any> = [];
+  yorkGroups: Array<any> = [];
+  formattedYorkClasses: Array<any> = [];
   favoriteClasses: Array<any> = [];
   throttleTimer = {
 
@@ -44,14 +45,15 @@ export class SidenavComponent implements OnInit {
     });
 
     DataHolder.classAndGroupState$.subscribe((classesAndGroups) => {
-      if (this.filteredClasses.length === 0) {
-        this.showAllClasses = false;
-        this.filteredClasses = classesAndGroups['classes'];
-        this.filteredGroups = classesAndGroups['groups'];
-      }
-      this.favoriteClasses = classesAndGroups['favorites'];
+      this.formattedYorkClasses = classesAndGroups['formattedClasses'];
+      this.yorkGroups = classesAndGroups['groups'];
       this.changeDetector.detectChanges();
     });
+
+    DataHolder.currentUserState$.subscribe((user) => {
+      this.favoriteClasses = user['favorites'];
+      this.changeDetector.detectChanges();
+    })
   }
 
 
@@ -130,26 +132,20 @@ export class SidenavComponent implements OnInit {
     }
   }
 
-  setFavorite(classObj) {
+  setFavorite(className) {
     const serverSync = () => {
-      this.ServerAPIs.setFavorites(this.favoriteClasses).toPromise().then((serverResponse) => {
+      this.ServerAPIs.setFavorites(this.favoriteClasses).then((serverResponse) => {
         console.log(serverResponse)
-        if (serverResponse['errors'] === 0 && serverResponse['changes'][0]) {
-          if (this.favoriteClasses != serverResponse['changes'][0].new_val.favorites) {
-            this.DataHolder.updateFavorites(this.favoriteClasses)
-          } else {
-            serverSync();
-          }
-        }
+      }).catch((e) => {
+        console.warn(e);
+        serverSync();
       })
     }
     if (this.editingFavorites) {
-      if (classObj.userFavorite === true) {
-        classObj.userFavorite = false;
-        this.favoriteClasses.splice(this.favoriteClasses.indexOf(classObj.name), 1);
+      if (this.favoriteClasses[className]) {
+        delete this.favoriteClasses[className];
       } else {
-        classObj.userFavorite = true
-        this.favoriteClasses.push(classObj.name);
+        this.favoriteClasses[className] = true;
       }
       clearTimeout(this.throttleTimer['onFavorite']);
       this.throttleTimer['onFavorite'] = setTimeout(serverSync, 1000)
@@ -160,14 +156,24 @@ export class SidenavComponent implements OnInit {
     const searchText = event.target.value;
     if (searchText !== this.classSearchText) {
       this.classSearchText = searchText;
+      this.formattedYorkClasses.forEach(category => {
+        category.classes.forEach(function (classObj) {
+          if (classObj.name.toLowerCase().indexOf(searchText.toLowerCase()) === -1) {
+            classObj.hidden = true;
+          } else {
+            classObj.hidden = undefined;
+          }
+        })
+      });
+      for (const groupName in this.yorkGroups) {
+        if (groupName.toLowerCase().indexOf(searchText.toLowerCase()) === -1) {
+          this.yorkGroups[groupName].hidden = true;
+        } else {
+          delete this.yorkGroups[groupName].hidden;
+        }
+      }
       if (this.showAllClasses === false) this.showAllClasses = true
       if (this.showAllGroups === false) this.showAllGroups = true
-      this.filteredClasses = this.DataHolder.yorkClasses.filter(function (classObj) {
-        return !(classObj.name.toLowerCase().indexOf(searchText.toLowerCase()) === -1)
-      })
-      this.filteredGroups = this.DataHolder.yorkGroups.filter(function (group) {
-        return !(group.toLowerCase().indexOf(searchText.toLowerCase()) === -1)
-      })
     }
     //clearTimeout(this.throttleTimer['onLabelAndClassSearchInput']);
   }

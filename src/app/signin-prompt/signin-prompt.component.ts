@@ -17,7 +17,6 @@ export class SigninPromptComponent implements OnInit {
   constructor(private GSignin: GoogleSigninService, private FireAuth: AngularFireAuth, ChangeDetector: ChangeDetectorRef) {
     // GSignin.signinProgress$.subscribe((message) => {
     GSignin.signinState$.subscribe((isGSignedIn) => {
-      console.log("is", isGSignedIn);
       if (isGSignedIn) {
         this.bgShown = false;
         this.buttonShown = false;
@@ -28,8 +27,7 @@ export class SigninPromptComponent implements OnInit {
       ChangeDetector.detectChanges()
     });
     FireAuth.authState.subscribe((authState) => {
-      console.log(authState);
-      if (authState['email']) {
+      if (authState && authState.email) {
         this.bgShown = false; this.buttonShown = true;
       } else {
         this.bgShown = true; this.dialogShown = true; this.buttonShown = true;

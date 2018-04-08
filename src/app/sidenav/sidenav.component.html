@@ -34,7 +34,7 @@
         <button mat-icon-button class="expand-arrow" [ngClass]="{'expanded': showAllClasses === true}" (click)="showAllClasses = !showAllClasses; showAllGroups = (editingFavorites && showAllGroups)">
           <mat-icon>keyboard_arrow_right</mat-icon>
         </button>
-        <h4 class="sidenav-header-text">{{showAllClasses ? 'All Classes':'Favorites'}}</h4>
+        <h4 class="sidenav-header-text"> {{ showAllClasses ? 'All Classes': 'Favorites' }}</h4>
         <button mat-button style="margin-left:auto;min-width:0" color="accent" *ngIf="editingFavorites === false" (click)="showAllClasses = true; showAllGroups = true; editingFavorites = true">EDIT</button>
         <button mat-button style="margin-left:auto;min-width:0" color="accent" *ngIf="editingFavorites === true" (click)="showAllClasses = false; showAllGroups = false; editingFavorites = false">DONE</button>
       </div>
@@ -44,17 +44,24 @@
       </div>
     </section>
     <mat-nav-list class="class-list" [ngClass]="{'all-shown': showAllClasses === true}">
-      <ng-container *ngFor="let class of filteredClasses; let classIndex = index; trackBy: trackByClassNameFn">
-        <div class="sidenav-class-catagory-header" [ngStyle]="{'background': 'linear-gradient(152deg,hsl('+class?.color.h+','+class?.color.s+'%,'+class?.color.l+'%), white)'}"
-          *ngIf="!classSearchText && (class?.category != filteredClasses[classIndex - 1]?.category)">
-          <h3 mat-subheader style="margin-top: 0;">{{class.category}}</h3>
+      <ng-container *ngFor="let category of formattedYorkClasses; ">
+        <div class="sidenav-class-category-header" *ngIf="!classSearchText" [ngStyle]="{'background': 'linear-gradient(152deg,hsl('+category?.color.h+','+category?.color.s+'%,'+category?.color.l+'%), white)'}">
+          <h3 mat-subheader style="margin-top: 0;">{{ category?.category }}</h3>
         </div>
-        <mat-list-item [ngClass]="{'not-favorite': !class?.userFavorite}" (click)="setFavorite(class)" routerLinkActive="route-active"
-          [routerLink]="editingFavorites ? null : class.name">
-          <h4 mat-line [ngStyle]="{'color': 'hsl('+class?.color.h+','+class?.color.s+'%,'+(40)+'%)'}">{{class.name}}</h4>
-          <mat-icon *ngIf="editingFavorites">{{class.userFavorite ? 'star' : 'star_outline'}}</mat-icon>
-        </mat-list-item>
+        <ng-container *ngFor="let class of category.classes; ">
+          <mat-list-item [ngClass]="{'not-favorite': !favoriteClasses[class.name]}" (click)="setFavorite(class.name)" routerLinkActive="route-active"
+            [routerLink]="editingFavorites ? null : class.name" *ngIf="class.hidden != true">
+            <h4 mat-line [ngStyle]="{'color': 'hsl('+category?.color.h+','+category?.color.s+'%,40%)'}">{{ class.name }}</h4>
+            <mat-icon *ngIf="editingFavorites">{{ favoriteClasses[class.name] === true ? 'star': 'star_outline' }}
+            </mat-icon>
+          </mat-list-item>
+        </ng-container>
       </ng-container>
+      <mat-list-item style="height: 30px" (click)="showAllClasses = !showAllClasses;">
+        <span style="display: flex;justify-content: center;width:100%">
+          <mat-icon>{{showAllClasses? 'keyboard_arrow_up' :'keyboard_arrow_down'}}</mat-icon>
+        </span>
+      </mat-list-item>
     </mat-nav-list>
     <div class="sidenav-buttons-header">
       <button mat-icon-button class="expand-arrow" [ngClass]="{'expanded': showAllGroups === true}" (click)="showAllGroups = !showAllGroups; showAllClasses = (editingFavorites && showAllClasses);">
@@ -67,18 +74,26 @@
       </button>
     </div>
     <mat-nav-list class="group-list" [ngClass]="{'all-shown': showAllGroups === true }">
-      <mat-list-item *ngFor="let group of filteredGroups">
-        <h4 mat-line>{{group.name}}</h4>
-        <mat-icon *ngIf="editingFavorites">{{group.userFavorite ? 'star' : 'star_outline'}}</mat-icon>
+      <ng-container *ngFor="let group of yorkGroups | objKeys">
+        <mat-list-item [ngClass]="{'not-favorite': !favoriteClasses[group]}" (click)="setFavorite(group)" routerLinkActive="route-active"
+          [routerLink]="editingFavorites ? null : group" *ngIf="yorkGroups[group].hidden != true">
+          <h4 mat-line>{{ group }}</h4>
+          <mat-icon *ngIf="editingFavorites">{{ favoriteClasses[group] ? 'star': 'star_outline' }}</mat-icon>
+        </mat-list-item>
+      </ng-container>
+      <mat-list-item style="height: 30px" (click)="showAllGroups = !showAllGroups">
+        <span style="display: flex;justify-content: center;width:100%">
+          <mat-icon>{{showAllGroups? 'keyboard_arrow_up' :'keyboard_arrow_down'}}</mat-icon>
+        </span>
       </mat-list-item>
-      <mat-list-item (click)="showAllClasses = true;showAllGroups = true" *ngIf="showAllGroups === false">
+      <!-- <mat-list-item (click)="showAllClasses = true;showAllGroups = true" *ngIf="showAllGroups === false">
         <mat-icon mat-list-icon>arrow_drop_down</mat-icon>
         <h4 mat-line>Show All</h4>
       </mat-list-item>
       <mat-list-item (click)="showAllClasses = false; showAllGroups = false" *ngIf="showAllGroups === true">
         <mat-icon mat-list-icon>arrow_drop_up</mat-icon>
         <h4 mat-line>Show Favorites</h4>
-      </mat-list-item>
+      </mat-list-item> -->
     </mat-nav-list>
   </div>
   <div class="backdrop" (click)="closeSideNav()"></div>

@@ -65,7 +65,7 @@ export class PostCardComponent implements OnInit, OnDestroy {
     }
   }
   deletePost(post) {
-
+    this.dataHolder.deletePost(post)
   }
   editPost(post) {
     this.eventBoard.openPostModal(post, 'edit')

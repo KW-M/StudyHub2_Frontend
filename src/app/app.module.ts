@@ -9,6 +9,7 @@ import { AngularMaterialModule } from './modules/angular-material.module';
 import { AngularFireModule } from 'angularfire2';
 import { AngularFirestoreModule } from 'angularfire2/firestore';
 import { AngularFireStorageModule } from 'angularfire2/storage';
+import { AngularFireDatabaseModule } from 'angularfire2/database'
 import { AngularFireAuthModule } from 'angularfire2/auth';
 import { HttpClientModule } from '@angular/common/http';
 import { FormsModule } from '@angular/forms'
@@ -34,6 +35,7 @@ import { ScrollToElementDirective } from './directives/scroll-to-element.directi
 import { FeedPageComponent } from './pages/feed-page/feed-page.component';
 import { ClassPageComponent } from './pages/class-page/class-page.component';
 import { SigninPromptComponent } from './signin-prompt/signin-prompt.component';
+import { ObjKeysPipe } from './obj-keys.pipe';
 
 @NgModule({
   declarations: [
@@ -50,6 +52,7 @@ import { SigninPromptComponent } from './signin-prompt/signin-prompt.component';
     FeedPageComponent,
     ClassPageComponent,
     SigninPromptComponent,
+    ObjKeysPipe,
   ],
   imports: [
     BrowserModule,
@@ -60,6 +63,7 @@ import { SigninPromptComponent } from './signin-prompt/signin-prompt.component';
     AngularMaterialModule,
     ServiceWorkerModule.register('/ngsw-worker.js', { enabled: false }), //environment.production
     AngularFireModule.initializeApp(environment.firebase), // imports firebase/app needed for everything
+    AngularFireDatabaseModule,
     AngularFirestoreModule, // imports firebase/firestore, only needed for database features
     AngularFireAuthModule, // imports firebase/auth, only needed for auth features,
     AngularFireStorageModule // imports firebase/storage only needed for storage features

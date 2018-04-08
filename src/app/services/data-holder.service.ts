@@ -1,4 +1,4 @@
-import { Injectable, OnInit } from "@angular/core";
+import { Injectable, OnInit, Output } from "@angular/core";
 import { Router, NavigationEnd, ActivatedRoute, RouterState } from '@angular/router';
 import { ReplaySubject } from "rxjs";
 import { Observable } from 'rxjs/Observable';
@@ -6,6 +6,9 @@ import { EventBoardService } from "../services/event-board.service";
 import { GoogleSigninService } from "../services/google-signin.service";
 import { ExternalApisService } from "../services/external-apis.service";
 import { StudyhubServerApisService } from '../services/studyhub-server-apis.service';
+import { AngularFireAuth } from "angularfire2/auth";
+import * as firebase from 'firebase/app';
+import { MatSnackBar } from "@angular/material";
 
 @Injectable()
 export class DataHolderService {
@@ -14,6 +17,7 @@ export class DataHolderService {
     yorkGroups;
     labelList;
     searchQuery;
+    loadingPostsSubscription;
     linkPreviewCache = {};
     allLoadedPosts;
     currentPage;
@@ -42,32 +46,34 @@ export class DataHolderService {
 
     constructor(public EventBoard: EventBoardService,
         private GSignin: GoogleSigninService,
+        private FirebaseAuth: AngularFireAuth,
         private ExternalAPIs: ExternalApisService,
         private ServerAPIs: StudyhubServerApisService,
-        private Router: Router) {
-
+        private Router: Router,
+        public snackBar: MatSnackBar) {
         //constructor functions
-        GSignin.signinState$.subscribe((signedIn) => {
-            if (signedIn) {
-                this.ServerAPIs.getUserFromServer(GSignin.getGUserToken()).then((userObj) => {
-                    this.signedinUser = userObj;
-                    this.signedinUser.profilePhoto = GSignin.getProfilePhoto()
+        FirebaseAuth.authState.subscribe((signedIn) => {
+            if (signedIn != null && signedIn.email) {
+                this.ServerAPIs.getUserFromServer(signedIn.email).then((userObj) => {
+                    this.signedinUser = Object.assign(userObj, {
+                        email: signedIn.email,
+                        photoURL: signedIn.photoURL
+                    })
+                    console.log("Fire Signin Sucsessful! User: ", userObj);
                     this.currentUserStateSource.next(this.signedinUser)
-                    console.log(this.signedinUser);
-                    console.log(this.yorkClasses, this.currentPage);
-                    if (this.yorkClasses && this.signedinUser) this.updateFavorites(this.signedinUser.favorites);
                     if (this.currentPage && this.signedinUser) this.updateVisiblePosts();
                 }).catch(console.warn)
             } else {
+                console.log('Fire Not Signed In');
                 this.signedinUser = null;
                 this.currentUserStateSource.next(this.signedinUser)
             };
         });
-        this.ServerAPIs.getClassAndGroupList().subscribe((response: any) => {
+
+        this.ServerAPIs.getClassAndGroupList().then((response: any) => {
             this.yorkClasses = response['classes'];
             this.yorkGroups = response['groups'];
-            if (this.yorkClasses && this.signedinUser) this.updateFavorites(this.signedinUser.favorites);
-            if (this.yorkClasses && this.signedinUser === undefined) this.classAndGroupStateSource.next(response);
+            this.classAndGroupStateSource.next(response);
         })
 
         Router.events.filter(event => event instanceof NavigationEnd).subscribe((newRoute) => {
@@ -75,14 +81,15 @@ export class DataHolderService {
             this.searchQuery = this.Router.routerState.snapshot.root.queryParams.query;
             if (this.currentPage && this.signedinUser) this.updateVisiblePosts();
         });
-        // this.ServerAPIs.getLabels().toPromise().then((labelsResponse: any) => {
-        //     this.labelsStateSource.next(labelsResponse);
-        //     console.log('labels:', labelsResponse)
-        //     this.labelList = labelsResponse;
-        // }).catch((err) => {
-        //     this.labelsStateSource.error(err);
-        //     console.warn(err);
-        // })
+
+        this.ServerAPIs.getLabels().then((labelsResponse: any) => {
+            console.log('labels:', labelsResponse)
+            this.labelList = labelsResponse;
+            this.labelsStateSource.next(labelsResponse);
+        }).catch((err) => {
+            this.labelsStateSource.error(err);
+            console.warn(err);
+        })
         // this.ServerAPIs.getUserBookmarks().toPromise().then((bookmarksResponse: any) => {
         //     this.labelsStateSource.next(labelsResponse);
         //     console.log('labels:', labelsResponse)
@@ -91,26 +98,27 @@ export class DataHolderService {
         //     this.labelsStateSource.error(err);
         //     console.warn(err);
         // })
-        // Observable.combineLatest(this.GSignin.signinState$, classAndGroupObservable).subscribe(([signedinUser, classesAndGroups]) => {
-        //     if (signedinUser['user']) {
-        //         this.yorkClasses = classesAndGroups['classes'];
-        //         this.yorkGroups = classesAndGroups['groups']// needs seperate var.push({ name: 'Other', userFavorite: true })//
-        //         this.updateFavorites(signedinUser['user'].favorites);
-        //     }
-        //     console.log(signedinUser, classesAndGroups);
-        // });
+
+        window.onscroll = (event) => {
+            console.log(event);
+            console.log(window.scrollY, window.document.body.scrollHeight);
+            if (window.scrollY > window.document.body.scrollHeight - window.document.body.clientHeight) {
+                console.log('scrollDown');
+            }
+        }
+
     }
 
     updateVisiblePosts() {
         switch (this.currentPage) {
             case 'all posts':
-                if (this.searchQuery) {
-                    this.updateSearchFilters({
-                        searchQuery: this.searchQuery || null,
-                    }, null)
-                } else {
-                    this.getAllPosts()
-                }
+                this.updateSearchFilters({
+                    searchQuery: this.searchQuery || null,
+                    className: null,
+                    userEmail: null,
+                    tags: [],
+                    date: null,
+                }, null)
                 break;
             case 'my posts':
                 this.updateSearchFilters({
@@ -119,17 +127,10 @@ export class DataHolderService {
                     userEmail: this.signedinUser['email'] || null,
                     tags: [],
                     date: null,
-                    usersBookmarks: false
                 }, null)
                 break;
             case 'bookmarks':
-                this.updateSearchFilters({
-                    className: null,
-                    userEmail: null,
-                    tags: [],
-                    date: null,
-                    usersBookmarks: true,
-                }, null)
+                //this.getBookmarkedPosts()
                 break;
             case 'feed':
                 //this.getRecentlyViewedPosts()
@@ -141,50 +142,47 @@ export class DataHolderService {
                     userEmail: null,
                     tags: [],
                     date: null,
-                    usersBookmarks: false
                 }, null)
                 break;
-        }
-    }
-
-    updateFavorites(favList) {
-        this.applyFavorites(this.yorkClasses, favList);
-        this.applyFavorites(this.yorkGroups, favList);
-        this.classAndGroupStateSource.next({
-            classes: this.yorkClasses,
-            groups: this.yorkGroups,
-            favorites: favList,
-        });
-    }
-
-    private applyFavorites(arrayToSearch, favList) {
-        for (let classIndex = 0; classIndex < arrayToSearch.length; classIndex++) {
-            for (let favIndex = 0; favIndex < favList.length; favIndex++) {
-                if (favList[favIndex] === arrayToSearch[classIndex].name) {
-                    arrayToSearch[classIndex].userFavorite = true;
-                    favIndex = favList.length; //break  out of the class search loop if we've added the class
-                } else {
-                    arrayToSearch[classIndex].userFavorite = false;
-                }
-            }
         }
     }
 
     updateSearchFilters(postFilters, sortMethod) {
         this.currentSortMethod = sortMethod || this.currentSortMethod;
         this.currentPostFilters = Object.assign(this.currentPostFilters, postFilters)
-        if (this.signedinUser) {
-            let gotResponse = (posts: any) => { this.currentPosts = posts; console.log(posts); this.visiblePostsStateSource.next(posts) }
+        console.log(this.currentPostFilters);
+        this.getNextPostSet(null)
+    }
+
+    getNextPostSet(startingPostId) {
+        if (this.loadingPostsSubscription !== 'no more' && this.signedinUser) {
             if (this.currentPostFilters.searchQuery) {
-                this.ServerAPIs.getQueryPosts(this.currentPostFilters).then(gotResponse, console.warn)
+                //this.loadingPostsSubscription = this.ServerAPIs.getSearchPosts(this.currentPostFilters, startingPostId).then(handlePostSet).catch(console.warn);
             } else {
-                this.ServerAPIs.getPosts(this.currentPostFilters, this.currentSortMethod).then(gotResponse, console.warn)
+                this.loadingPostsSubscription = this.ServerAPIs.getPosts(this.currentPostFilters, this.currentSortMethod, startingPostId).first().toPromise().then(handlePostSet).catch(console.warn);
+            }
+        }
+        var handlePostSet = (postSet) => {
+            console.log(postSet);
+
+            if (startingPostId = null) {
+                this.currentPosts = postSet;
+            } else {
+                this.currentPosts.push(postSet);
+            }
+            this.visiblePostsStateSource.next(this.currentPosts)
+            if (this.loadingPostsSubscription = 'next') {
+                this.getNextPostSet(this.currentPosts[this.currentPosts.length - 1].id)
+            } else {
+                this.loadingPostsSubscription = null;
             }
         }
     }
 
+    getPosts
+
     getAllPosts() {
-        this.ServerAPIs.getAllPosts(this.currentSortMethod).then((posts: any) => { this.allLoadedPosts = posts; this.visiblePostsStateSource.next(posts) }, console.warn)
+        // this.ServerAPIs.getAllPosts(this.currentSortMethod).then((posts: any) => { this.allLoadedPosts = posts; this.visiblePostsStateSource.next(posts) }, console.warn)
     }
 
     getFeedPosts() {
@@ -195,6 +193,25 @@ export class DataHolderService {
         this.ServerAPIs.getRecentlyViewedPosts().then((posts: any) => { this.allLoadedPosts = posts; this.feedPostsStateSource.next({ feed: posts }) }, console.warn)
     }
 
+    deletePost(postObj) {
+        let postBackup = postObj;
+        let postIndex = this.findPost(postObj.id)
+        this.currentPosts.splice(postIndex, 1)
+        this.visiblePostsStateSource.next(this.currentPosts);
+        let snackBar = this.snackBar.open('Deleting Post', 'Undo', {
+            duration: 10000,
+            horizontalPosition: "start"
+        })
+        snackBar.afterDismissed().toPromise().then((action) => {
+            if (action.dismissedByAction === true) {
+                this.currentPosts.splice(postIndex, 0, postBackup)
+                this.visiblePostsStateSource.next(this.currentPosts);
+            } else {
+                this.ServerAPIs.deletePost(postObj.id).then(console.log).catch(console.warn);
+            }
+        })
+    }
+
     setCachedLinkPreview(postId, linkPreview) {
         this.linkPreviewCache[postId] = linkPreview;
     }
@@ -203,9 +220,34 @@ export class DataHolderService {
         return this.linkPreviewCache[postId];
     }
     getClassColor(className: string) {
-        for (let classIndex = 0; classIndex < this.yorkClasses.length; classIndex++) {
-            if (this.yorkClasses[classIndex].name === className) return this.yorkClasses[classIndex].color;
+        let classObj = this.yorkClasses[className];
+        if (classObj) {
+            return classObj.color
+        } else {
+            return null;
         }
-        return null;
+    }
+    findPost(postId) {
+        for (let arrayIndex = 0; arrayIndex < this.currentPosts.length; arrayIndex++) {
+            if (this.currentPosts[arrayIndex].id === postId) return arrayIndex
+        }
+    }
+    objToArray(input) {
+        var output = []
+        for (var key in input) {
+            if (parseInt(input[key]) != NaN) {
+                output[parseInt(input[key])] = key;
+            } else {
+                output.push(key);
+            }
+        }
+        return output;
+    }
+    arrayToObj(input, preserveOrder) {
+        var output = {}
+        for (let arrayIndex = 0; arrayIndex < input.length; arrayIndex++) {
+            output[input[arrayIndex]] = preserveOrder ? arrayIndex : true;
+        }
+        return output;
     }
 }

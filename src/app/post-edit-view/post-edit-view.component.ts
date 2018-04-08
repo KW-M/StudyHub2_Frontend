@@ -32,12 +32,12 @@ export class PostEditViewComponent implements OnDestroy {
   classChooserExpanded: boolean = false;
   linkURL: string = '';
   labelAndClassSearchText: string = '';
-  yorkLabels;
+  labels = [];
   yorkGroups;
-  yorkClasses;
-  userFavorites;
+  formattedYorkClasses;
   classAndGroupObserver;
   signedinUserObserver;
+  labelsObserver
   backupSetIntervalRef;
   currentSnackBarRef;
   throttleTimer = {
@@ -47,7 +47,7 @@ export class PostEditViewComponent implements OnDestroy {
     private ExternalAPIs: ExternalApisService,
     private ServerAPIs: StudyhubServerApisService,
     private componentElem: ElementRef,
-    private changeDetector: ChangeDetectorRef,
+    private ChangeDetector: ChangeDetectorRef,
     private DataHolder: DataHolderService,
     public snackBar: MatSnackBar
   ) {
@@ -56,10 +56,9 @@ export class PostEditViewComponent implements OnDestroy {
       "title": "",
       "link": "",
       "description": "",
-      "likes": [],
-      "labels": [],
-      //"teachers": [],
-      "classes": [],//<-
+      "likes": {},
+      "labels": {},
+      "classes": [],
       "creator": {
         "email": null,
         "name": null,
@@ -71,41 +70,49 @@ export class PostEditViewComponent implements OnDestroy {
     console.log(this.currentPost)
     this.classAndGroupObserver = DataHolder.classAndGroupState$.subscribe((classesAndGroups) => {
       console.log(classesAndGroups)
-      this.yorkLabels = classesAndGroups['classes'];
-      this.yorkClasses = classesAndGroups['classes'];
+      //this.yorkLabels = classesAndGroups['formattedClasses'];
+      this.formattedYorkClasses = classesAndGroups['formattedClasses'];
       this.yorkGroups = classesAndGroups['groups'];
-      this.userFavorites = classesAndGroups['favorites'];
-      // this.changeDetector.detectChanges();
+      // this.ChangeDetector.detectChanges();
     });
+
     this.signedinUserObserver = this.DataHolder.currentUserState$.subscribe((userObj) => {
       this.signedinUser = userObj;
-      if (this.currentPost.creator.email === null) this.currentPost.creator.email = userObj['email']
-      if (this.currentPost.creator.name === null) this.currentPost.creator.name = userObj['name']
+      this.currentPost.creator.email = this.currentPost.creator.email || userObj['email']
+      this.currentPost.creator.name = this.currentPost.creator.name || userObj['name']
+      console.log(this.currentPost);
     })
+
+    this.labelsObserver = this.DataHolder.labelsState$.subscribe((labels) => {
+      for (var key in labels) {
+        labels[key].label = key;
+        this.labels.push(labels[key]);
+      }
+      this.ChangeDetector.markForCheck();
+    })
+
     let backupPost = window.localStorage.getItem("postDraftBackup")
     let snackBarAction = null
     if (backupPost) {
       let backupPostObj = JSON.parse(backupPost);
-      if (backupPostObj.title || backupPostObj.description || backupPostObj.link) {
-        let snackBar = this.snackBar.open('Unsaved Draft Found', 'Restore', {
-          duration: 20000,
-          horizontalPosition: "start"
-        })
-      }
+      let snackBar = this.snackBar.open('Unsaved Draft Found', 'Restore', {
+        duration: 15000,
+        horizontalPosition: "start"
+      })
       this.currentSnackBarRef = snackBar;
-      snackBar['afterDismissed']().toPromise().then((action) => {
+      snackBar.afterDismissed().toPromise().then((action) => {
         snackBarAction = action;
         if (action.dismissedByAction === true) {
           this.currentPost = JSON.parse(backupPost);
           this.onLinkInput(this.currentPost.link)
-          this.changeDetector.detectChanges();
+          this.ChangeDetector.detectChanges();
         }
       })
     }
     this.backupSetIntervalRef = setInterval(() => {
       this.currentPost.description = this.descriptionElm.nativeElement.innerHTML;
       console.log(this.currentPost);
-      if (!this.currentSnackBarRef || snackBarAction) window.localStorage.setItem("postDraftBackup", JSON.stringify(this.currentPost));
+      if ((!this.currentSnackBarRef || snackBarAction) && (this.currentPost.title || this.currentPost.description || this.currentPost.link)) window.localStorage.setItem("postDraftBackup", JSON.stringify(this.currentPost));
     }, 25000)
   }
 
@@ -130,7 +137,7 @@ export class PostEditViewComponent implements OnDestroy {
             this.currentPost.attachmentName = websitePreview['title'];
             this.currentLinkPreview.thumbnail = websitePreview['image'];
             this.currentLinkPreview.icon = websitePreview['icon'];
-            this.changeDetector.detectChanges();
+            this.ChangeDetector.detectChanges();
           }, (err) => {
             console.warn(err);
             this.linkURL = '';
@@ -151,59 +158,73 @@ export class PostEditViewComponent implements OnDestroy {
     this.labelAndClassSearchText = searchText;
     let currentPostLabels = this.currentPost.labels;
     let currentPostClasses = this.currentPost.classes;
-    this.labelMissing = true
-    this.yorkLabels = this.yorkClasses.map(function (label) {
-      label.hidden = !(currentPostLabels.includes(label.name) || !(label.name.toLowerCase().indexOf(searchText.toLowerCase()) === -1)) || undefined;
+    this.labelMissing = true;
+    this.labels = this.labels.map((label) => {
+      label.hidden = label.label.toLowerCase().indexOf(searchText.toLowerCase()) === -1 || undefined //!(currentPostLabels.includes(label.label) || !(label.label.toLowerCase().indexOf(searchText.toLowerCase()) === -1)) || undefined;
       if (label.hidden === undefined) this.labelMissing = false;
       return label;
     })
-    if (this.classChooserExpanded === true) this.yorkClasses = this.yorkClasses.map(function (classObj) {
-      classObj.hidden = !(currentPostClasses.includes(classObj.name) || !(classObj.name.toLowerCase().indexOf(searchText.toLowerCase()) === -1)) || undefined;
-      return classObj;
-    })
+    if (this.classChooserExpanded === true) this.formattedYorkClasses.forEach(category => {
+      category.classes.forEach(function (classObj) {
+        classObj.hidden = (classObj.name.toLowerCase().indexOf(searchText.toLowerCase()) === -1) || undefined;
+        //!(currentPostClasses.includes(classObj.name) || !(classObj.name.toLowerCase().indexOf(searchText.toLowerCase()) === -1)) || undefined;
+      })
+    });
+    // for (const groupName in this.yorkGroups) {
+    //   if (groupName.toLowerCase().indexOf(searchText.toLowerCase()) === -1) {
+    //     this.yorkGroups[groupName].hidden = true;
+    //   } else {
+    //     delete this.yorkGroups[groupName].hidden;
+    //   }
+    // }
     //clearTimeout(this.throttleTimer['onLabelAndClassSearchInput']);
   }
 
-  toggleChipSelect(index) {
-    this.labelChipList = this.labelChip.toArray();
-    var chip = this.labelChipList[index]
-    if (chip.selected) {
-      chip.deselect();
-      setTimeout(() => {
-        this.changeDetector.markForCheck();
-      });
+  toggleLabel(label) {
+    if (this.currentPost.labels[label] === true) {
+      delete this.currentPost.labels[label]
     } else {
-      chip.selectViaInteraction();
-      console.log(chip._elementRef);
+      this.currentPost.labels[label] = true;
       setTimeout(() => {
-        chip._elementRef.nativeElement.scrollIntoView({ behavior: "smooth", block: "center", inline: "center" });
-      }, 10);
+        document.getElementById("class_label_chips").lastElementChild.scrollIntoView({ behavior: "smooth", block: "center", inline: "center" });
+      }, 30)
     }
   }
 
   createLabel(newLabelText) {
-    // this.visibleLabels.push(newLabelText)
-    this.currentPost.labels.push(newLabelText)
-    this.ServerAPIs.createLabel(newLabelText, this.currentPost.classes).then(console.log);
-    this.changeDetector.detectChanges()
+    this.onLabelAndClassSearchInput('')
+    this.currentPost.labels[newLabelText] = true;
+    var usage = {}
+    usage[this.currentPost.classes[0]] = 1
+    this.labels.push({ label: newLabelText, usage: usage, totalUsage: this.currentPost.classes.length, new: true });
+    this.labelMissing = false;
+    this.ChangeDetector.detectChanges()
   }
 
   submitPost() {
     this.currentPost.description = this.descriptionElm.nativeElement.innerHTML
-    this.ServerAPIs.submitPost(this.currentPost).then((response) => {
+    console.log(this.currentPost)
+    this.ServerAPIs.submitPost(this.currentPost).then((response: any) => {
       console.log(response);
       window.localStorage.removeItem("postDraftBackup")
-    }, console.warn);
-    console.log(this.currentPost)
+    });
   }
 
   closeModal() {
     this.EventBoard.closePostModal()
   }
 
+  getClassColorString(className: string) {
+    console.log(className);
+    let colorObj = this.DataHolder.getClassColor(className)
+    if (colorObj) return 'hsl(' + colorObj.h + ',' + colorObj.s + '%,40%)'
+  }
+
   ngOnDestroy() {
     this.classAndGroupObserver.unsubscribe()
     this.signedinUserObserver.unsubscribe()
+    this.labelsObserver.unsubscribe()
+    if (this.currentPost.title || this.currentPost.description || this.currentPost.link) window.localStorage.setItem("postDraftBackup", JSON.stringify(this.currentPost));
     if (this.websitePreviewObserver) this.websitePreviewObserver.unsubscribe();
     if (this.currentSnackBarRef) this.currentSnackBarRef.dismiss()
     clearInterval(this.backupSetIntervalRef);

@@ -30,11 +30,12 @@ import { PostEditViewComponent } from './post-edit-view/post-edit-view.component
 import { PostCardComponent } from './post-card/post-card.component';
 import { PostCardMiniComponent } from './post-card-mini/post-card-mini.component';
 import { NewPostBarComponent } from './new-post-bar/new-post-bar.component';
+import { SigninPromptComponent } from './signin-prompt/signin-prompt.component';
 
 import { ScrollToElementDirective } from './directives/scroll-to-element.directive';
 import { FeedPageComponent } from './pages/feed-page/feed-page.component';
 import { ClassPageComponent } from './pages/class-page/class-page.component';
-import { SigninPromptComponent } from './signin-prompt/signin-prompt.component';
+import { SearchPageComponent } from './pages/search-page/search-page.component';
 import { ObjKeysPipe } from './obj-keys.pipe';
 
 @NgModule({
@@ -51,6 +52,7 @@ import { ObjKeysPipe } from './obj-keys.pipe';
     ScrollToElementDirective,
     FeedPageComponent,
     ClassPageComponent,
+    SearchPageComponent,
     SigninPromptComponent,
     ObjKeysPipe,
   ],
@@ -66,7 +68,7 @@ import { ObjKeysPipe } from './obj-keys.pipe';
     AngularFireDatabaseModule,
     AngularFirestoreModule, // imports firebase/firestore, only needed for database features
     AngularFireAuthModule, // imports firebase/auth, only needed for auth features,
-    AngularFireStorageModule // imports firebase/storage only needed for storage features
+    AngularFireStorageModule, // imports firebase/storage only needed for storage features
   ],
   providers: [
     WindowService,

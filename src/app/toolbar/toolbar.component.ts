@@ -5,6 +5,9 @@ import { GoogleSigninService } from "../services/google-signin.service";
 import { DataHolderService } from '../services/data-holder.service';
 import { WindowService } from "../services/window.service";
 import { Router, NavigationEnd } from '@angular/router';
+import { connectSearchBox } from 'instantsearch.js/es/connectors';
+import { ExternalApisService } from '../services/external-apis.service';
+
 
 @Component({
   selector: 'app-toolbar',
@@ -14,6 +17,7 @@ import { Router, NavigationEnd } from '@angular/router';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ToolbarComponent implements OnInit {
+  algoliaSearchState: any;
   mobileSearchOpen: boolean = false;
   windowSize;
   searchText;
@@ -30,6 +34,7 @@ export class ToolbarComponent implements OnInit {
     private GSignin: GoogleSigninService,
     public EventBoard: EventBoardService,
     private DataHolder: DataHolderService,
+    private ExternalAPIs: ExternalApisService,
     public WindowFrame: WindowService,
     private ChangeDetector: ChangeDetectorRef,
   ) {
@@ -44,21 +49,24 @@ export class ToolbarComponent implements OnInit {
       ChangeDetector.detectChanges()
     });
     router.events.filter(event => event instanceof NavigationEnd).subscribe((newRoute) => {
-      this.searchText = this.router.routerState.snapshot.root.queryParams.query || null;
+      this.searchText = this.router.routerState.snapshot.root.queryParams.q || null;
       ChangeDetector.detectChanges()
     });
   }
 
   updateSearch(query) {
-    clearTimeout(this.throttleTimer['onSearchInput']);
-    this.throttleTimer['onSearchInput'] = setTimeout(() => {
-      console.log('searching');
-      console.log(this.router.navigate(['/all posts'], { queryParams: { 'query': query } }));
-    }, 1100)
+    this.algoliaSearchState.refine(query)
+    // clearTimeout(this.throttleTimer['onSearchInput']);
+    // this.throttleTimer['onSearchInput'] = setTimeout(() => {
+    //   console.log('searching');
+    //   console.log(this.router.navigate(['/all posts'], { queryParams: { 'query': query } }));
+    // }, 1100)
   }
 
   clearSearch() {
-
+    this.searchText = ''
+    this.algoliaSearchState.refine('')
+    this.ChangeDetector.detectChanges()
   }
 
   setMobileSearchOpen(open) {
@@ -78,7 +86,19 @@ export class ToolbarComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.searchText = this.router.routerState.snapshot.root.queryParams.query || null;
+    const widget = connectSearchBox((state, isFirstRendering) => {
+      // asynchronous update of the state
+      // avoid `ExpressionChangedAfterItHasBeenCheckedError`
+      if (isFirstRendering) {
+        return Promise.resolve(null).then(() => {
+          this.algoliaSearchState = state;
+        });
+      } else {
+        this.algoliaSearchState = state;
+      }
+    });
+    this.ExternalAPIs.algoliaSearch.addWidget(widget());
+    this.searchText = this.router.routerState.snapshot.root.queryParams.q || null;
   }
 
 }

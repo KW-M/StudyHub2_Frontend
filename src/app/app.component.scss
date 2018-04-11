@@ -1,6 +1,6 @@
 app-toolbar {
     position: fixed;
-    width:100vw;
+    width: 100vw;
     z-index: 10;
 }
 
@@ -10,7 +10,7 @@ app-toolbar {
 }
 
 app-sidenav {
-    z-index:8;
+    z-index: 8;
 }
 
 app-speeddial {
@@ -25,7 +25,8 @@ app-post-modal-frame {
     z-index: 11;
 }
 
-app-class-page {
+app-class-page,
+app-search-page {
     display: block;
 }
 

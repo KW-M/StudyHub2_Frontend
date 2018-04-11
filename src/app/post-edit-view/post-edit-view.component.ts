@@ -1,4 +1,4 @@
-import { Component, ViewEncapsulation, Input, ViewChild, ViewChildren, ElementRef, ChangeDetectionStrategy, ChangeDetectorRef, OnDestroy } from '@angular/core';
+import { Component, ViewEncapsulation, Input, ViewChild, ViewChildren, ElementRef, ChangeDetectionStrategy, ChangeDetectorRef, OnDestroy, OnInit } from '@angular/core';
 import { MatSnackBar } from '@angular/material';
 
 import { WindowService } from "../services/window.service";
@@ -14,7 +14,7 @@ import { StudyhubServerApisService } from '../services/studyhub-server-apis.serv
   encapsulation: ViewEncapsulation.None,
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class PostEditViewComponent implements OnDestroy {
+export class PostEditViewComponent implements OnInit, OnDestroy {
   labelMissing: boolean = false;
   visibleLabels: any;
   websitePreviewObserver;
@@ -51,7 +51,7 @@ export class PostEditViewComponent implements OnDestroy {
     private DataHolder: DataHolderService,
     public snackBar: MatSnackBar
   ) {
-    this.currentPost = Object.assign({
+    this.currentPost = {
       "id": null,
       "title": "",
       "link": "",
@@ -66,8 +66,8 @@ export class PostEditViewComponent implements OnDestroy {
       "flagged": false,
       "creationDate": new Date(),
       "updateDate": new Date(),
-    }, this.inputPost)
-    console.log(this.currentPost)
+    }
+
     this.classAndGroupObserver = DataHolder.classAndGroupState$.subscribe((classesAndGroups) => {
       console.log(classesAndGroups)
       //this.yorkLabels = classesAndGroups['formattedClasses'];
@@ -152,6 +152,10 @@ export class PostEditViewComponent implements OnDestroy {
     }
     //https://www.googleapis.com/pagespeedonline/v2/runPagespeed?url=http://haiku.york.org&rule=AvoidLandingPageRedirects&screenshot=true&strategy=desktop&fields=screenshot(data%2Cmime_type)%2Ctitle&key=AIzaSyCFXAknC9Fza_lsQBlRCAJJZbzQGDYr6mo
     //https://www.google.com/s2/favicons?domain_url=https://drive.google.com/drive/u/0/folders/0B5NVuDykezpkZVhzV3QzVDhhTXM
+  }
+
+  ngOnInit() {
+    this.currentPost = this.inputPost
   }
 
   onLabelAndClassSearchInput(searchText) {

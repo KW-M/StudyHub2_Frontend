@@ -1,4 +1,3 @@
-<app-new-post-bar></app-new-post-bar>
 <div class="label-bar-container">
   <mat-chip-list [multiple]="true" class="label-chips">
     <mat-chip color="accent" *ngFor="let label of labels;">
@@ -6,11 +5,9 @@
     </mat-chip>
   </mat-chip-list>
 </div>
-<div class="label-bar-overlay"></div>
 <div class="class-preview-posts-grid-container">
   <div class="class-preview-posts" *ngFor="let column of gridColumns; let i = index">
-    <!-- <app-post-card *ngFor="let post of postsGrid[i]; let indexy = index; trackBy:trackByPostIdFn" [input-post]="post"></app-post-card> -->
-    <div *ngFor="let post of postsGrid[i]; let indexy = index;">{{post.toString()}}</div>
+    <app-post-card *ngFor="let post of postsGrid[i]; let indexy = index; trackBy:trackByPostIdFn" [input-post]="post"></app-post-card>
   </div>
   <!-- spacer grid items at the end keep the other grid items equal width -->
   <div class="class-preview-posts"></div>

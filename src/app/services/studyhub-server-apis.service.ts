@@ -44,38 +44,25 @@ export class StudyhubServerApisService {
     })
   }
 
-  submitPost(postObj) { // send a new or updated post object to the server
-    var convertedPost: any = {}
-    Object.assign(convertedPost, postObj);
-    delete convertedPost.id;
-    convertedPost.classes = this.arrayToObj(convertedPost.classes, true)
-    convertedPost.updateDate = firebase.firestore.FieldValue.serverTimestamp()
-    console.log(convertedPost);
-    this.updateLabels(postObj.labels, postObj.classes)
-    if (postObj.id) {
-      //  return new Promise((resolve, reject) => { this.FireStore.collection('posts').doc(postObj.id).set(convertedPost).then(resolve as any).catch(reject) })
-      return this.FireStore.collection('posts').doc(postObj.id).set(convertedPost) as any;
-    } else {
-      convertedPost.creationDate = firebase.firestore.FieldValue.serverTimestamp()
-      return this.FireStore.collection('posts').add(convertedPost)
-    }
-  }
-
   getAllPosts(sortBy) {
     return this.FireStore.collection('posts')
   }
 
-  getPosts(postFilters, sortBy, startingId) {
-    console.log(JSON.stringify({
+  getPosts(postFilters, sortBy, lastPost) {
+    console.log({
       filters: postFilters,
       sortingOrder: sortBy,
-    }))
+      lastPost: lastPost
+    })
     return this.FireStore.collection("posts", (ref) => {
-      ref.where("flagged", "==", postFilters.flagged || false)
-      if (postFilters.className) ref.where("classes." + postFilters.className, ">=", 0)
-      ref.orderBy("updateDate", "desc")
-      if (startingId) ref.startAfter(startingId)
-      return ref.limit(3)
+      console.log(lastPost);
+      let query: firebase.firestore.CollectionReference | firebase.firestore.Query = ref;
+      if (postFilters.className) { query = query.where("classes." + postFilters.className, "==", true) }
+      if (postFilters.userEmail) { query = query.where("creator.email", "==", postFilters.userEmail) }
+      if (lastPost) { query = query.startAfter(lastPost) }
+      query = query.where("flagged", "==", postFilters.flagged || false)
+      query = query.orderBy("updateDate", "desc").limit(4);
+      return query
     }).snapshotChanges().map(actions => {
       return actions.map(action => {
         const data = action.payload.doc.data();
@@ -89,6 +76,13 @@ export class StudyhubServerApisService {
   getFeedPosts() {
     const params = new HttpParams().append('idtoken', gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse().id_token)
     return this.http.get(this.serverURLBase + "/feedPosts", { 'params': params }).toPromise()
+  }
+
+  getUserBookmarks(email) {
+    return new Promise((resolve, reject) => {
+      email = this.removeFirebaseKeyIllegalChars(email)
+      this.FireDB.object('users/' + email + '/bookmarks')
+    })
   }
 
   getSearchPosts(postFilters, startingId) {
@@ -136,11 +130,22 @@ export class StudyhubServerApisService {
     return this.FireDB.object('labels/').valueChanges().first().toPromise()
   }
 
-  getUserBookmarks(email) {
-    return new Promise((resolve, reject) => {
-      email = this.removeFirebaseKeyIllegalChars(email)
-      this.FireDB.object('users/' + email + '/bookmarks')
-    })
+  submitPost(postObj) { // send a new or updated post object to the server
+    postObj.likeCount = postObj.likeUsers.length || 0
+    var convertedPost: any = {}
+    convertedPost = Object.assign({}, postObj);
+    delete convertedPost.id;
+    convertedPost.classes = this.arrayToObj(convertedPost.classes)
+    convertedPost.updateDate = firebase.firestore.FieldValue.serverTimestamp()
+    console.log(convertedPost);
+    this.updateLabels(postObj.labels, postObj.classes)
+    if (postObj.id) {
+      //  return new Promise((resolve, reject) => { this.FireStore.collection('posts').doc(postObj.id).set(convertedPost).then(resolve as any).catch(reject) })
+      return this.FireStore.collection('posts').doc(postObj.id).set(convertedPost) as any;
+    } else {
+      convertedPost.creationDate = firebase.firestore.FieldValue.serverTimestamp()
+      return this.FireStore.collection('posts').add(convertedPost)
+    }
   }
 
   updateLabels(labelList, classes) {
@@ -177,19 +182,14 @@ export class StudyhubServerApisService {
   objToArray(input) {
     var output = []
     for (var key in input) {
-      try {
-        output[parseInt(input[key])] = key;
-      } catch (e) {
-        console.log(e);
-        output.push(key);
-      }
+      output.push(key);
     }
     return output;
   }
-  arrayToObj(input, preserveOrder) {
+  arrayToObj(input) {
     var output = {}
     for (let arrayIndex = 0; arrayIndex < input.length; arrayIndex++) {
-      output[input[arrayIndex]] = preserveOrder ? arrayIndex : true;
+      output[input[arrayIndex]] = true;
     }
     return output;
   }

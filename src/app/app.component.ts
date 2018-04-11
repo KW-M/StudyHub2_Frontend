@@ -1,4 +1,5 @@
-import { Component, ViewChild, ViewEncapsulation, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import { Component, ViewChild, ViewEncapsulation, ChangeDetectionStrategy, ChangeDetectorRef, AfterViewInit } from '@angular/core';
+import { ExternalApisService } from './services/external-apis.service';
 
 @Component({
   selector: 'app-root',
@@ -16,8 +17,11 @@ import { Component, ViewChild, ViewEncapsulation, ChangeDetectionStrategy, Chang
   encapsulation: ViewEncapsulation.None,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class AppComponent {
-
+export class AppComponent implements AfterViewInit {
+  constructor(private ExternalAPIs: ExternalApisService) { }
+  ngAfterViewInit() {
+    this.ExternalAPIs.algoliaSearch.start();
+  }
 }
       // <app-new-post-bar></app-new-post-bar>
       // <app-post-card></app-post-card>

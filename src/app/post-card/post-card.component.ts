@@ -32,16 +32,18 @@ export class PostCardComponent implements OnInit, OnDestroy {
       "title": "",
       "link": "",
       "description": "",
-      "likes": [],
+      "likeCount": 0,//<-
+      "likeUsers": [],//<-
+      "viewCount": 0,//<-
       "labels": [],
-      "classes": [],//<-
+      "classes": [],
       "creator": {
         "email": null,
-        "name": null
+        "name": null,
       },
       "flagged": false,
-      "creationDate": new Date().getSeconds(),
-      "updateDate": new Date().getSeconds(),
+      "creationDate": new Date(),
+      "updateDate": new Date(),
     }, this.inputPost);
     this.currentPost['color'] = this.dataHolder.getClassColor(this.currentPost.classes[0]);
     if (this.currentPost.link) {
@@ -64,12 +66,30 @@ export class PostCardComponent implements OnInit, OnDestroy {
       }
     }
   }
-  deletePost(post) {
-    this.dataHolder.deletePost(post)
+  likePost() {
+    var emailIndex = this.currentPost.likeUsers.indexOf(this.dataHolder.signedinUser.email)
+    if (emailIndex !== -1) {
+      this.currentPost.likeUsers.splice(emailIndex, 1)
+    } else {
+      this.currentPost.likeUsers.push(this.dataHolder.signedinUser.email)
+    }
+    this.currentPost.likeCount = this.currentPost.likeUsers.length
   }
+
+  viewPost() {
+
+  }
+
+  viewLink() {
+    window.open()
+  }
+
   editPost(post) {
     this.eventBoard.openPostModal(post, 'edit')
   };
+  deletePost(post) {
+    this.dataHolder.deletePost(post)
+  }
   debugPost(post) {
     console.log(post);
   };

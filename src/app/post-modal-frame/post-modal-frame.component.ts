@@ -51,9 +51,25 @@ export class PostModalFrameComponent {
   inputPost;
   constructor(public EventBoard: EventBoardService, public componentElem: ElementRef, private changeDetector: ChangeDetectorRef) {
     EventBoard.postModal$.subscribe(inputPostObj => {
-      this.inputPost = inputPostObj.postObj || {};
+      this.inputPost = Object.assign({
+        "id": null,
+        "title": "",
+        "link": "",
+        "description": "",
+        "likeCount": 0,//<-
+        "likeUsers": [],//<-
+        "viewCount": 0,//<-
+        "labels": [],
+        "classes": [],
+        "creator": {
+          "email": null,
+          "name": null,
+        },
+        "flagged": false,
+        "creationDate": new Date(),
+        "updateDate": new Date(),
+      }, inputPostObj.postObj || {});
       this.postAction = inputPostObj.action;
-      console.log(inputPostObj.action, this.inputPost)
       if (this.postAction === 'close') {
         if (document.activeElement) {
           (document.activeElement as HTMLElement).blur()
@@ -64,6 +80,7 @@ export class PostModalFrameComponent {
       } else {
         this.modalOpenState = 'open-centered'
       }
+      console.log(inputPostObj.action, this.inputPost)
       this.changeDetector.detectChanges();
     });
   }

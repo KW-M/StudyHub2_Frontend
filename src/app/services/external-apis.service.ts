@@ -3,6 +3,7 @@ import { DomSanitizer } from '@angular/platform-browser';
 import { Subject } from "rxjs/Subject";
 import { HttpClient, HttpHeaders } from "@angular/common/http";
 import { map, filter, scan } from 'rxjs/operators';
+import instantsearch from 'instantsearch.js/es';
 
 declare var google;
 
@@ -10,6 +11,12 @@ declare var google;
 export class ExternalApisService {
 
   driveFilePickerRef;
+  algoliaSearch = instantsearch({
+    appId: 'latency',
+    apiKey: '3d9875e51fbd20c7754e65422f7ce5e1',
+    indexName: 'bestbuy',
+    urlSync: true
+  });
   constructor(private http: HttpClient, private sanitizer: DomSanitizer) { }
 
   getWebsitePreview(url) {

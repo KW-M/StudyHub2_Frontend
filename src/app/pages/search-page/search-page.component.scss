@@ -1,0 +1,113 @@
+.class-preview-posts-grid-container {
+    display: flex;
+    margin: 0 6px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.class-preview-posts {
+    display: block;
+    margin: 0 6px;
+    min-width: 312px;
+    flex: 1 1 300px;
+}
+
+app-new-post-bar {
+    position: relative;
+    display: block;
+    z-index: 5;
+}
+
+.label-bar-container {
+    position: relative;
+    margin: 20px;
+    height: 44px;
+    overflow: scroll;
+    flex: 1;
+}
+
+.label-bar-container:hover+.label-bar-overlay {
+    transform: translateY(-60px);
+}
+
+// .label-bar-overlay {
+//     position: relative;
+//     margin-top: -53px;
+//     margin-bottom: -8px;
+//     width: 100%;
+//     height: 62px;
+//     box-sizing: border-box;
+//     z-index: 2;
+//     border-top: solid white 6px;
+//     background: linear-gradient(to bottom, white, rgba(255, 255, 255, 0.92) 23%, rgba(255, 255, 255, 0.7) 45%, transparent);
+//     transition-timing-function: cubic-bezier(0.25, 0.8, 0.25, 1);
+//     transition-duration: 300ms;
+//     transition-property: transform;
+//     pointer-events: none;
+// }
+.label-chips {
+    .mat-chip-list-wrapper {
+        position: absolute;
+        margin: 0 12px;
+        left: 0;
+        right: 0;
+        height: 42px;
+        white-space: nowrap;
+        align-items: center;
+        flex-wrap: nowrap;
+    }
+    mat-chip.mat-chip {
+        background: #311b92;
+        box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.14), 0 2px 1px -1px rgba(0, 0, 0, 0.12), 0 1px 3px 0 rgba(0, 0, 0, 0.2);
+        color: #ffffff;
+        cursor: pointer;
+    }
+    mat-chip.mat-chip:nth-child(16n) {
+        background: linear-gradient(to right, #311b92, #4c1c97);
+    }
+    mat-chip.mat-chip:nth-child(16n+15) {
+        background: linear-gradient(to left, #311b92, #4c1c97);
+    }
+    mat-chip.mat-chip:nth-child(16n+1) {
+        background: linear-gradient(to right, #4c1c97, #621e9d);
+    }
+    mat-chip.mat-chip:nth-child(16n+14) {
+        background: linear-gradient(to left, #4c1c97, #621e9d);
+    }
+    mat-chip.mat-chip:nth-child(16n+2) {
+        background: linear-gradient(to right, #621e9d, #721ea0);
+    }
+    mat-chip.mat-chip:nth-child(16n+13) {
+        background: linear-gradient(to left, #621e9d, #721ea0);
+    }
+    mat-chip.mat-chip:nth-child(16n+3) {
+        background: linear-gradient(to right, #721ea0, #881d97);
+    }
+    mat-chip.mat-chip:nth-child(16n+12) {
+        background: linear-gradient(to left, #721ea0, #881d97);
+    }
+    mat-chip.mat-chip:nth-child(16n+4) {
+        background: linear-gradient(to right, #881d97, #9d1985);
+    }
+    mat-chip.mat-chip:nth-child(16n+11) {
+        background: linear-gradient(to left, #881d97, #9d1985);
+    }
+    mat-chip.mat-chip:nth-child(16n+5) {
+        background: linear-gradient(to right, #9d1985, #b11573);
+    }
+    mat-chip.mat-chip:nth-child(16n+10) {
+        background: linear-gradient(to left, #9d1985, #b11573);
+    }
+    mat-chip.mat-chip:nth-child(16n+6) {
+        background: linear-gradient(to right, #b11573, #c51161);
+    }
+    mat-chip.mat-chip:nth-child(16n+9) {
+        background: linear-gradient(to left, #b11573, #c51161);
+    }
+    mat-chip.mat-chip:nth-child(16n+7) {
+        background: linear-gradient(to right, #c51161, #c5194e);
+    }
+    mat-chip.mat-chip:nth-child(16n+8) {
+        background: linear-gradient(to left, #c51161, #c5194e);
+    }
+}

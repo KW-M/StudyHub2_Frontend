@@ -19,7 +19,9 @@
       "testTsconfig": "tsconfig.spec.json",
       "prefix": "app",
       "styles": [
-        "styles.scss"
+        "styles.scss",
+        "../node_modules/angular-instantsearch/bundles/instantsearch.min.css",
+        "../node_modules/angular-instantsearch/bundles/instantsearch-theme-algolia.min.css"
       ],
       "scripts": [],
       "environmentSource": "environments/environment.ts",
@@ -67,7 +69,7 @@
       "viewEncapsulation": "None"
     },
     "serve": {
-      "host":"localhost"
+      "host": "localhost"
     },
     "directive": {
       "spec": false

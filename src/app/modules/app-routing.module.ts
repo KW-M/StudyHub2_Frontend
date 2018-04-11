@@ -3,6 +3,7 @@ import { Routes, RouterModule } from '@angular/router';
 
 import { FeedPageComponent } from '../pages/feed-page/feed-page.component';
 import { ClassPageComponent } from '../pages/class-page/class-page.component';
+import { SearchPageComponent } from '../pages/search-page/search-page.component';
 
 const routes: Routes = [
   {
@@ -21,6 +22,10 @@ const routes: Routes = [
   {
     path: ':class',
     component: ClassPageComponent
+  },
+  {
+    path: ':class/search',
+    component: SearchPageComponent
   }
 ];
 

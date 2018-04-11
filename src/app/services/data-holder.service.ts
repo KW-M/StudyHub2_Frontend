@@ -16,7 +16,7 @@ export class DataHolderService {
     yorkClasses;
     yorkGroups;
     labelList;
-    searchQuery;
+    searchQuery = null;
     loadingPostsSubscription;
     linkPreviewCache = {};
     allLoadedPosts;
@@ -78,7 +78,7 @@ export class DataHolderService {
 
         Router.events.filter(event => event instanceof NavigationEnd).subscribe((newRoute) => {
             this.currentPage = this.Router.routerState.snapshot.root.firstChild.url[0].path;
-            this.searchQuery = this.Router.routerState.snapshot.root.queryParams.query;
+            this.searchQuery = this.Router.routerState.snapshot.root.queryParams.q;
             if (this.currentPage && this.signedinUser) this.updateVisiblePosts();
         });
 
@@ -103,7 +103,10 @@ export class DataHolderService {
             console.log(event);
             console.log(window.scrollY, window.document.body.scrollHeight);
             if (window.scrollY > window.document.body.scrollHeight - window.document.body.clientHeight) {
-                console.log('scrollDown');
+                if (this.loadingPostsSubscription === null) {
+                    console.log(this.currentPosts[this.currentPosts.length - 1].updateDate);
+                    this.getNextPostSet(this.currentPosts[this.currentPosts.length - 1].updateDate)
+                }
             }
         }
 
@@ -154,27 +157,28 @@ export class DataHolderService {
         this.getNextPostSet(null)
     }
 
-    getNextPostSet(startingPostId) {
-        if (this.loadingPostsSubscription !== 'no more' && this.signedinUser) {
+    getNextPostSet(startingPost) {
+        var handlePostSet = (postSet) => {
+            console.log(postSet, startingPost);
+            //if (postSet.length < 3) this.loadingPostsSubscription = 'no more';
+            if (startingPost === null) {
+                this.currentPosts = postSet;
+            } else {
+                this.currentPosts = this.currentPosts.concat(postSet);
+            }
+            this.visiblePostsStateSource.next(this.currentPosts)
+            if (this.loadingPostsSubscription === 'next') {
+                console.log(this.currentPosts, this.currentPosts[this.currentPosts.length - 1]);
+                this.getNextPostSet(this.currentPosts[this.currentPosts.length - 1].updateDate)
+            } else {
+                this.loadingPostsSubscription = null;
+            }
+        }
+        if (this.loadingPostsSubscription !== 'no more' && this.signedinUser && this.Router.parseUrl(this.Router.url).root.children.primary.segments[1] === undefined) {
             if (this.currentPostFilters.searchQuery) {
                 //this.loadingPostsSubscription = this.ServerAPIs.getSearchPosts(this.currentPostFilters, startingPostId).then(handlePostSet).catch(console.warn);
             } else {
-                this.loadingPostsSubscription = this.ServerAPIs.getPosts(this.currentPostFilters, this.currentSortMethod, startingPostId).first().toPromise().then(handlePostSet).catch(console.warn);
-            }
-        }
-        var handlePostSet = (postSet) => {
-            console.log(postSet);
-
-            if (startingPostId = null) {
-                this.currentPosts = postSet;
-            } else {
-                this.currentPosts.push(postSet);
-            }
-            this.visiblePostsStateSource.next(this.currentPosts)
-            if (this.loadingPostsSubscription = 'next') {
-                this.getNextPostSet(this.currentPosts[this.currentPosts.length - 1].id)
-            } else {
-                this.loadingPostsSubscription = null;
+                this.loadingPostsSubscription = this.ServerAPIs.getPosts(this.currentPostFilters, this.currentSortMethod, startingPost).first().toPromise().then(handlePostSet).catch(console.warn);
             }
         }
     }

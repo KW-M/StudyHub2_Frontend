@@ -9,7 +9,7 @@
         </button>
         <mat-icon class="searchbar-search-icon">search</mat-icon>
         <input class="searchbar-input" placeholder="Search" [(ngModel)]="searchText" (ngModelChange)="updateSearch(searchText)">
-        <button mat-icon-button class="searchbar-clear-button">
+        <button mat-icon-button class="searchbar-clear-button" *ngIf="searchText" (click)="clearSearch()">
             <mat-icon>close</mat-icon>
         </button>
     </div>

@@ -27,7 +27,6 @@
       </mat-progress-bar>
     </div>
     <div class="post-header-overlay bottom-overlay" *ngIf="linkURL == currentPost.link && currentPost.attachmentName != null">
-      <span style="display:none;margin: 0 auto 0 12px;">Title Is Here</span>
       <div class="link-chip">
         <img [src]="currentLinkPreview.icon || 'https://drive-thirdparty.googleusercontent.com/16/type/application/pdf'" class="link-favicon">
         <span class="link-name">{{currentPost.attachmentName}}</span>

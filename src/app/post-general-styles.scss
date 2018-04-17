@@ -11,10 +11,10 @@
     -webkit-font-smoothing: antialiased;
 }
 
-.post-card-header {
+//---- header styles ----
+section.post-header {
     position: relative;
     display: flex;
-    //padding-top: 56.25%;
     width: 100%;
     z-index: 5;
     overflow: hidden;
@@ -28,7 +28,7 @@
 
 .post-header-preview-image {
     position: absolute;
-top: 0;
+    top: 0;
     width: 100%;
 }
 
@@ -63,35 +63,34 @@ top: 0;
     background: linear-gradient(to top, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0));
 }
 
-.post-card-header .link-chip {
+.link-chip {
     display: flex;
     margin: 0 6px;
     max-width: calc(100% - 12px);
     height: 32px;
     border-radius: 16px;
     background: rgba(224, 224, 224, 0.80);
-    color: rgb(66, 66, 66);
-    font-size: 13px;
-    line-height: 32px;
 }
 
-.post-card-header .link-name {
+.link-chip .link-name {
     display: inline-block;
     margin: 0 10px;
     overflow: hidden;
     flex: 1 1 0;
+    color: rgb(66, 66, 66);
     text-overflow: ellipsis;
     white-space: nowrap;
-    font-size: inherit;
+    font-size: 13px;
+    line-height: 32px;
 }
 
-.post-card-header .link-favicon {
+.link-chip .link-favicon {
     margin: 8px 0 8px 12px;
     width: 16px;
     height: 16px;
 }
 
-.post-card-header .link-chip-remove {
+.link-chip .link-chip-remove {
     margin: 6px 6px 6px 0;
     width: 1em;
     height: 1em;
@@ -101,11 +100,12 @@ top: 0;
     cursor: pointer;
 }
 
-.post-card-header .link-chip-remove:hover {
+.link-chip .link-chip-remove:hover {
     opacity: 1;
 }
 
-.post-card-title {
+//text blocks
+.post-title {
     margin: 0;
     padding: 24px 16px 0 16px;
     width: 100%;
@@ -117,9 +117,9 @@ top: 0;
     line-height: 2rem;
 }
 
-.post-card-subtitle {
+.post-subtitle {
     margin: -0.063rem 0;
-    padding: 0 16px 16px 16px;
+    padding: 0 16px;
     color: rgba(0, 0, 0, 0.54);
     letter-spacing: 0.04em;
     font-weight: 400;
@@ -127,16 +127,9 @@ top: 0;
     line-height: 1.25rem;
 }
 
-// .post-card-body-text-container {
-//     position: relative;
-//     box-sizing: border-box;
-//     padding: 0 16px;
-//     transition: padding 225ms cubic-bezier(.4, 0, .2, 1);
-// }
-.post-card-body-text {
-    user-select: text;
+.post-body-text {
     margin: 0;
-    padding: 0 16px;
+    padding: 12px 16px 0 16px;
     min-height: 100px;
     box-sizing: border-box;
     flex: 1;
@@ -144,24 +137,29 @@ top: 0;
     letter-spacing: 0.04em;
     font-size: 0.875rem;
     line-height: 1.25rem;
+    user-select: all;
+    user-select: text;
 }
 
-.post-card-actions {
+.post-actions {
     display: flex;
     padding: 8px;
     box-sizing: border-box;
     align-items: center;
 }
 
-.post-card-actions .mat-icon-button {
+.post-actions .mat-icon-button {
     width: 36px;
     height: 36px;
     line-height: 35px;
 }
 
-.post-card-actions .like-button {
+.post-actions .like-button {
     width: 54px;
     border-radius: 50px;
+    .mat-button-ripple.mat-ripple {
+        border-radius: inherit;
+    }
     mat-icon {
         transform: translateY(-2px);
     }
@@ -172,6 +170,142 @@ top: 0;
     }
 }
 
-.mat-button-ripple.mat-ripple {
-    border-radius: inherit;
+//View/edit dialog specific:
+.post-view-scroll-zone {
+    display: flex;
+    max-height: calc(100vh - 161px);
+    overflow-y: auto;
+    flex-direction: column;
+    flex: 1 100;
+    @media (max-width: 599px) {
+        max-height: calc(100vh - 52px);
+    }
+}
+
+.post-header-overlay * {
+    pointer-events: all;
+}
+
+.post-view-close-button {
+    position: absolute;
+    margin: -2px 0 0 auto;
+    top: 0;
+    right: 0;
+    z-index: 100;
+    color: white;
+}
+
+.floating-close-button {
+    position: absolute;
+    padding: 0 0 8px 8px;
+    top: 0;
+    right: 0;
+    width: 40px;
+    height: 40px;
+    z-index: 1;
+    border-radius: 0 0 0 50px;
+    background: #603ca0;
+    box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.26);
+    cursor: pointer;
+    .mat-icon {
+        margin: 8px;
+        color: white;
+    }
+}
+
+.mat-icon-button.post-view-close-button {
+    position: absolute;
+    margin: -2px 0 0 auto;
+    top: 0;
+    right: 0;
+    z-index: 100;
+    color: white;
+}
+
+.formatting-divider {
+    margin: 0 6px;
+    width: 1px;
+    height: 28px;
+    background-color: rgba(0, 0, 0, 0.1);
+}
+
+.post-chip-list {
+    display: flex;
+    left: 0;
+    right: 0;
+    height: 46px;
+    box-sizing: content-box;
+    overflow: scroll;
+    flex-direction: row;
+    flex: none;
+    white-space: nowrap;
+    align-content: flex-start;
+    align-items: center;
+    mat-chip.mat-chip {
+        display: inline-flex;
+        margin: 3px 4px;
+        padding: 7px 12px;
+        border-radius: 24px;
+        cursor: pointer;
+        transition: box-shadow 280ms cubic-bezier(0.4, 0, 0.2, 1);
+        align-items: center;
+    }
+    mat-chip.mat-chip.chip-gradient {
+        background: #311b92;
+        color: #ffffff;
+        opacity: 0.7;
+    }
+    mat-chip.mat-chip.chip-gradient.mat-chip-selected,
+    mat-chip.mat-chip.chip-gradient:hover {
+        box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.14), 0 2px 1px -1px rgba(0, 0, 0, 0.12), 0 1px 3px 0 rgba(0, 0, 0, 0.2);
+        opacity: 1;
+    }
+    mat-chip.mat-chip.chip-gradient:nth-child(16n) {
+        background: linear-gradient(to right, #311b92, #4c1c97);
+    }
+    mat-chip.mat-chip.chip-gradient:nth-child(16n+15) {
+        background: linear-gradient(to left, #311b92, #4c1c97);
+    }
+    mat-chip.mat-chip.chip-gradient:nth-child(16n+1) {
+        background: linear-gradient(to right, #4c1c97, #621e9d);
+    }
+    mat-chip.mat-chip.chip-gradient:nth-child(16n+14) {
+        background: linear-gradient(to left, #4c1c97, #621e9d);
+    }
+    mat-chip.mat-chip.chip-gradient:nth-child(16n+2) {
+        background: linear-gradient(to right, #621e9d, #721ea0);
+    }
+    mat-chip.mat-chip.chip-gradient:nth-child(16n+13) {
+        background: linear-gradient(to left, #621e9d, #721ea0);
+    }
+    mat-chip.mat-chip.chip-gradient:nth-child(16n+3) {
+        background: linear-gradient(to right, #721ea0, #881d97);
+    }
+    mat-chip.mat-chip.chip-gradient:nth-child(16n+12) {
+        background: linear-gradient(to left, #721ea0, #881d97);
+    }
+    mat-chip.mat-chip.chip-gradient:nth-child(16n+4) {
+        background: linear-gradient(to right, #881d97, #9d1985);
+    }
+    mat-chip.mat-chip.chip-gradient:nth-child(16n+11) {
+        background: linear-gradient(to left, #881d97, #9d1985);
+    }
+    mat-chip.mat-chip.chip-gradient:nth-child(16n+5) {
+        background: linear-gradient(to right, #9d1985, #b11573);
+    }
+    mat-chip.mat-chip.chip-gradient:nth-child(16n+10) {
+        background: linear-gradient(to left, #9d1985, #b11573);
+    }
+    mat-chip.mat-chip.chip-gradient:nth-child(16n+6) {
+        background: linear-gradient(to right, #b11573, #c51161);
+    }
+    mat-chip.mat-chip.chip-gradient:nth-child(16n+9) {
+        background: linear-gradient(to left, #b11573, #c51161);
+    }
+    mat-chip.mat-chip.chip-gradient:nth-child(16n+7) {
+        background: linear-gradient(to right, #c51161, #c5194e);
+    }
+    mat-chip.mat-chip.chip-gradient:nth-child(16n+8) {
+        background: linear-gradient(to left, #c51161, #c5194e);
+    }
 }

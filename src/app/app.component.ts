@@ -13,7 +13,7 @@ import { ExternalApisService } from './services/external-apis.service';
       <app-signin-prompt></app-signin-prompt>
     </div>
   `,
-  styleUrls: ['./app.component.scss'],
+  styleUrls: ['./app.component.scss', './post-general-styles.scss'],
   encapsulation: ViewEncapsulation.None,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

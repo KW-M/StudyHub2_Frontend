@@ -8,6 +8,7 @@ import { HttpClient, HttpParams, HttpHeaders } from "@angular/common/http";
 import { AngularFireAuth } from 'angularfire2/auth';
 import * as firebase from 'firebase/app';
 
+
 @Injectable()
 export class StudyhubServerApisService {
   serverURLBase: string = 'https://fir-test-156302.firebaseio.com/';
@@ -48,7 +49,7 @@ export class StudyhubServerApisService {
     return this.FireStore.collection('posts')
   }
 
-  getPosts(postFilters, sortBy, lastPost) {
+  getPosts(postFilters, sortBy, lastPost, pageSize) {
     console.log({
       filters: postFilters,
       sortingOrder: sortBy,
@@ -57,25 +58,40 @@ export class StudyhubServerApisService {
     return this.FireStore.collection("posts", (ref) => {
       console.log(lastPost);
       let query: firebase.firestore.CollectionReference | firebase.firestore.Query = ref;
-      if (postFilters.className) { query = query.where("classes." + postFilters.className, "==", true) }
-      if (postFilters.userEmail) { query = query.where("creator.email", "==", postFilters.userEmail) }
+      if (!postFilters.userEmail) query = query.where("flagged", "==", postFilters.flagged || false)
+      if (postFilters.className) {
+        query = query.where("classes." + postFilters.className, "==", true).orderBy("updateDate", "desc");
+      } else {
+        if (postFilters.userEmail) {
+          query = query.where("creator.email", "==", postFilters.userEmail).orderBy("updateDate", "desc");
+        } else {
+          query = query.orderBy(sortBy || "updateDate", "desc")
+        }
+      }
       if (lastPost) { query = query.startAfter(lastPost) }
-      query = query.where("flagged", "==", postFilters.flagged || false)
-      query = query.orderBy("updateDate", "desc").limit(4);
-      return query
+      return query.limit(pageSize || 4);
     }).snapshotChanges().map(actions => {
-      return actions.map(action => {
-        const data = action.payload.doc.data();
-        data.id = action.payload.doc.id;
+      return actions.map((changeSnapshot) => {
+        console.log(changeSnapshot);
+        const data = changeSnapshot.payload.doc.data();
+        data.id = changeSnapshot.payload.doc.id;
         data.classes = this.objToArray(data.classes)
         return data
       });
     })
   }
 
-  getFeedPosts() {
-    const params = new HttpParams().append('idtoken', gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse().id_token)
-    return this.http.get(this.serverURLBase + "/feedPosts", { 'params': params }).toPromise()
+  getFeedPosts(favorites) {
+    var requestArray = []
+    for (const favClass in favorites) {
+      if (favorites.hasOwnProperty(favClass)) {
+        console.log(favClass);
+        requestArray.push(this.getPosts({
+          className: favClass
+        }, null, null, 4).first().toPromise())
+      }
+    }
+    return Promise.all(requestArray)
   }
 
   getUserBookmarks(email) {
@@ -95,10 +111,18 @@ export class StudyhubServerApisService {
     return this.http.get(this.serverURLBase + "/search", { 'params': params }).toPromise();
   }
 
-  getRecentlyViewedPosts() {
-    ///////////not done
-    const params = new HttpParams().append('idtoken', gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse().id_token)
-    return this.http.get(this.serverURLBase + "/lastviewedPosts", { 'params': params }).toPromise()
+  getRecentlyViewedPosts(recentPostArray) {
+    var requestArray = []
+    recentPostArray.forEach(postId => {
+      requestArray.push(this.FireStore.collection('posts').doc(postId).snapshotChanges().map((changeSnapshot) => {
+        console.log(changeSnapshot);
+        const data = changeSnapshot.payload.data();
+        data.id = changeSnapshot.payload.id;
+        data.classes = this.objToArray(data.classes)
+        return data
+      }).first().toPromise())
+    });
+    return Promise.all(requestArray)
   }
 
   getClassAndGroupList() {
@@ -167,6 +191,50 @@ export class StudyhubServerApisService {
     }
   }
 
+  updateLikes(postId, userEmail) {
+    console.log(postId, userEmail);
+
+    return this.FireStore.firestore.runTransaction((transaction) => {
+      // This code may get re-run multiple times if there are conflicts.
+      return transaction.get(this.FireStore.collection("posts").doc(postId).ref).then((post) => {
+        if (!post.exists) {
+          throw "Document does not exist!";
+        } else {
+          var likeUsers = post.data().likeUsers
+          var index = likeUsers.indexOf(userEmail)
+          if (index === -1) {
+            likeUsers.push(userEmail)
+          } else {
+            likeUsers.splice(index, 1)
+          }
+          var likeCount = likeUsers.length;
+        }
+        transaction.update(this.FireStore.collection("posts").doc(postId).ref, { likeUsers: likeUsers, likeCount: likeCount });
+      });
+    })
+  }
+
+  viewPost(postId) {
+    return this.FireStore.firestore.runTransaction((transaction) => {
+      // This code may get re-run multiple times if there are conflicts.
+      return transaction.get(this.FireStore.collection("posts").doc(postId).ref).then((post) => {
+        if (!post.exists) {
+          throw "Document does not exist!";
+        }
+        transaction.update(this.FireStore.collection("posts").doc(postId).ref, { viewCount: post.data().viewCount + 1 || 0 });
+      });
+    }).then(() => {
+      return this.FireDB.object('users/' + this.removeFirebaseKeyIllegalChars(this.FireAuth.auth.currentUser.email) + '/recentlyViewed').query.ref.transaction(recents => {
+        recents = recents || []
+        var indexOf = recents.indexOf(postId)
+        if (indexOf !== -1) recents.splice(indexOf, 1)
+        recents.splice(0, 0, postId)
+        if (recents.length > 5) { recents.pop(1) }
+        return recents;
+      })
+    })
+  }
+
   setFavorites(favoritesObj) {
     return this.FireDB.object('users/' + this.removeFirebaseKeyIllegalChars(this.FireAuth.auth.currentUser.email) + "/favorites").set(favoritesObj)
   }
@@ -193,10 +261,8 @@ export class StudyhubServerApisService {
     }
     return output;
   }
+
+  calculatePostRanking(post) {
+
+  }
 }
-
-
-    // this.FireAuth.auth.currentUser.getIdToken(false).then(function (idToken) {
-    //   fireIdToken = idToken;
-    //   return this.http.get(this.serverURLBase + "/yorkClasses.json?auth=" + fireIdToken)
-    // })

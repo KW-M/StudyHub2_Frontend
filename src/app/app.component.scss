@@ -6,6 +6,8 @@ app-toolbar {
 
 .main-content {
     margin-top: 64px;
+    width: auto;
+    min-width: 0;
     flex: 1;
 }
 

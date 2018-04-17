@@ -1,22 +1,26 @@
-<div class="feed-header">
+<div class="feed-header" *ngIf="recentPosts !== null">
   <div class="top-posts-text feed-header-padding">
-    Top Posts
+    Quick Access
   </div>
+  <mat-progress-spinner mode="indeterminate" style="margin:auto" color="accent" diameter="36" *ngIf="recentPosts.length === 0"></mat-progress-spinner>
   <div class="top-posts-container feed-header-padding">
-    <!-- <app-post-card-mini *ngFor="let post of allPosts;" [input-post]="post"></app-post-card-mini> -->
+    <app-post-card-mini *ngFor="let post of recentPosts" [input-post]="post"></app-post-card-mini>
   </div>
 </div>
 <app-new-post-bar></app-new-post-bar>
 <div class="class-preview-posts-grid-container">
   <div class="class-preview-posts" *ngFor="let classBlock of currentPostsGrid; let i = index">
-    <span class="class-preview-title">Class Name {{i}}</span>
-    <app-post-card *ngFor="let post of classBlock" [input-post]="post"></app-post-card>
+    <span class="class-preview-title">{{classBlock.className}}</span>
+    <app-post-card *ngFor="let post of classBlock.posts" [input-post]="post"></app-post-card>
     <div class="class-preview-more-button">
-      <button color="accent" mat-button>MORE</button>
+      <button color="accent" mat-button [routerLink]="'/'+classBlock.className" *ngIf="classBlock.posts.length === 4">MORE</button>
     </div>
   </div>
   <!-- spacer grid items at the end keep the other grid items equal width trackBy:trackByPostIdFn -->
   <div class="class-preview-posts"></div>
   <div class="class-preview-posts"></div>
   <div class="class-preview-posts"></div>
+</div>
+<div class="loading-container">
+  <mat-progress-spinner mode="indeterminate" style="margin:auto;flex: 1" color="accent" diameter="36" *ngIf="currentPostsGrid.length === 0"></mat-progress-spinner>
 </div>

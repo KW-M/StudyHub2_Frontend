@@ -1,5 +1,6 @@
 import { Component, ViewEncapsulation, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef, ElementRef } from '@angular/core';
 import { connectHits } from 'instantsearch.js/es/connectors';
+import { connectRefinementList } from 'instantsearch.js/es/connectors';
 
 import { WindowService } from "../../services/window.service";
 import { EventBoardService } from "../../services/event-board.service";
@@ -17,6 +18,7 @@ import { ExternalApisService } from '../../services/external-apis.service';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class SearchPageComponent implements OnDestroy {
+  classRefinementstate: any;
   labels: any = [];
   posts: any = [];
   postsGrid;
@@ -59,7 +61,7 @@ export class SearchPageComponent implements OnDestroy {
       }
       this.ChangeDetector.detectChanges();
     })
-    // Create a widget which will call `this.updateState` whenever
+    // Create a widget which will run the function whenever
     // something changes on the search state itself
     const widget = connectHits((state, isFirstRendering) => {
       console.log(state);
@@ -85,13 +87,24 @@ export class SearchPageComponent implements OnDestroy {
         updatePosts()
       }
     });
+    const classWidget = connectRefinementList((state, isFirstRendering) => {
+      // asynchronous update of the state
+      // avoid `ExpressionChangedAfterItHasBeenCheckedError`
+      if (isFirstRendering) {
+        return Promise.resolve(null).then(() => {
+          this.classRefinementstate = state;
+        });
+      }
+      this.classRefinementstate = state;
+    });
     // Register the Hits widget into the instantSearchService search instance.
     this.ExternalAPIs.algoliaSearch.addWidget(widget());
+    this.ExternalAPIs.algoliaSearch.addWidget(widget({
+      attributeName: 'category'
+    }));
   }
 
   getPostsGrid(inputArray, skipColCheck) {
-
-
     var numOfColumns = Math.floor(this.nativeElementRef.nativeElement.clientWidth / 320);
     this.columnWidth = (this.nativeElementRef.nativeElement.clientWidth - 12) / numOfColumns
     console.dir(this.nativeElementRef.nativeElement, numOfColumns);
@@ -119,12 +132,19 @@ export class SearchPageComponent implements OnDestroy {
     return post.id
   }
 
+  updateSearchClass(className) {
+    // index.search({
+    //   filters: 'device:smartphone AND display:retina'
+    // });
+  }
+
   ngOnDestroy() {
-    //  this.ChangeDetector.detach(); // try this
     console.log('searchDestoryed')
     // for me I was detecting changes inside "subscribe" so was enough for me to just unsubscribe;
     this.sideNavOpenObserver.unsubscribe()
   }
 
 }
+
+
 

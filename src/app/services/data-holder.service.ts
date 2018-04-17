@@ -23,13 +23,9 @@ export class DataHolderService {
     currentPage;
     currentPosts;
     currentPostFilters = {
-        searchQuery: null,
+        flagged: false,
         className: null,
         userEmail: null,
-        tags: [],
-        date: null,
-        usersBookmarks: false,
-        fancySearch: false,
     };
     currentSortMethod = 'magic'; //byDate byLikes byViews
 
@@ -116,35 +112,29 @@ export class DataHolderService {
         switch (this.currentPage) {
             case 'all posts':
                 this.updateSearchFilters({
-                    searchQuery: this.searchQuery || null,
                     className: null,
+                    flagged: false,
                     userEmail: null,
-                    tags: [],
-                    date: null,
                 }, null)
                 break;
             case 'my posts':
                 this.updateSearchFilters({
-                    searchQuery: this.searchQuery || null,
+                    flagged: false,
                     className: null,
                     userEmail: this.signedinUser['email'] || null,
-                    tags: [],
-                    date: null,
                 }, null)
                 break;
             case 'bookmarks':
                 //this.getBookmarkedPosts()
                 break;
             case 'feed':
-                //this.getRecentlyViewedPosts()
-                this.getFeedPosts()
+                //the feed page handles things
                 break;
             default:
                 this.updateSearchFilters({
+                    flagged: false,
                     className: this.currentPage,
                     userEmail: null,
-                    tags: [],
-                    date: null,
                 }, null)
                 break;
         }
@@ -175,26 +165,25 @@ export class DataHolderService {
             }
         }
         if (this.loadingPostsSubscription !== 'no more' && this.signedinUser && this.Router.parseUrl(this.Router.url).root.children.primary.segments[1] === undefined) {
-            if (this.currentPostFilters.searchQuery) {
-                //this.loadingPostsSubscription = this.ServerAPIs.getSearchPosts(this.currentPostFilters, startingPostId).then(handlePostSet).catch(console.warn);
-            } else {
-                this.loadingPostsSubscription = this.ServerAPIs.getPosts(this.currentPostFilters, this.currentSortMethod, startingPost).first().toPromise().then(handlePostSet).catch(console.warn);
-            }
+            this.loadingPostsSubscription = this.ServerAPIs.getPosts(this.currentPostFilters, null, startingPost, null).first().toPromise().then(handlePostSet).catch((e) => {
+                console.warn(e)
+                if (e.message.indexOf("index")) {
+                    console.log("error index", this.currentPostFilters.className);
+                }
+            });
         }
     }
 
-    getPosts
-
-    getAllPosts() {
-        // this.ServerAPIs.getAllPosts(this.currentSortMethod).then((posts: any) => { this.allLoadedPosts = posts; this.visiblePostsStateSource.next(posts) }, console.warn)
-    }
+    // getAllPosts() {
+    //     // this.ServerAPIs.getAllPosts(this.currentSortMethod).then((posts: any) => { this.allLoadedPosts = posts; this.visiblePostsStateSource.next(posts) }, console.warn)
+    // }
 
     getFeedPosts() {
-        this.ServerAPIs.getFeedPosts().then((posts: any) => { this.allLoadedPosts = posts; this.feedPostsStateSource.next({ feed: posts }) }, console.warn)
+        return this.ServerAPIs.getFeedPosts(this.signedinUser.favorites)
     }
 
     getRecentlyViewedPosts() {
-        this.ServerAPIs.getRecentlyViewedPosts().then((posts: any) => { this.allLoadedPosts = posts; this.feedPostsStateSource.next({ feed: posts }) }, console.warn)
+        return this.ServerAPIs.getRecentlyViewedPosts(this.signedinUser.recentlyViewed)
     }
 
     deletePost(postObj) {
@@ -202,8 +191,8 @@ export class DataHolderService {
         let postIndex = this.findPost(postObj.id)
         this.currentPosts.splice(postIndex, 1)
         this.visiblePostsStateSource.next(this.currentPosts);
-        let snackBar = this.snackBar.open('Deleting Post', 'Undo', {
-            duration: 10000,
+        let snackBar = this.snackBar.open('Deleting Post', 'Cancel', {
+            duration: 5000,
             horizontalPosition: "start"
         })
         snackBar.afterDismissed().toPromise().then((action) => {

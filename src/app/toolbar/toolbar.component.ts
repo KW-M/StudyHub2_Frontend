@@ -19,18 +19,19 @@ import { ExternalApisService } from '../services/external-apis.service';
 export class ToolbarComponent implements OnInit {
   algoliaSearchState: any;
   mobileSearchOpen: boolean = false;
+  currentPage
   windowSize;
   searchText;
   user = {
     name: 'York Student',
     email: ' . . . @york.org',
-    profilePhoto: 'http://studyhub.york.org/images/accountPic.jpg',
+    photoURL: 'http://studyhub.york.org/images/accountPic.jpg',
   };
   throttleTimer = {
 
   };
   constructor(
-    private router: Router,
+    private Router: Router,
     private GSignin: GoogleSigninService,
     public EventBoard: EventBoardService,
     private DataHolder: DataHolderService,
@@ -48,8 +49,9 @@ export class ToolbarComponent implements OnInit {
       this.user = userObj || { photoURL: 'http://studyhub.york.org/images/accountPic.jpg', name: 'York Student', email: ' . . . @york.org' };
       ChangeDetector.detectChanges()
     });
-    router.events.filter(event => event instanceof NavigationEnd).subscribe((newRoute) => {
-      this.searchText = this.router.routerState.snapshot.root.queryParams.q || null;
+    Router.events.filter(event => event instanceof NavigationEnd).subscribe((newRoute) => {
+      this.currentPage = this.Router.routerState.snapshot.root.firstChild.url[0].path || "My Feed";
+      this.searchText = this.Router.routerState.snapshot.root.queryParams.q || null;
       ChangeDetector.detectChanges()
     });
   }
@@ -98,7 +100,7 @@ export class ToolbarComponent implements OnInit {
       }
     });
     this.ExternalAPIs.algoliaSearch.addWidget(widget());
-    this.searchText = this.router.routerState.snapshot.root.queryParams.q || null;
+    this.searchText = this.Router.routerState.snapshot.root.queryParams.q || null;
   }
 
 }

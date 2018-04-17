@@ -51,8 +51,10 @@ export class SidenavComponent implements OnInit {
     });
 
     DataHolder.currentUserState$.subscribe((user) => {
-      this.favoriteClasses = user['favorites'];
-      this.changeDetector.detectChanges();
+      if (user) {
+        this.favoriteClasses = user['favorites'] || {};
+        this.changeDetector.detectChanges();
+      }
     })
   }
 

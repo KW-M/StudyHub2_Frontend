@@ -17,44 +17,41 @@
         overflow: hidden;
         cursor: pointer;
         user-select: none;
-        .post-card-body-text {
-            min-height: unset;
+        .post-body-overflow-indicator {
+            position: absolute;
+            top: 7.75em;
+            right: 16px;
+            width: 70px;
+            height: 1.25rem;
+            background: white;
+            box-shadow: -20px 3px 40px 19px white;
         }
     }
-
-    .post-card-body-text-container.over-actions {
-     }
-
     .post-card-body-text-container.under-actions {
-       margin-bottom: 24px;
-       transition: max-height 225ms cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    .post-card-body-text-container.under-actions:not(.expanded) {
-        margin-bottom: 0;
         max-height: 0;
+        box-sizing: content-box;
+        transition: max-height 225ms cubic-bezier(0.4, 0, 0.2, 1);
+        .post-body-text {
+            padding-top: 0;
+        }
     }
-    .post-card-overflow-indicator {
-        position: absolute;
-        right: 16px;
-        bottom: 0;
-        width: 70px;
-        height: 1.25rem;
-        /* background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.83), white, white); */
-        /* background: linear-gradient(to left, white 45%, transparent); */
-        background: white;
-        box-shadow: -20px 3px 40px 19px white;
+    .post-card-body-text-container.under-actions.expanded {
+        max-height: 9rem;
+        border-bottom: 18px solid transparent;
     }
-    .post-card-actions .expand-button {
+    .post-body-text {
+        min-height: unset;
+    }
+    .post-actions .expand-button {
         margin-left: auto;
         mat-icon {
             width: 30px;
             font-size: 30px;
-            transition: transform 225ms cubic-bezier(0.4, 0, 0.2, 1);
             transform: none;
+            transition: transform 225ms cubic-bezier(0.4, 0, 0.2, 1);
         }
     }
-    .post-card-actions .expand-button.expanded mat-icon {
+    .post-actions .expand-button.expanded mat-icon {
         transform: rotate(180deg);
     }
 }

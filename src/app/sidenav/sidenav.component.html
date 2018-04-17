@@ -63,7 +63,7 @@
         </span>
       </mat-list-item>
     </mat-nav-list>
-    <div class="sidenav-buttons-header">
+    <!-- <div class="sidenav-buttons-header">
       <button mat-icon-button class="expand-arrow" [ngClass]="{'expanded': showAllGroups === true}" (click)="showAllGroups = !showAllGroups; showAllClasses = (editingFavorites && showAllClasses);">
         <mat-icon>keyboard_arrow_right</mat-icon>
       </button>
@@ -86,15 +86,7 @@
           <mat-icon>{{showAllGroups? 'keyboard_arrow_up' :'keyboard_arrow_down'}}</mat-icon>
         </span>
       </mat-list-item>
-      <!-- <mat-list-item (click)="showAllClasses = true;showAllGroups = true" *ngIf="showAllGroups === false">
-        <mat-icon mat-list-icon>arrow_drop_down</mat-icon>
-        <h4 mat-line>Show All</h4>
-      </mat-list-item>
-      <mat-list-item (click)="showAllClasses = false; showAllGroups = false" *ngIf="showAllGroups === true">
-        <mat-icon mat-list-icon>arrow_drop_up</mat-icon>
-        <h4 mat-line>Show Favorites</h4>
-      </mat-list-item> -->
-    </mat-nav-list>
+    </mat-nav-list> -->
   </div>
   <div class="backdrop" (click)="closeSideNav()"></div>
 </div>

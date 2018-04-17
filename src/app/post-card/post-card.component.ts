@@ -2,11 +2,12 @@ import { Component, OnInit, ViewEncapsulation, Input, ChangeDetectionStrategy, C
 import { ExternalApisService } from '../services/external-apis.service';
 import { DataHolderService } from '../services/data-holder.service';
 import { EventBoardService } from '../services/event-board.service';
+import { StudyhubServerApisService } from '../services/studyhub-server-apis.service';
 
 @Component({
   selector: 'app-post-card',
   templateUrl: './post-card.component.html',
-  styleUrls: ['./post-card.component.scss', '../post-general-styles.scss'],
+  styleUrls: ['./post-card.component.scss'],
   encapsulation: ViewEncapsulation.None,
   changeDetection: ChangeDetectionStrategy.OnPush
 })
@@ -22,6 +23,7 @@ export class PostCardComponent implements OnInit, OnDestroy {
 
   constructor(private changeDetector: ChangeDetectorRef,
     private ExternalAPIs: ExternalApisService,
+    private ServerAPIS: StudyhubServerApisService,
     private dataHolder: DataHolderService,
     private eventBoard: EventBoardService) {
   }
@@ -35,7 +37,8 @@ export class PostCardComponent implements OnInit, OnDestroy {
       "likeCount": 0,//<-
       "likeUsers": [],//<-
       "viewCount": 0,//<-
-      "labels": [],
+      "ranking": 0,//<-
+      "labels": {},
       "classes": [],
       "creator": {
         "email": null,
@@ -66,6 +69,7 @@ export class PostCardComponent implements OnInit, OnDestroy {
       }
     }
   }
+
   likePost() {
     var emailIndex = this.currentPost.likeUsers.indexOf(this.dataHolder.signedinUser.email)
     if (emailIndex !== -1) {
@@ -74,14 +78,22 @@ export class PostCardComponent implements OnInit, OnDestroy {
       this.currentPost.likeUsers.push(this.dataHolder.signedinUser.email)
     }
     this.currentPost.likeCount = this.currentPost.likeUsers.length
+    this.ServerAPIS.updateLikes(this.currentPost.id, this.dataHolder.signedinUser.email)
+    this.changeDetector.detectChanges()
   }
 
   viewPost() {
-
+    this.eventBoard.openPostModal(this.currentPost, 'view')
+    this.ServerAPIS.viewPost(this.currentPost.id).then(console.log).catch(console.warn)
   }
 
   viewLink() {
-    window.open()
+    if (this.currentPost.link) {
+      this.ServerAPIS.viewPost(this.currentPost.id).then(console.log).catch(console.warn)
+      window.open(this.currentPost.link)
+    } else {
+      this.viewPost()
+    }
   }
 
   editPost(post) {

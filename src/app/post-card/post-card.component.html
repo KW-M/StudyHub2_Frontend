@@ -1,5 +1,5 @@
-<div class="post-card mat-elevation-z3" [ngStyle]="{'background-color':'hsl('+currentPost?.color?.h+','+currentPost?.color?.s+'%,'+currentPost?.color?.l+'%)'}">
-  <section class="post-card-header" matRipple *ngIf="currentPost?.link">
+<div class="post-card post-styles mat-elevation-z3" [ngStyle]="{'background-color':'hsl('+currentPost?.color?.h+','+currentPost?.color?.s+'%,'+currentPost?.color?.l+'%)'}">
+  <section class="post-header" matRipple *ngIf="currentPost?.link" (click)="viewLink()">
     <img src="https://material-components-web.appspot.com/images/16-9.jpg" style="width:100%;height:100%">
     <img [src]="currentLinkPreview?.thumbnail" *ngIf="currentLinkPreview?.thumbnail" class="post-header-preview-image">
     <div class="post-header-overlay bottom-overlay">
@@ -9,19 +9,19 @@
       </div>
     </div>
   </section>
-  <section class="post-card-title-container">
-    <h1 class="post-card-title">{{currentPost?.title}}</h1>
-    <h2 class="post-card-subtitle">{{currentPost?.creator.name}}</h2>
+  <section class="post-title-container" (click)="viewLink()">
+    <h1 class="post-title">{{currentPost?.title}}</h1>
+    <h2 class="post-subtitle">{{currentPost?.creator.name}}</h2>
   </section>
-  <section class="post-card-body-text-container over-actions" *ngIf="!currentPost?.link" onclick="alert('hi')">
-    <p class="post-card-body-text" [innerHTML]="currentPost?.description"></p>
-    <div class="post-card-overflow-indicator" [ngStyle]="{'background-color':'hsl('+currentPost?.color?.h+','+currentPost?.color?.s+'%,'+currentPost?.color?.l+'%)','box-shadow':'-20px 3px 40px 19px hsl('+currentPost?.color?.h+','+currentPost?.color?.s+'%,'+currentPost?.color?.l+'%)'}">
-      <mat-icon style="    margin-left: 12px; line-height: 20px;">more_horiz</mat-icon>
+  <section class="post-card-body-text-container over-actions" *ngIf="currentPost?.description && !currentPost?.link" (click)="viewPost()">
+    <p class="post-body-text" [innerHTML]="currentPost?.description"></p>
+    <div class="post-body-overflow-indicator" [ngStyle]="{'background-color':'hsl('+currentPost?.color?.h+','+currentPost?.color?.s+'%,'+currentPost?.color?.l+'%)','box-shadow':'-20px 3px 40px 19px hsl('+currentPost?.color?.h+','+currentPost?.color?.s+'%,'+currentPost?.color?.l+'%)'}">
+      <mat-icon style="margin-left: 12px; line-height: 20px;">more_horiz</mat-icon>
     </div>
   </section>
-  <section class="post-card-actions">
-    <button mat-icon-button class="like-button">
-      <span class="like-counter">12</span>
+  <section class="post-actions">
+    <button mat-icon-button class="like-button" (click)="likePost()">
+      <span class="like-counter">{{currentPost?.likeCount || 0}}</span>
       <mat-icon>thumb_up</mat-icon>
     </button>
     <button mat-icon-button [matMenuTriggerFor]="postActionsMenu">
@@ -47,9 +47,9 @@
     </button>
   </section>
   <section class="post-card-body-text-container under-actions" *ngIf="currentPost?.description && currentPost?.link" [ngClass]="{'expanded':postBodyTextShown}"
-    onclick="alert('hi')">
-    <p class="post-card-body-text" [innerHTML]="currentPost?.description"></p>
-    <div class="post-card-overflow-indicator" [ngStyle]="{'background-color':'hsl('+currentPost?.color?.h+','+currentPost?.color?.s+'%,'+currentPost?.color?.l+'%)','box-shadow':'-20px 3px 40px 19px hsl('+currentPost?.color?.h+','+currentPost?.color?.s+'%,'+currentPost?.color?.l+'%)'}">
+    (click)="viewPost(currentPost)">
+    <p class="post-body-text" [innerHTML]="currentPost?.description"></p>
+    <div class="post-body-overflow-indicator" [ngStyle]="{'background-color':'hsl('+currentPost?.color?.h+','+currentPost?.color?.s+'%,'+currentPost?.color?.l+'%)','box-shadow':'-20px 3px 40px 19px hsl('+currentPost?.color?.h+','+currentPost?.color?.s+'%,'+currentPost?.color?.l+'%)'}">
       <mat-icon style="    margin-left: 12px; line-height: 20px;">more_horiz</mat-icon>
     </div>
   </section>

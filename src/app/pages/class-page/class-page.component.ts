@@ -13,6 +13,7 @@ import { EventBoardService } from '../../services/event-board.service';
 export class ClassPageComponent implements OnInit, OnDestroy {
   labels: any = [];
   posts: any = [];
+  labelScrollPercentage = 0;
   postsGrid;
   gridColumns;
   numOfColumns;
@@ -45,6 +46,12 @@ export class ClassPageComponent implements OnInit, OnDestroy {
         this.ChangeDetector.detectChanges();
       }
     };
+
+    var labelsScrollElm = document.getElementById('scrollable_class_labels')
+    labelsScrollElm.onscroll = () => {
+      this.labelScrollPercentage = labelsScrollElm.scrollLeft / (labelsScrollElm.scrollWidth - labelsScrollElm.clientWidth);
+      this.ChangeDetector.markForCheck()
+    }
 
     this.sideNavOpenObserver = this.EventBoard.sideNavOpen$.subscribe(() => {
       if (this.posts.length > 0) {
@@ -86,7 +93,20 @@ export class ClassPageComponent implements OnInit, OnDestroy {
   }
 
   trackByPostIdFn(index, post) {
+    console.log(post.id);
+
     return post.id
+  }
+  trackByIndex(index, post) {
+    return index
+  }
+
+  scrollLabels(direction) {
+    var labelsScrollElm = document.getElementById('scrollable_class_labels')
+    labelsScrollElm.scroll({
+      left: labelsScrollElm.scrollLeft + ((direction === 'right') ? labelsScrollElm.clientWidth * 0.6 : -(labelsScrollElm.clientWidth * 0.6)),
+      behavior: "smooth"
+    })
   }
 
   ngOnDestroy() {

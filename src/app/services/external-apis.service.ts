@@ -12,8 +12,8 @@ export class ExternalApisService {
 
   driveFilePickerRef;
   algoliaSearch = instantsearch({
-    appId: 'latency',
-    apiKey: '3d9875e51fbd20c7754e65422f7ce5e1',
+    appId: 'E4ZO0GZETF',
+    apiKey: '86abcc5769205165e5da838c20e882c4',
     indexName: 'bestbuy',
     urlSync: true
   });
@@ -40,7 +40,6 @@ export class ExternalApisService {
   openShareDialog(fileID) {
     return new Promise(function (resolve, reject) {
       console.log(fileID);
-
       if (gapi['drive'] && gapi['drive']['share']) {
         showDialog()
       } else {
@@ -49,7 +48,7 @@ export class ExternalApisService {
       function showDialog() {
         console.log('fileID');
         let s = new gapi['drive'].share.ShareClient();
-        s.setOAuthToken(gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse().id_token);
+        s.setOAuthToken(gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse().access_token);
         s.setItemIds([fileID]);
         s.showSettingsDialog();
       }
@@ -71,10 +70,10 @@ export class ExternalApisService {
           var recentsView = new google.picker.DocsView(google.picker.ViewId.DOCS).setIncludeFolders(false).setSelectFolderEnabled(true).setLabel('Recents');
           var staredView = new google.picker.DocsView(google.picker.ViewId.DOCS).setIncludeFolders(true).setSelectFolderEnabled(true).setStarred(true).setLabel('Stared');
           this.driveFilePickerRef = new google.picker.PickerBuilder()
-            .setAppId("191304458473")
+            .setAppId("191304458473-pkjgflqvuk0n7u7q3smb5r7ul6l3cevn")
             .setDeveloperKey("AIzaSyBpJyrgXYqBYUG5iKlTE--8z8ZaiAJRqL0")
             .setOrigin(window.location.protocol + '//' + window.location.host)
-            .setOAuthToken(gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse().id_token)
+            .setOAuthToken(gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse().access_token)
             .setCallback(resolve)
             .addView(docsView).addView(sharedView).addView(recentsView).addView(staredView).build();
           this.driveFilePickerRef.setVisible(true);

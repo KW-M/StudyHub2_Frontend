@@ -34,10 +34,12 @@ app-root {
 *,
 *:before,
 *:after {
+    -webkit-overflow-scrolling: touch;
     //box-sizing: inherit;
     outline: inherit;
     user-select: inherit;
     -webkit-tap-highlight-color: transparent;
+    -ms-overflow-style: -ms-autohiding-scrollbar;
 }
 
 input,

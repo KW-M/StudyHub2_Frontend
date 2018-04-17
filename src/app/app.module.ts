@@ -27,6 +27,7 @@ import { SpeeddialComponent } from './speeddial/speeddial.component';
 import { SidenavComponent } from './sidenav/sidenav.component';
 import { PostModalFrameComponent } from './post-modal-frame/post-modal-frame.component';
 import { PostEditViewComponent } from './post-edit-view/post-edit-view.component';
+import { PostViewViewComponent } from './post-view-view/post-view-view.component';
 import { PostCardComponent } from './post-card/post-card.component';
 import { PostCardMiniComponent } from './post-card-mini/post-card-mini.component';
 import { NewPostBarComponent } from './new-post-bar/new-post-bar.component';
@@ -46,6 +47,7 @@ import { ObjKeysPipe } from './obj-keys.pipe';
     SidenavComponent,
     PostModalFrameComponent,
     PostEditViewComponent,
+    PostViewViewComponent,
     PostCardComponent,
     PostCardMiniComponent,
     NewPostBarComponent,

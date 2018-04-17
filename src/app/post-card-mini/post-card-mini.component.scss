@@ -1,0 +1,89 @@
+.post-card-mini {
+    position: relative;
+    display: inline-block;
+    margin: 0 6px;
+    width: 260px;
+    border-radius: 3px;
+    background: white;
+    font-weight: 400;
+    font-family: Roboto, sans-serif;
+    cursor: pointer;
+    user-select: none;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-font-smoothing: antialiased;
+}
+
+.post-card-mini-header {
+    position: relative;
+    height: 100px;
+    background: url(https://material-components-web.appspot.com/images/16-9.jpg);
+    background-size: cover;
+    background-repeat: no-repeat;
+}
+
+// .post-header-overlay {
+//     position: absolute;
+//     display: flex;
+//     left: 0;
+//     right: 0;
+//     height: 56px;
+//     flex-direction: column;
+//     color: white;
+//     align-items: center;
+//     justify-content: center;
+// }
+// .post-header-overlay.bottom-overlay {
+//     bottom: 0;
+//     background: linear-gradient(to top, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0));
+// }
+// .post-card-mini-header .link-chip {
+//     margin: 0 6px;
+//     height: 32px;
+//     border-radius: 16px;
+//     background: rgba(224, 224, 224, 0.80);
+//     color: rgb(66, 66, 66);
+//     font-size: 13px;
+//     line-height: 32px;
+// }
+// .post-card-mini-header .link-name {
+//     display: inline-block;
+//     margin: 0 10px;
+//     overflow: hidden;
+//     flex: 1 1 0;
+//     text-overflow: ellipsis;
+//     white-space: nowrap;
+//     font-size: inherit;
+//     -webkit-box-flex: 1;
+// }
+// .post-card-mini-header .link-favicon {
+//     margin: 8px 0 8px 12px;
+//     width: 16px;
+//     height: 16px;
+// }
+.post-card-mini-text-content {
+    padding: 8px 16px;
+}
+
+.post-card-mini-title {
+    color: rgba(0, 0, 0, 0.87);
+    font-size: 1rem;
+    line-height: 1.6rem;
+}
+
+.post-card-mini-subtitle {
+    color: rgba(0, 0, 0, 0.87);
+    letter-spacing: 0.04em;
+    font-size: 0.675rem;
+    line-height: 1.15rem;
+}
+
+.post-card-mini-body-text {
+    position: relative;
+    height: 100px;
+    box-sizing: border-box;
+    overflow: hidden;
+    color: rgba(0, 0, 0, 0.87);
+    letter-spacing: 0.04em;
+    font-size: 0.875rem;
+    line-height: 1.15rem;
+}

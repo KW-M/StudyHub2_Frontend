@@ -10,7 +10,7 @@ import { StudyhubServerApisService } from '../services/studyhub-server-apis.serv
 @Component({
   selector: 'app-post-edit-view',
   templateUrl: './post-edit-view.component.html',
-  styleUrls: ['./post-edit-view.component.scss', '../post-general-styles.scss'],
+  styleUrls: ['./post-edit-view.component.scss'],
   encapsulation: ViewEncapsulation.None,
   changeDetection: ChangeDetectionStrategy.OnPush
 })
@@ -56,13 +56,17 @@ export class PostEditViewComponent implements OnInit, OnDestroy {
       "title": "",
       "link": "",
       "description": "",
-      "likes": {},
+      "likeCount": 0,//<-
+      "likeUsers": [],//<-
+      "viewCount": 0,//<-
+      "ranking": 0,//<-
       "labels": {},
       "classes": [],
       "creator": {
         "email": null,
         "name": null,
       },
+      "attachmentName": null,
       "flagged": false,
       "creationDate": new Date(),
       "updateDate": new Date(),
@@ -76,13 +80,6 @@ export class PostEditViewComponent implements OnInit, OnDestroy {
       // this.ChangeDetector.detectChanges();
     });
 
-    this.signedinUserObserver = this.DataHolder.currentUserState$.subscribe((userObj) => {
-      this.signedinUser = userObj;
-      this.currentPost.creator.email = this.currentPost.creator.email || userObj['email']
-      this.currentPost.creator.name = this.currentPost.creator.name || userObj['name']
-      console.log(this.currentPost);
-    })
-
     this.labelsObserver = this.DataHolder.labelsState$.subscribe((labels) => {
       for (var key in labels) {
         labels[key].label = key;
@@ -93,7 +90,7 @@ export class PostEditViewComponent implements OnInit, OnDestroy {
 
     let backupPost = window.localStorage.getItem("postDraftBackup")
     let snackBarAction = null
-    if (backupPost) {
+    if (backupPost && !this.currentPost.id) {
       let backupPostObj = JSON.parse(backupPost);
       let snackBar = this.snackBar.open('Unsaved Draft Found', 'Restore', {
         duration: 15000,
@@ -112,7 +109,7 @@ export class PostEditViewComponent implements OnInit, OnDestroy {
     this.backupSetIntervalRef = setInterval(() => {
       this.currentPost.description = this.descriptionElm.nativeElement.innerHTML;
       console.log(this.currentPost);
-      if ((!this.currentSnackBarRef || snackBarAction) && (this.currentPost.title || this.currentPost.description || this.currentPost.link)) window.localStorage.setItem("postDraftBackup", JSON.stringify(this.currentPost));
+      if ((!this.currentSnackBarRef || snackBarAction) && !this.currentPost.id && (this.currentPost.title || this.currentPost.description || this.currentPost.link)) window.localStorage.setItem("postDraftBackup", JSON.stringify(this.currentPost));
     }, 25000)
   }
 
@@ -156,6 +153,12 @@ export class PostEditViewComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.currentPost = this.inputPost
+    this.signedinUserObserver = this.DataHolder.currentUserState$.subscribe((userObj) => {
+      this.signedinUser = userObj;
+      this.currentPost.creator.email = this.currentPost.creator.email || userObj['email']
+      this.currentPost.creator.name = this.currentPost.creator.name || userObj['name']
+      console.log("user post", this.currentPost);
+    })
   }
 
   onLabelAndClassSearchInput(searchText) {
@@ -168,12 +171,7 @@ export class PostEditViewComponent implements OnInit, OnDestroy {
       if (label.hidden === undefined) this.labelMissing = false;
       return label;
     })
-    if (this.classChooserExpanded === true) this.formattedYorkClasses.forEach(category => {
-      category.classes.forEach(function (classObj) {
-        classObj.hidden = (classObj.name.toLowerCase().indexOf(searchText.toLowerCase()) === -1) || undefined;
-        //!(currentPostClasses.includes(classObj.name) || !(classObj.name.toLowerCase().indexOf(searchText.toLowerCase()) === -1)) || undefined;
-      })
-    });
+    if (this.classChooserExpanded === true) { }
     // for (const groupName in this.yorkGroups) {
     //   if (groupName.toLowerCase().indexOf(searchText.toLowerCase()) === -1) {
     //     this.yorkGroups[groupName].hidden = true;
@@ -190,6 +188,8 @@ export class PostEditViewComponent implements OnInit, OnDestroy {
     } else {
       this.currentPost.labels[label] = true;
       setTimeout(() => {
+        console.log(document.getElementById("class_label_chips"));
+
         document.getElementById("class_label_chips").lastElementChild.scrollIntoView({ behavior: "smooth", block: "center", inline: "center" });
       }, 30)
     }
@@ -219,7 +219,6 @@ export class PostEditViewComponent implements OnInit, OnDestroy {
   }
 
   getClassColorString(className: string) {
-    console.log(className);
     let colorObj = this.DataHolder.getClassColor(className)
     if (colorObj) return 'hsl(' + colorObj.h + ',' + colorObj.s + '%,40%)'
   }

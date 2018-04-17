@@ -41,6 +41,7 @@ export class GoogleSigninService {
           gapi.auth2.getAuthInstance().isSignedIn.listen((isSignedIn) => this.updateGAuthSigninStatus(isSignedIn));
         }).catch((err) => {
           console.warn(err);
+          alert("signin error, try again with your york.org account")
         })
       }, 3)
     })

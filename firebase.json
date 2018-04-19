@@ -1,17 +1,10 @@
 {
-  // "database": {
-  //   "rules": "realtimedb.rules.json"
-  // },
-  "firestore": {
-    "rules": "firestoredb.rules",
-    "indexes": "firestoredb.indexes.json"
-  },
   "storage": {
     "rules": "storage.rules"
   },
   "functions": {
     "predeploy": [
-      "npm --prefix \"$RESOURCE_DIR\" run lint"
+      "npm --prefix \"$RESOURCE_DIR\" run lint \n ng build --prod"
     ]
   },
   "hosting": {

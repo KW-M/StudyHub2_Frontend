@@ -27,6 +27,8 @@
     "@firebase/app": "^0.1.10",
     "@types/gapi": "^0.0.35",
     "@types/gapi.auth2": "^0.0.47",
+    "algoliasearch": "^3.27.0",
+    "algoliasearch-helper": "^2.25.0",
     "angularfire2": "^5.0.0-rc.6",
     "core-js": "^2.5.3",
     "firebase": "^4.12.0",

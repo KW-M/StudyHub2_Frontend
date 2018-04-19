@@ -2,16 +2,16 @@
 const functions = require('firebase-functions');
 // The Firebase Admin SDK to access the Firebase Realtime Database.
 const firebaseAdmin = require('firebase-admin');
+// Create and Deploy Your First Cloud Functions
+// https://firebase.google.com/docs/functions/write-firebase-functions
+var serviceAccount = require("./private_stuff/serviceAccountKey.json");
+firebaseAdmin.initializeApp({
+    credential: firebaseAdmin.credential.cert(serviceAccount),
+    databaseURL: "https://fir-test-156302.firebaseio.com"
+});
 
 const algoliasearch = require('algoliasearch');
 const searchClient = algoliasearch(functions.config().algolia.app_id, functions.config().algolia.api_key);
-// // Create and Deploy Your First Cloud Functions
-// // https://firebase.google.com/docs/functions/write-firebase-functions
-var serviceAccount = require("path/to/serviceAccountKey.json");
-firebaseAdmin.initializeApp({
-    credential: admin.credential.cert(serviceAccount),
-    databaseURL: "https://fir-test-156302.firebaseio.com"
-});
 // Take the text parameter passed to this HTTP endpoint and insert it into the
 // Realtime Database under the path /messages/:pushId/original
 // exports.addIndex = functions.https.onCall((req, res) => {
@@ -34,6 +34,9 @@ exports.searchIndexEntry = functions.firestore.document('posts/{postId}').onWrit
     const document = change.after.exists ? change.after.data() : null;
     // Get an object with the previous document value (for update or delete)
     const oldDocument = change.before.data();
+    console.log('document', document)
+    console.log('olddocument', oldDocument)
+    console.log('index', index)
     if (document !== null) {
         addOrUpdateSearchIndexRecord(index, document, change.after.id)
     } else if (oldDocument) {
@@ -46,7 +49,7 @@ exports.searchIndexEntry = functions.firestore.document('posts/{postId}').onWrit
 function addOrUpdateSearchIndexRecord(index, post, postId) {
     post.id = postId
     // Add or update object
-    index.saveObject(post, function (err, content) {
+    index.saveObject(post, (err, content) => {
         if (err) {
             throw err;
         }
@@ -56,7 +59,7 @@ function addOrUpdateSearchIndexRecord(index, post, postId) {
 
 function deleteSearchIndexRecord(index, postId) {
     // Remove the object from Algolia
-    index.deleteObject(postId, function (err, content) {
+    index.deleteObject(postId, (err, content) => {
         if (err) {
             throw err;
         }

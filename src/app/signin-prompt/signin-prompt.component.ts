@@ -26,14 +26,14 @@ export class SigninPromptComponent implements OnInit {
       }
       ChangeDetector.detectChanges()
     });
-    FireAuth.authState.subscribe((authState) => {
-      if (authState && authState.email) {
-        this.bgShown = false; this.buttonShown = true;
-      } else {
-        this.bgShown = true; this.dialogShown = true; this.buttonShown = true;
-      }
-      ChangeDetector.detectChanges()
-    })
+    // FireAuth.authState.subscribe((authState) => {
+    //   if (authState && authState.email) {
+    //     this.bgShown = false; this.buttonShown = true;
+    //   } else {
+    //     this.bgShown = true; this.dialogShown = true; this.buttonShown = true;
+    //   }
+    //   ChangeDetector.detectChanges()
+    // })
   }
 
   ngOnInit() {

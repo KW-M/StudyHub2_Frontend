@@ -125,9 +125,9 @@ export class PostEditViewComponent implements OnInit, OnDestroy {
     } else if (linkurl.length > 10) {
       this.throttleTimer['onLinkInput'] = setTimeout(() => {
         let driveFileId = this.currentPost.link.match(/(?:(?:\/(?:d|s|file|folder|folders)\/)|(?:id=)|(?:open=))([-\w]{25,})/)
-        if (driveFileId) {
-          console.log('driveURL', driveFileId)
-          // this.ExternalAPIs.getDrivePreview(driveFileId[0])
+        console.log(this.currentPost.link, driveFileId)
+        if (driveFileId && driveFileId[1]) {
+          this.ExternalAPIs.getDrivePreview(driveFileId[1])
         } else {
           this.websitePreviewObserver = this.ExternalAPIs.getWebsitePreview(linkurl).subscribe((websitePreview) => {
             this.currentPost.link = linkurl;
@@ -139,7 +139,7 @@ export class PostEditViewComponent implements OnInit, OnDestroy {
             console.warn(err);
             this.linkURL = '';
             this.currentSnackBarRef = this.snackBar.open('Can\'t reach attached link:', linkurl, {
-              duration: 9000,
+              duration: 7000,
               horizontalPosition: "start"
             })
             this.currentSnackBarRef.afterDismissed().toPromise().then(function (action) { if (action.dismissedByAction === true) window.open(linkurl) })

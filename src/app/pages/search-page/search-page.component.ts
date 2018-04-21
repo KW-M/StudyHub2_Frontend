@@ -1,6 +1,4 @@
 import { Component, ViewEncapsulation, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef, ElementRef } from '@angular/core';
-import { connectHits } from 'instantsearch.js/es/connectors';
-import { connectRefinementList } from 'instantsearch.js/es/connectors';
 
 import { WindowService } from "../../services/window.service";
 import { EventBoardService } from "../../services/event-board.service";
@@ -63,45 +61,33 @@ export class SearchPageComponent implements OnDestroy {
     })
     // Create a widget which will run the function whenever
     // something changes on the search state itself
-    const widget = connectHits((state, isFirstRendering) => {
-      console.log(state);
-      var updatePosts = () => {
-        if (state && state.hits) {
-          this.posts = state.hits;
-          if (this.posts.length > 0) {
-            this.postsGrid = this.getPostsGrid(this.posts, true);
-          } else {
-            this.postsGrid = [];
-          }
-          console.log("final Postgrid", this.postsGrid);
-          this.ChangeDetector.detectChanges();
-        }
-      }
-      // asynchronous update of the state
-      // avoid `ExpressionChangedAfterItHasBeenCheckedError`
-      if (isFirstRendering) {
-        return Promise.resolve().then(() => {
-          updatePosts()
-        });
-      } else {
-        updatePosts()
-      }
+    // const widget = connectHits((state, isFirstRendering) => {
+    //   console.log(state);
+    //   var updatePosts = () => {
+    //     if (state && state.hits) {
+    //       this.posts = state.hits;
+    //       if (this.posts.length > 0) {
+    //         this.postsGrid = this.getPostsGrid(this.posts, true);
+    //       } else {
+    //         this.postsGrid = [];
+    //       }
+    //       console.log("final Postgrid", this.postsGrid);
+    //       this.ChangeDetector.detectChanges();
+    //     }
+    //   }
+    //   // asynchronous update of the state
+    //   // avoid `ExpressionChangedAfterItHasBeenCheckedError`
+    //   if (isFirstRendering) {
+    //     return Promise.resolve().then(() => {
+    //       updatePosts()
+    //     });
+    //   } else {
+    //     updatePosts()
+    //   }
+    // });
+    this.ExternalAPIs.searchHelper.on('result', (searchResult) => {
+      console.log('searchResult', searchResult)
     });
-    const classWidget = connectRefinementList((state, isFirstRendering) => {
-      // asynchronous update of the state
-      // avoid `ExpressionChangedAfterItHasBeenCheckedError`
-      if (isFirstRendering) {
-        return Promise.resolve(null).then(() => {
-          this.classRefinementstate = state;
-        });
-      }
-      this.classRefinementstate = state;
-    });
-    // Register the Hits widget into the instantSearchService search instance.
-    this.ExternalAPIs.algoliaSearch.addWidget(widget());
-    this.ExternalAPIs.algoliaSearch.addWidget(widget({
-      attributeName: 'category'
-    }));
   }
 
   getPostsGrid(inputArray, skipColCheck) {
@@ -133,9 +119,7 @@ export class SearchPageComponent implements OnDestroy {
   }
 
   updateSearchClass(className) {
-    // index.search({
-    //   filters: 'device:smartphone AND display:retina'
-    // });
+
   }
 
   ngOnDestroy() {

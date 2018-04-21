@@ -65,10 +65,10 @@ import { ObjKeysPipe } from './obj-keys.pipe';
     HttpClientModule,
     BrowserAnimationsModule,
     AngularMaterialModule,
-    ServiceWorkerModule.register('/ngsw-worker.js', { enabled: false }), //environment.production
+    //ServiceWorkerModule,//.register('/ngsw-worker.js', { enabled: environment.production }), //
     AngularFireModule.initializeApp(environment.firebase), // imports firebase/app needed for everything
     AngularFireDatabaseModule,
-    AngularFirestoreModule, // imports firebase/firestore, only needed for database features
+    AngularFirestoreModule.enablePersistence(), // imports firebase/firestore, only needed for database features
     AngularFireAuthModule, // imports firebase/auth, only needed for auth features,
     AngularFireStorageModule, // imports firebase/storage only needed for storage features
   ],

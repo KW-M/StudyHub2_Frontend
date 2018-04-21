@@ -20,7 +20,7 @@ import { ExternalApisService } from './services/external-apis.service';
 export class AppComponent implements AfterViewInit {
   constructor(private ExternalAPIs: ExternalApisService) { }
   ngAfterViewInit() {
-    this.ExternalAPIs.algoliaSearch.start();
+
   }
 }
       // <app-new-post-bar></app-new-post-bar>

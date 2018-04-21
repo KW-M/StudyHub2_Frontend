@@ -5,7 +5,6 @@ import { GoogleSigninService } from "../services/google-signin.service";
 import { DataHolderService } from '../services/data-holder.service';
 import { WindowService } from "../services/window.service";
 import { Router, NavigationEnd } from '@angular/router';
-import { connectSearchBox } from 'instantsearch.js/es/connectors';
 import { ExternalApisService } from '../services/external-apis.service';
 
 
@@ -57,7 +56,7 @@ export class ToolbarComponent implements OnInit {
   }
 
   updateSearch(query) {
-    this.algoliaSearchState.refine(query)
+    this.ExternalAPIs.searchHelper.setQuery(query).search()
     // clearTimeout(this.throttleTimer['onSearchInput']);
     // this.throttleTimer['onSearchInput'] = setTimeout(() => {
     //   console.log('searching');
@@ -67,7 +66,7 @@ export class ToolbarComponent implements OnInit {
 
   clearSearch() {
     this.searchText = ''
-    this.algoliaSearchState.refine('')
+    this.ExternalAPIs.searchHelper.setQuery('')
     this.ChangeDetector.detectChanges()
   }
 
@@ -88,19 +87,8 @@ export class ToolbarComponent implements OnInit {
   }
 
   ngOnInit() {
-    const widget = connectSearchBox((state, isFirstRendering) => {
-      // asynchronous update of the state
-      // avoid `ExpressionChangedAfterItHasBeenCheckedError`
-      if (isFirstRendering) {
-        return Promise.resolve(null).then(() => {
-          this.algoliaSearchState = state;
-        });
-      } else {
-        this.algoliaSearchState = state;
-      }
-    });
-    this.ExternalAPIs.algoliaSearch.addWidget(widget());
     this.searchText = this.Router.routerState.snapshot.root.queryParams.q || null;
+    if (this.searchText) this.ExternalAPIs.searchHelper.setQuery(this.searchText).search()
   }
 
 }

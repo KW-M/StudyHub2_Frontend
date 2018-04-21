@@ -35,8 +35,7 @@
       "name": "algolia-api",
       "version": 0,
       "urls": [
-        "/tasks",
-        "/users"
+        "https://e4zo0gzetf-dsn.algolia.net/1/indexes/**",
       ],
       "cacheConfig": {
         "strategy": "freshness",

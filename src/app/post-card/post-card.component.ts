@@ -54,9 +54,9 @@ export class PostCardComponent implements OnInit, OnDestroy {
       console.log("gotLinkPreview", this.currentLinkPreview);
       if (this.currentLinkPreview.thumbnail === null) {
         let driveFileId = this.currentPost.link.match(/(?:(?:\/(?:d|s|file|folder|folders)\/)|(?:id=)|(?:open=))([-\w]{25,})/)
-        if (driveFileId) {
-          console.log('driveURL', driveFileId)
-          // this.ExternalAPIs.getDrivePreview(driveFileId[0])
+        console.log('driveURL', driveFileId)
+        if (driveFileId && driveFileId[1]) {
+          this.ExternalAPIs.getDrivePreview(driveFileId[1])
         } else {
           this.websitePreviewObserver = this.ExternalAPIs.getWebsitePreview(this.currentPost.link).subscribe((websitePreview) => {
             this.currentLinkPreview['thumbnail'] = websitePreview['image'];

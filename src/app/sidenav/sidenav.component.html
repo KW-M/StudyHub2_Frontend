@@ -1,25 +1,27 @@
 <div class="sidenav-container" [ngClass]="{'open':sidenavOpen}">
   <div class="side-nav">
     <mat-nav-list class="main-sidenav-links">
-      <mat-list-item routerLinkActive="route-active" [routerLink]="'feed'">
+      <mat-list-item routerLinkActive="route-active" [routerLink]="'Feed'">
         <mat-icon mat-list-icon>inbox</mat-icon>
         <h4 mat-line>Feed</h4>
       </mat-list-item>
-      <mat-list-item routerLinkActive="route-active" [routerLink]="'my posts'">
+      <mat-list-item routerLinkActive="route-active" [routerLink]="'My Posts'">
         <mat-icon mat-list-icon>person</mat-icon>
         <h4 mat-line>My Posts</h4>
       </mat-list-item>
-      <mat-list-item routerLinkActive="route-active" [routerLink]="'bookmarks'">
+      <mat-list-item routerLinkActive="route-active" [routerLink]="'Bookmarks'">
         <mat-icon mat-list-icon>bookmark</mat-icon>
         <h4 mat-line>Bookmarks</h4>
       </mat-list-item>
-      <mat-list-item routerLinkActive="route-active" [routerLink]="'all posts'">
+      <mat-list-item routerLinkActive="route-active" [routerLink]="'All Posts'">
         <mat-icon mat-list-icon>inbox</mat-icon>
         <h4 mat-line>All Posts</h4>
       </mat-list-item>
       <div>
         <mat-list-item>
-          <mat-icon mat-list-icon>slow_motion_video</mat-icon>
+          <mat-icon mat-list-icon>
+            <img src="assets/quizlet_logo.svg" alt="" srcset="">
+          </mat-icon>
           <h4 mat-line>York Quizlet</h4>
         </mat-list-item>
       </div>

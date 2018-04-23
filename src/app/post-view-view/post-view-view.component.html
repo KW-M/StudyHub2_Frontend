@@ -20,7 +20,7 @@
       <span>{{currentPost.classes.join(', ') || 'CLASS'}}</span>
     </button>
     <span class="formatting-divider" style="flex:none"></span>
-    <mat-chip color="primary" selected="true" *ngFor="let label of currentPost.labels | objKeys">
+    <mat-chip color="primary" selected="true" *ngFor="let label of currentPost.labels">
       {{label}}
     </mat-chip>
     <span style="flex:none;width: 58px;height: 10px;"></span>

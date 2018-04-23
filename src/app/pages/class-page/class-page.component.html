@@ -6,9 +6,6 @@
   <mat-chip color="accent" class="chip-gradient" *ngFor="let label of labels;">
     {{label?.label}}
   </mat-chip>
-  <mat-chip color="accent" class="chip-gradient" selected="true" *ngFor="let label of labels;">
-    {{label?.label}}
-  </mat-chip>
   <mat-chip color="accent" class="chip-gradient" *ngFor="let label of labels;">
     {{label?.label}}
   </mat-chip>
@@ -25,7 +22,6 @@
       <mat-icon>keyboard_arrow_right</mat-icon>
     </button>
   </div>
-
 </div>
 <div class="class-preview-posts-grid-container">
   <div class="class-preview-posts" *ngFor="let column of gridColumns; let i = index, trackBy:trackByIndex">

@@ -6,6 +6,7 @@ import { DataHolderService } from '../services/data-holder.service';
 import { WindowService } from "../services/window.service";
 import { Router, NavigationEnd } from '@angular/router';
 import { ExternalApisService } from '../services/external-apis.service';
+import { AlgoliaApisService } from '../services/algolia-apis.service';
 
 
 @Component({
@@ -16,9 +17,12 @@ import { ExternalApisService } from '../services/external-apis.service';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ToolbarComponent implements OnInit {
-  algoliaSearchState: any;
   mobileSearchOpen: boolean = false;
-  currentPage
+  currentPage;
+  lastState = {
+    sideNavOpen: true,
+    page: "Feed"
+  };
   windowSize;
   searchText;
   user = {
@@ -34,7 +38,7 @@ export class ToolbarComponent implements OnInit {
     private GSignin: GoogleSigninService,
     public EventBoard: EventBoardService,
     private DataHolder: DataHolderService,
-    private ExternalAPIs: ExternalApisService,
+    private AlgoliaApis: AlgoliaApisService,
     public WindowFrame: WindowService,
     private ChangeDetector: ChangeDetectorRef,
   ) {
@@ -49,29 +53,42 @@ export class ToolbarComponent implements OnInit {
       ChangeDetector.detectChanges()
     });
     Router.events.filter(event => event instanceof NavigationEnd).subscribe((newRoute) => {
-      this.currentPage = this.Router.routerState.snapshot.root.firstChild.url[0].path || "My Feed";
-      this.searchText = this.Router.routerState.snapshot.root.queryParams.q || null;
+      console.log(this);
+
+      var newPath = this.Router.routerState.snapshot.root.firstChild.url[0].path || "Feed";
+      if (newPath !== this.currentPage) this.lastState = {
+        page: this.currentPage || "Feed",
+        sideNavOpen: this.EventBoard.sideNavOpen,
+      };
+      if (newPath === 'Search') this.EventBoard.setSideNavOpen(false)
+      this.currentPage = newPath
+      this.searchText = this.AlgoliaApis.getSearchQuery() || '';
       ChangeDetector.detectChanges()
     });
   }
 
   updateSearch(query) {
-    this.ExternalAPIs.searchHelper.setQuery(query).search()
-    // clearTimeout(this.throttleTimer['onSearchInput']);
-    // this.throttleTimer['onSearchInput'] = setTimeout(() => {
-    //   console.log('searching');
-    //   console.log(this.router.navigate(['/all posts'], { queryParams: { 'query': query } }));
-    // }, 1100)
+    console.log(query);
+    this.AlgoliaApis.searchHelper.setQuery(query)
+    this.AlgoliaApis.updateURLQueryParams()
+    this.AlgoliaApis.runSearch()
   }
 
   clearSearch() {
     this.searchText = ''
-    this.ExternalAPIs.searchHelper.setQuery('')
+    this.AlgoliaApis.searchHelper.setQuery('')
     this.ChangeDetector.detectChanges()
   }
 
-  setMobileSearchOpen(open) {
-    this.mobileSearchOpen = open
+  setSearchModeOpen(open) {
+    if (open === true && this.currentPage !== 'Search') {
+      this.Router.navigate(['Search'], { queryParamsHandling: 'preserve' })
+    } else if (open === false) {
+      this.clearSearch()
+      console.log(this.lastState)
+      this.Router.navigate([this.lastState.page || "Feed"], { queryParamsHandling: 'preserve' })
+      this.EventBoard.setSideNavOpen(this.lastState.sideNavOpen)
+    }
     this.ChangeDetector.detectChanges()
   }
 
@@ -82,14 +99,13 @@ export class ToolbarComponent implements OnInit {
   signIn() {
     this.GSignin.handleSignInClick()
   }
+
   signOut() {
     this.GSignin.handleSignOutClick()
   }
 
   ngOnInit() {
-    this.searchText = this.Router.routerState.snapshot.root.queryParams.q || null;
-    if (this.searchText) this.ExternalAPIs.searchHelper.setQuery(this.searchText).search()
+    this.searchText = this.AlgoliaApis.getSearchQuery() || '';
   }
-
 }
 

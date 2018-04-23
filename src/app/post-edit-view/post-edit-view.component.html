@@ -45,25 +45,7 @@
     </div>
     <div class="class-selector-backdrop" (click)="classChooserExpanded = false"></div>
     <div class="class-selector-area">
-      <mat-selection-list style="padding-top:0;" [(ngModel)]="currentPost.classes" *ngIf="labelAndClassSearchText == ''">
-        <mat-list-option [value]="favClass" *ngFor="let favClass of signedinUser.favorites | objKeys" [ngStyle]="{'color': getClassColorString(favClass)}"
-          (keydown)="$event.stopPropagation()">
-          <h4 mat-line>{{favClass}}</h4>
-        </mat-list-option>
-      </mat-selection-list>
-      <mat-selection-list style="padding-top:0;" [(ngModel)]="currentPost.classes">
-        <ng-container *ngFor="let category of formattedYorkClasses">
-          <div class="class-category-header" *ngIf="labelAndClassSearchText == ''">
-            <h3 mat-subheader [ngStyle]="{'background': 'linear-gradient(152deg,hsl('+category?.color.h+','+category?.color.s+'%,'+category?.color.l+'%), white)'}"
-              style="margin-top: 0;">{{category.category}}</h3>
-          </div>
-          <ng-container *ngFor="let class of category.classes">
-            <mat-list-option [value]="class.name" *ngIf="class.hidden != true">
-              <h4 mat-line [ngStyle]="{'color': 'hsl('+category?.color.h+','+category?.color.s+'%,40%)'}">{{class.name}}</h4>
-            </mat-list-option>
-          </ng-container>
-        </ng-container>
-      </mat-selection-list>
+      <!-- <app-class-selector [(selection)]="currentPost.classes" [filter-search]="labelAndClassSearchText"></app-class-selector> -->
     </div>
     <div class="post-chip-list">
       <button mat-button color="primary" id="class_expand_button" *ngIf="!classChooserExpanded" (click)="labelAreaExpanded = true;classChooserExpanded = true">

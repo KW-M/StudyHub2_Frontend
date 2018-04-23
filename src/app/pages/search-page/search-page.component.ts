@@ -4,8 +4,7 @@ import { WindowService } from "../../services/window.service";
 import { EventBoardService } from "../../services/event-board.service";
 import { GoogleSigninService } from "../../services/google-signin.service";
 import { DataHolderService } from "../../services/data-holder.service";
-import { StudyhubServerApisService } from '../../services/studyhub-server-apis.service';
-import { ExternalApisService } from '../../services/external-apis.service';
+import { AlgoliaApisService } from '../../services/algolia-apis.service';
 
 
 @Component({
@@ -16,7 +15,9 @@ import { ExternalApisService } from '../../services/external-apis.service';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class SearchPageComponent implements OnDestroy {
-  classRefinementstate: any;
+  favoriteClasses: any;
+  formattedYorkClasses: any;
+  labelScrollPercentage: number = 0;
   labels: any = [];
   posts: any = [];
   postsGrid;
@@ -27,17 +28,36 @@ export class SearchPageComponent implements OnDestroy {
   visiblePostsObserver;
   sideNavOpenObserver;
   findTags;
-  findClass;
+  classFilters = [];
+  classSearchText = '';
+  findClass = '';
 
   constructor(public EventBoard: EventBoardService,
     private DataHolder: DataHolderService,
-    private ExternalAPIs: ExternalApisService,
+    private AlgoliaApis: AlgoliaApisService,
     public WindowFrame: WindowService,
     private ChangeDetector: ChangeDetectorRef,
-    private nativeElementRef: ElementRef) { }
+    private nativeElementRef: ElementRef) {
+    this.DataHolder.classAndGroupState$.first().toPromise().then((classesAndGroups) => {
+      this.formattedYorkClasses = classesAndGroups['formattedClasses'];
+      this.ChangeDetector.detectChanges();
+      //only put here so that york classes must ha`  ve loaded>
+      this.DataHolder.currentUserState$.subscribe((user: any) => {
+        if (user) {
+          this.favoriteClasses = []
+          for (const favClass in user.favorites) {
+            if (user.favorites.hasOwnProperty(favClass)) {
+              this.favoriteClasses.push(this.DataHolder.getClassObj(favClass))
+            }
+          }
+          console.log(this.favoriteClasses)
+          this.ChangeDetector.detectChanges();
+        }
+      })
+    })
+  }
 
   ngOnInit() {
-
     window.onresize = () => {
       if (this.posts.length > 0) {
         this.postsGrid = this.getPostsGrid(this.posts, false) || this.postsGrid;
@@ -52,6 +72,12 @@ export class SearchPageComponent implements OnDestroy {
       }
     })
 
+    var labelsScrollElm = document.getElementById('scrollable_class_labels')
+    labelsScrollElm.onscroll = () => {
+      this.labelScrollPercentage = labelsScrollElm.scrollLeft / (labelsScrollElm.scrollWidth - labelsScrollElm.clientWidth);
+      this.ChangeDetector.markForCheck()
+    }
+
     this.labelsObserver = this.DataHolder.labelsState$.subscribe((labels) => {
       for (var key in labels) {
         labels[key].label = key;
@@ -59,33 +85,8 @@ export class SearchPageComponent implements OnDestroy {
       }
       this.ChangeDetector.detectChanges();
     })
-    // Create a widget which will run the function whenever
-    // something changes on the search state itself
-    // const widget = connectHits((state, isFirstRendering) => {
-    //   console.log(state);
-    //   var updatePosts = () => {
-    //     if (state && state.hits) {
-    //       this.posts = state.hits;
-    //       if (this.posts.length > 0) {
-    //         this.postsGrid = this.getPostsGrid(this.posts, true);
-    //       } else {
-    //         this.postsGrid = [];
-    //       }
-    //       console.log("final Postgrid", this.postsGrid);
-    //       this.ChangeDetector.detectChanges();
-    //     }
-    //   }
-    //   // asynchronous update of the state
-    //   // avoid `ExpressionChangedAfterItHasBeenCheckedError`
-    //   if (isFirstRendering) {
-    //     return Promise.resolve().then(() => {
-    //       updatePosts()
-    //     });
-    //   } else {
-    //     updatePosts()
-    //   }
-    // });
-    this.ExternalAPIs.searchHelper.on('result', (searchResult) => {
+
+    this.AlgoliaApis.searchHelper.on('result', (searchResult) => {
       console.log('searchResult', searchResult)
     });
   }
@@ -112,6 +113,14 @@ export class SearchPageComponent implements OnDestroy {
       return columnArray
     }
     return null
+  }
+
+  scrollLabels(direction) {
+    var labelsScrollElm = document.getElementById('scrollable_class_labels')
+    labelsScrollElm.scroll({
+      left: labelsScrollElm.scrollLeft + ((direction === 'right') ? labelsScrollElm.clientWidth * 0.6 : -(labelsScrollElm.clientWidth * 0.6)),
+      behavior: "smooth"
+    })
   }
 
   trackByPostIdFn(index, post) {

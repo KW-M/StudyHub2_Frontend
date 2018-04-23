@@ -15,6 +15,7 @@ import { StudyhubServerApisService } from '../services/studyhub-server-apis.serv
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class PostEditViewComponent implements OnInit, OnDestroy {
+  favoriteClasses: any[];
   labelMissing: boolean = false;
   visibleLabels: any;
   websitePreviewObserver;
@@ -71,14 +72,6 @@ export class PostEditViewComponent implements OnInit, OnDestroy {
       "creationDate": new Date(),
       "updateDate": new Date(),
     }
-
-    this.classAndGroupObserver = DataHolder.classAndGroupState$.subscribe((classesAndGroups) => {
-      console.log(classesAndGroups)
-      //this.yorkLabels = classesAndGroups['formattedClasses'];
-      this.formattedYorkClasses = classesAndGroups['formattedClasses'];
-      this.yorkGroups = classesAndGroups['groups'];
-      // this.ChangeDetector.detectChanges();
-    });
 
     this.labelsObserver = this.DataHolder.labelsState$.subscribe((labels) => {
       for (var key in labels) {
@@ -153,12 +146,24 @@ export class PostEditViewComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.currentPost = this.inputPost
-    this.signedinUserObserver = this.DataHolder.currentUserState$.subscribe((userObj) => {
-      this.signedinUser = userObj;
-      this.currentPost.creator.email = this.currentPost.creator.email || userObj['email']
-      this.currentPost.creator.name = this.currentPost.creator.name || userObj['name']
-      console.log("user post", this.currentPost);
-    })
+    this.DataHolder.classAndGroupState$.first().toPromise().then((classesAndGroups) => {
+      this.formattedYorkClasses = classesAndGroups['formattedClasses'];
+      this.yorkGroups = classesAndGroups['groups'];
+      //only put here so that york classes must have loaded>
+      this.signedinUserObserver = this.DataHolder.currentUserState$.subscribe((userObj: any) => {
+        this.signedinUser = userObj;
+        this.currentPost.creator.email = this.currentPost.creator.email || userObj['email']
+        this.currentPost.creator.name = this.currentPost.creator.name || userObj['name']
+        console.log("user post", this.currentPost);
+        this.favoriteClasses = []
+        for (const favClass in userObj.favorites) {
+          if (userObj.favorites.hasOwnProperty(favClass)) {
+            this.favoriteClasses.push(this.DataHolder.getClassObj(favClass))
+          }
+        }
+        this.ChangeDetector.detectChanges();
+      });
+    });
   }
 
   onLabelAndClassSearchInput(searchText) {
@@ -219,7 +224,7 @@ export class PostEditViewComponent implements OnInit, OnDestroy {
   }
 
   getClassColorString(className: string) {
-    let colorObj = this.DataHolder.getClassColor(className)
+    let colorObj = this.DataHolder.getClassObj(className).color
     if (colorObj) return 'hsl(' + colorObj.h + ',' + colorObj.s + '%,40%)'
   }
 

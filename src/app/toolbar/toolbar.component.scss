@@ -1,12 +1,16 @@
 .mat-toolbar.studyhub-toolbar {
     padding: 0 12px;
     background-color: rgb(161, 10, 25);
+    .page-text {
+        flex: 1 100 140px;
+    }
     .searchbar-container {
         position: relative;
         display: flex;
         margin: 0 10px 0 24px;
         width: 100%;
         max-width: 720px;
+        flex: 20 1 720px;
         align-items: center;
     }
     .searchbar-input {
@@ -38,7 +42,7 @@
         transition: opacity ease 200ms, transform ease 200ms;
         pointer-events: inherit;
     }
-    .mobile-search-close-button{
+    .mobile-search-close-button {
         margin-right: 8px;
     }
     .divider {
@@ -70,6 +74,7 @@
         }
     }
 }
+
 .avatar-circle {
     width: 36px;
     height: 36px;

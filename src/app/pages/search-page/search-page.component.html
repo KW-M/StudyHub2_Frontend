@@ -1,9 +1,74 @@
-<div class="label-bar-container">
-  <mat-chip-list [multiple]="true" class="label-chips">
-    <mat-chip color="accent" *ngFor="let label of labels;">
-      {{label?.label}}
-    </mat-chip>
-  </mat-chip-list>
+<div class="search-filters">
+  <button mat-button [matMenuTriggerFor]="menu">{{classFilters.length === 0 ? 'Filter by Class': classFilters.join(', ')}}
+    <mat-icon *ngIf="classFilters.length === 0" style="font-size: 24px">arrow_drop_down</mat-icon>
+    <mat-icon *ngIf="classFilters.length !== 0" style="padding: 6px 0 6px 6px;font-size: 18px;height: 18px;width: 18px;color:black;opacity:0.6"
+      (click)="classFilters = []">cancel</mat-icon>
+  </button>
+  <mat-menu #menu="matMenu" overlapTrigger="false" (closed)="classSearchText = ''" class="search-class-filter-menu">
+    <!-- <mat-selection-list style="padding-top:0;" [(ngModel)]="classes">
+      <mat-list-option [value]="favClass" *ngFor="let favClass of favoriteClasses" [ngStyle]="{'color': 'hsl('+favClass?.color.h+','+favClass?.color.s+'%,'+favClass?.color.l+'%)'}">
+        <h4 mat-line>{{favClass.name}}</h4>
+      </mat-list-option>
+    </mat-selection-list>
+    <mat-selection-list style="padding-top:0;" [(ngModel)]="classes">
+      <ng-container *ngFor="let category of formattedYorkClasses">
+        <div class="class-category-header">
+          <h3 mat-subheader [ngStyle]="{'background': 'linear-gradient(152deg,hsl('+category?.color.h+','+category?.color.s+'%,'+category?.color.l+'%), white)'}"
+            style="margin-top: 0;">{{category.category}}</h3>
+        </div>
+        <ng-container *ngFor="let class of category.classes">
+          <mat-list-option [value]="class.name">
+            <h4 mat-line [ngStyle]="{'color': 'hsl('+category?.color.h+','+category?.color.s+'%,40%)'}">{{class.name}}</h4>
+          </mat-list-option>
+        </ng-container>
+      </ng-container>
+    </mat-selection-list> -->
+    <!-- <app-class-selector (click)="$event.stopPropagation()" [(selection)]="classFilters" [filter-search]="classSearchText" style="max-height: 50vh;width:100%;display: block;overflow:auto"></app-class-selector> -->
+    <input [(ngModel)]="classSearchText" (click)="$event.stopPropagation()" placeholder="Search Classes" style="width: 100%; font-size:16px; padding: 16px;box-sizing: border-box;border:none"
+      class="mat-elevation-z3">
+  </mat-menu>
+  <!-- <mat-form-field>
+    <mat-select placeholder="Class">
+      <mat-option *ngFor="let class of favoriteClasses; trackBy:trackByClassNameFn" [ngStyle]="{'color': 'hsl('+category?.color.h+','+category?.color.s+'%,40%)'}">{{class.name}}</mat-option>
+      <mat-optgroup *ngFor="let category of formattedYorkClasses" [label]="category.category" [ngStyle]="{'background': 'linear-gradient(152deg,hsl('+category?.color.h+','+category?.color.s+'%,'+category?.color.l+'%), white)','color': 'hsl('+category?.color.h+','+category?.color.s+'%,40%)'}">
+        <mat-option *ngFor="let class of category?.classes trackBy:trackByClassNameFn" [value]="class" [ngStyle]="{'color': 'hsl('+category?.color.h+','+category?.color.s+'%,40%)'}">
+          {{ class.name }}
+        </mat-option>
+      </mat-optgroup>
+    </mat-select>
+  </mat-form-field> -->
+  <!-- <mat-form-field>
+    <input type="text" placeholder="Creator" aria-label="Number" matInput [matAutocomplete]="creatorList">
+    <mat-autocomplete #creatorList="matAutocomplete">
+      <mat-option *ngFor="let class of favoriteClasses" [value]="class.name">
+        {{ class.name }}
+      </mat-option>
+    </mat-autocomplete>
+  </mat-form-field> -->
+</div>
+<div class="post-chip-list" id="scrollable_class_labels">
+  <mat-chip color="accent" class="chip-gradient" *ngFor="let label of labels;">
+    {{label?.label}}
+  </mat-chip>
+  <mat-chip color="accent" class="chip-gradient" *ngFor="let label of labels;">
+    {{label?.label}}
+  </mat-chip>
+  <mat-chip color="accent" class="chip-gradient" *ngFor="let label of labels;">
+    {{label?.label}}
+  </mat-chip>
+  <span style="flex:none;width: 12px;height: 10px;"></span>
+</div>
+<div class="label-bar-overlay">
+  <div class="scroll-button left mat-elevation-z2" *ngIf="labelScrollPercentage > 0.1">
+    <button mat-icon-button (click)="scrollLabels('left')">
+      <mat-icon>keyboard_arrow_left</mat-icon>
+    </button>
+  </div>
+  <div class="scroll-button right mat-elevation-z2" *ngIf="0.9 > labelScrollPercentage ">
+    <button mat-icon-button (click)="scrollLabels('right')">
+      <mat-icon>keyboard_arrow_right</mat-icon>
+    </button>
+  </div>
 </div>
 <div class="class-preview-posts-grid-container">
   <div class="class-preview-posts" *ngFor="let column of gridColumns; let i = index">

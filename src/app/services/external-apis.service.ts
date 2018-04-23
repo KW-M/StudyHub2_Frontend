@@ -3,32 +3,14 @@ import { DomSanitizer } from '@angular/platform-browser';
 import { Subject } from "rxjs/Subject";
 import { HttpClient, HttpHeaders } from "@angular/common/http";
 import { map, filter, scan } from 'rxjs/operators';
-import * as algoliasearch from 'algoliasearch'
-import * as algoliasearchHelper from 'algoliasearch-helper'
-import { ActivatedRoute } from '@angular/router';
 
 declare var google;
 
 @Injectable()
 export class ExternalApisService {
-  searchClient;
-  searchHelper;
   driveFilePickerRef;
-  // algoliaSearch = instantsearch({
-  //   appId: 'E4ZO0GZETF',
-  //   apiKey: '86abcc5769205165e5da838c20e882c4',
-  //   indexName: 'bestbuy',
-  //   urlSync: true
-  // });
+  constructor(private http: HttpClient, private sanitizer: DomSanitizer) {
 
-  constructor(private http: HttpClient, private sanitizer: DomSanitizer, private route: ActivatedRoute) {
-    this.searchClient = algoliasearch('E4ZO0GZETF', '86abcc5769205165e5da838c20e882c4');
-    this.searchHelper = algoliasearchHelper(this.searchClient, 'Posts', {
-      facets: ['labels', 'creator.name'],
-    });
-    console.log(this.searchHelper.setQuery('english').search());
-    console.log(this.route)
-    this.route.params.subscribe(console.log);
   }
 
   getWebsitePreview(url) {

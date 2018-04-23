@@ -92,7 +92,7 @@ export class PostViewViewComponent implements OnInit, OnDestroy {
   }
 
   getClassColorString(className: string) {
-    let colorObj = this.DataHolder.getClassColor(className)
+    let colorObj = this.DataHolder.getClassObj(className).color
     if (colorObj) return 'hsl(' + colorObj.h + ',' + colorObj.s + '%,40%)'
   }
 

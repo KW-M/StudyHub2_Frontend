@@ -35,7 +35,7 @@
       "name": "algolia-api",
       "version": 0,
       "urls": [
-        "https://e4zo0gzetf-dsn.algolia.net/1/indexes/**",
+        "https://e4zo0gzetf-dsn.algolia.net/1/indexes/**"
       ],
       "cacheConfig": {
         "strategy": "freshness",

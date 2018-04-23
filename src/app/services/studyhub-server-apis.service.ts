@@ -111,9 +111,9 @@ export class StudyhubServerApisService {
     return this.http.get(this.serverURLBase + "/search", { 'params': params }).toPromise();
   }
 
-  getRecentlyViewedPosts(recentPostArray) {
+  getPostsFromIds(postIdArray) {
     var requestArray = []
-    recentPostArray.forEach(postId => {
+    postIdArray.forEach(postId => {
       requestArray.push(this.FireStore.collection('posts').doc(postId).snapshotChanges().map((changeSnapshot) => {
         console.log(changeSnapshot);
         const data = changeSnapshot.payload.data();

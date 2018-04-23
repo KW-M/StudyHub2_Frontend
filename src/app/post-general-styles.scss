@@ -235,7 +235,8 @@ section.post-header {
     right: 0;
     height: 46px;
     box-sizing: content-box;
-    overflow: scroll;
+    overflow-x: scroll;
+    overflow-y: hidden;
     flex-direction: row;
     flex: none;
     white-space: nowrap;

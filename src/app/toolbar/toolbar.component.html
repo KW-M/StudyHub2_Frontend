@@ -1,21 +1,24 @@
 <mat-toolbar color="primary" class="studyhub-toolbar mat-elevation-z6">
-    <button mat-icon-button (click)="toggleSideMenu()" style="margin-right:8px">
+    <button mat-icon-button class="mobile-search-close-button" *ngIf="currentPage === 'Search'" (click)="setSearchModeOpen(false)">
+        <mat-icon>arrow_back</mat-icon>
+    </button>
+    <button mat-icon-button (click)="toggleSideMenu()" *ngIf="currentPage !== 'Search'" style="margin-right:8px">
         <mat-icon class="mat-24">menu</mat-icon>
     </button>
-    <span>{{currentPage}}</span>
-    <div class="searchbar-container" [ngClass]="{'mobile-search-open':mobileSearchOpen}">
-        <button mat-icon-button class="mobile-search-close-button" *ngIf="windowSize.xs" (click)="setMobileSearchOpen(false)">
+    <span class="page-text">{{currentPage}}</span>
+    <div class="searchbar-container" [ngClass]="{'mobile-search-open':windowSize.xs && currentPage === 'Search'}">
+        <button mat-icon-button class="mobile-search-close-button" *ngIf="windowSize.xs" (click)="setSearchModeOpen(false)">
             <mat-icon>arrow_back</mat-icon>
         </button>
         <mat-icon class="searchbar-search-icon">search</mat-icon>
-        <input class="searchbar-input" placeholder="Search" [(ngModel)]="searchText" (ngModelChange)="updateSearch(searchText)">
+        <input class="searchbar-input" placeholder="Search" [(ngModel)]="searchText" (focus)="setSearchModeOpen(true)" (ngModelChange)="updateSearch(searchText)">
         <button mat-icon-button class="searchbar-clear-button" *ngIf="searchText" (click)="clearSearch()">
             <mat-icon>close</mat-icon>
         </button>
     </div>
-    <span style="flex:1"></span>
+    <span style="        flex: 1 100 140px;"></span>
     <!-- <app-achevements-menu style="display: flex;flex: 1;align-items: center;"></app-achevements-menu> -->
-    <button mat-icon-button *ngIf="windowSize.xs" (click)="setMobileSearchOpen(true)">
+    <button mat-icon-button *ngIf="windowSize.xs" (click)="setSearchModeOpen(true)">
         <mat-icon>search</mat-icon>
     </button>
     <button mat-icon-button>

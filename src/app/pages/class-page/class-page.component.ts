@@ -28,15 +28,18 @@ export class ClassPageComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.visiblePostsObserver = this.DataHolder.visiblePostsState$.subscribe((posts) => {
-      console.log("posts from server", posts);
-      this.posts = posts;
+    this.visiblePostsObserver = this.DataHolder.visiblePostsState$.subscribe((result: any) => {
+      if (result.page === 0) {
+        this.posts = result.posts;
+      } else {
+        this.posts = this.posts.concat(result.posts);
+      };
       if (this.posts.length > 0) {
         this.postsGrid = this.getPostsGrid(this.posts, true);
       } else {
         this.postsGrid = [];
       }
-      console.log("final Postgrid", this.postsGrid);
+      console.log("final Postgrid page" + result.page + "/" + result.totalPages, this.postsGrid);
       this.ChangeDetector.detectChanges();
     })
 
@@ -93,8 +96,6 @@ export class ClassPageComponent implements OnInit, OnDestroy {
   }
 
   trackByPostIdFn(index, post) {
-    console.log(post.id);
-
     return post.id
   }
   trackByIndex(index, post) {

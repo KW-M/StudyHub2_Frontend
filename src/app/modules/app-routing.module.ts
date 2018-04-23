@@ -8,25 +8,25 @@ import { SearchPageComponent } from '../pages/search-page/search-page.component'
 const routes: Routes = [
   {
     path: '',
-    redirectTo: '/feed',
+    redirectTo: '/Feed',
     pathMatch: 'full'
   },
   {
-    path: 'feed',
+    path: 'Feed',
     component: FeedPageComponent
   },
   {
-    path: 'bookmarks',
-    component: FeedPageComponent
+    path: 'Bookmarks',
+    component: ClassPageComponent
+  },
+  {
+    path: 'Search',
+    component: SearchPageComponent
   },
   {
     path: ':class',
     component: ClassPageComponent
   },
-  {
-    path: ':class/search',
-    component: SearchPageComponent
-  }
 ];
 
 @NgModule({

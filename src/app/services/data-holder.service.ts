@@ -9,23 +9,25 @@ import { StudyhubServerApisService } from '../services/studyhub-server-apis.serv
 import { AngularFireAuth } from "angularfire2/auth";
 import * as firebase from 'firebase/app';
 import { MatSnackBar } from "@angular/material";
+import { AlgoliaApisService } from "./algolia-apis.service";
 
 @Injectable()
 export class DataHolderService {
+    otherQueryParams: any;
     signedinUser;
     yorkClasses;
     yorkGroups;
     labelList;
-    searchQuery = null;
     loadingPostsSubscription;
     linkPreviewCache = {};
     allLoadedPosts;
     currentPage;
     currentPosts;
     currentPostFilters = {
+        searchQuery: '',
         flagged: false,
         className: null,
-        userEmail: null,
+        creatorEmail: null,
     };
     currentSortMethod = 'magic'; //byDate byLikes byViews
 
@@ -43,6 +45,7 @@ export class DataHolderService {
     constructor(public EventBoard: EventBoardService,
         private GSignin: GoogleSigninService,
         private FirebaseAuth: AngularFireAuth,
+        private AlgoliaApis: AlgoliaApisService,
         private ExternalAPIs: ExternalApisService,
         private ServerAPIs: StudyhubServerApisService,
         private Router: Router,
@@ -72,11 +75,37 @@ export class DataHolderService {
             this.classAndGroupStateSource.next(response);
         })
 
+        this.otherQueryParams = this.AlgoliaApis.getOtherURLQueryParams();
+        this.AlgoliaApis.setQueryStateFromUrl();
         Router.events.filter(event => event instanceof NavigationEnd).subscribe((newRoute) => {
             this.currentPage = this.Router.routerState.snapshot.root.firstChild.url[0].path;
-            this.searchQuery = this.Router.routerState.snapshot.root.queryParams.q;
             if (this.currentPage && this.signedinUser) this.updateVisiblePosts();
         });
+
+        var handleSearchResult = (searchResult) => {
+            console.log(searchResult);
+            console.log(this.AlgoliaApis.searchHelper)
+            // if (searchResult.page === 0) {
+            this.currentPosts = searchResult.hits.map((post) => {
+                post.id = post.objectID
+                delete post.objectID
+                return post
+            })
+            // } else {
+            //     this.currentPosts = this.currentPosts.concat(searchResult.hits);
+            // };
+            this.visiblePostsStateSource.next({
+                posts: searchResult.hits,
+                page: searchResult.page,
+                totalPages: searchResult.nbPages,
+            })
+            if (searchResult.page <= searchResult.nbPages - 1 && window.document.body.scrollHeight === window.document.body.clientHeight) {
+                this.AlgoliaApis.searchHelper.nextPage()
+                this.AlgoliaApis.runSearch()
+            }
+        }
+
+        this.AlgoliaApis.searchHelper.on('result', handleSearchResult);
 
         this.ServerAPIs.getLabels().then((labelsResponse: any) => {
             console.log('labels:', labelsResponse)
@@ -96,13 +125,9 @@ export class DataHolderService {
         // })
 
         window.onscroll = (event) => {
-            console.log(event);
-            console.log(window.scrollY, window.document.body.scrollHeight);
-            if (window.scrollY > window.document.body.scrollHeight - window.document.body.clientHeight) {
-                if (this.loadingPostsSubscription === null) {
-                    console.log(this.currentPosts[this.currentPosts.length - 1].updateDate);
-                    this.getNextPostSet(this.currentPosts[this.currentPosts.length - 1].updateDate)
-                }
+            if ((window.scrollY > window.document.body.scrollHeight - window.document.body.clientHeight / 2) && this.AlgoliaApis.searchHelper.hasPendingRequests() === false) {
+                this.AlgoliaApis.searchHelper.nextPage()
+                this.AlgoliaApis.runSearch()
             }
         }
 
@@ -110,80 +135,54 @@ export class DataHolderService {
 
     updateVisiblePosts() {
         switch (this.currentPage) {
-            case 'all posts':
-                this.updateSearchFilters({
-                    className: null,
-                    flagged: false,
-                    userEmail: null,
-                }, null)
+            case 'All Posts':
+                this.AlgoliaApis.clearSearchRefinements()
+                this.AlgoliaApis.runSearch()
                 break;
-            case 'my posts':
-                this.updateSearchFilters({
-                    flagged: false,
-                    className: null,
-                    userEmail: this.signedinUser['email'] || null,
-                }, null)
+            case 'My Posts':
+                this.AlgoliaApis.clearSearchRefinements()
+                this.AlgoliaApis.setCreatedByFilter(this.signedinUser.name)
+                this.AlgoliaApis.runSearch()
                 break;
-            case 'bookmarks':
-                //this.getBookmarkedPosts()
+            case 'Bookmarks':
+                this.AlgoliaApis.clearSearchRefinements()
+                this.ServerAPIs.getPostsFromIds(this.signedinUser.recentlyViewed).then((posts) => {
+                    this.visiblePostsStateSource.next({
+                        posts: posts,
+                        page: 1,
+                        totalPages: 1,
+                    })
+                })
                 break;
-            case 'feed':
-                //the feed page handles things
+            case 'Feed':
+                this.AlgoliaApis.clearSearchRefinements()
+                //the feed page handles getting posts and things
+                break;
+            case 'Search':
+                //the search page handles getting posts and things
                 break;
             default:
-                this.updateSearchFilters({
-                    flagged: false,
-                    className: this.currentPage,
-                    userEmail: null,
-                }, null)
+                this.AlgoliaApis.clearSearchRefinements()
+                this.AlgoliaApis.setClassFilter(this.currentPage)
+                this.AlgoliaApis.runSearch()
                 break;
         }
+        this.AlgoliaApis.updateURLQueryParams()
     }
 
     updateSearchFilters(postFilters, sortMethod) {
         this.currentSortMethod = sortMethod || this.currentSortMethod;
         this.currentPostFilters = Object.assign(this.currentPostFilters, postFilters)
         console.log(this.currentPostFilters);
-        this.getNextPostSet(null)
+        // this.getNextPostSet(null)
     }
-
-    getNextPostSet(startingPost) {
-        var handlePostSet = (postSet) => {
-            console.log(postSet, startingPost);
-            //if (postSet.length < 3) this.loadingPostsSubscription = 'no more';
-            if (startingPost === null) {
-                this.currentPosts = postSet;
-            } else {
-                this.currentPosts = this.currentPosts.concat(postSet);
-            }
-            this.visiblePostsStateSource.next(this.currentPosts)
-            if (this.loadingPostsSubscription === 'next') {
-                console.log(this.currentPosts, this.currentPosts[this.currentPosts.length - 1]);
-                this.getNextPostSet(this.currentPosts[this.currentPosts.length - 1].updateDate)
-            } else {
-                this.loadingPostsSubscription = null;
-            }
-        }
-        if (this.loadingPostsSubscription !== 'no more' && this.signedinUser && this.Router.parseUrl(this.Router.url).root.children.primary.segments[1] === undefined) {
-            this.loadingPostsSubscription = this.ServerAPIs.getPosts(this.currentPostFilters, null, startingPost, null).first().toPromise().then(handlePostSet).catch((e) => {
-                console.warn(e)
-                if (e.message.indexOf("index")) {
-                    console.log("error index", this.currentPostFilters.className);
-                }
-            });
-        }
-    }
-
-    // getAllPosts() {
-    //     // this.ServerAPIs.getAllPosts(this.currentSortMethod).then((posts: any) => { this.allLoadedPosts = posts; this.visiblePostsStateSource.next(posts) }, console.warn)
-    // }
 
     getFeedPosts() {
         return this.ServerAPIs.getFeedPosts(this.signedinUser.favorites)
     }
 
     getRecentlyViewedPosts() {
-        return this.ServerAPIs.getRecentlyViewedPosts(this.signedinUser.recentlyViewed)
+        return this.ServerAPIs.getPostsFromIds(this.signedinUser.recentlyViewed)
     }
 
     deletePost(postObj) {
@@ -212,13 +211,10 @@ export class DataHolderService {
         console.log("linkPreviewData", this.linkPreviewCache);
         return this.linkPreviewCache[postId];
     }
-    getClassColor(className: string) {
-        let classObj = this.yorkClasses[className];
-        if (classObj) {
-            return classObj.color
-        } else {
-            return null;
-        }
+    getClassObj(className: string) {
+        var classObj = this.yorkClasses[className]
+        classObj.name = className;
+        return classObj;
     }
     findPost(postId) {
         for (let arrayIndex = 0; arrayIndex < this.currentPosts.length; arrayIndex++) {

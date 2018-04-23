@@ -37,23 +37,23 @@ export class SidenavComponent implements OnInit {
 
   };
 
-  constructor(private EventBoard: EventBoardService, private ServerAPIs: StudyhubServerApisService, private DataHolder: DataHolderService, public sideNavComponentElem: ElementRef, private zone: NgZone, private changeDetector: ChangeDetectorRef) {
+  constructor(private EventBoard: EventBoardService, private ServerAPIs: StudyhubServerApisService, private DataHolder: DataHolderService, public sideNavComponentElem: ElementRef, private zone: NgZone, private ChangeDetector: ChangeDetectorRef) {
     //Get notified by the event board service of the sideNavOpen Observable and set it to the local variable sidenavOpen.
     EventBoard.sideNavOpen$.subscribe((open) => {
       this.sidenavOpen = open;
-      this.changeDetector.detectChanges();
+      this.ChangeDetector.detectChanges();
     });
 
-    DataHolder.classAndGroupState$.subscribe((classesAndGroups) => {
+    DataHolder.classAndGroupState$.first().toPromise().then((classesAndGroups) => {
       this.formattedYorkClasses = classesAndGroups['formattedClasses'];
       this.yorkGroups = classesAndGroups['groups'];
-      this.changeDetector.detectChanges();
+      this.ChangeDetector.detectChanges();
     });
 
     DataHolder.currentUserState$.subscribe((user) => {
       if (user) {
         this.favoriteClasses = user['favorites'] || {};
-        this.changeDetector.detectChanges();
+        this.ChangeDetector.detectChanges();
       }
     })
   }
@@ -70,7 +70,7 @@ export class SidenavComponent implements OnInit {
     this.sideNavOverlayElm = this.sideNavContainerElm.children[1];
     this.zone.runOutsideAngular(() => {
       // Watch for touchStarts on the left 20px of screen (left edge drag).
-      document.ontouchstart = (event) => {
+      document.ontouchstart = (event: any) => {
         if (event.touches[0].clientX < 20) this.touchStart(event);
       };
       document.ontouchmove = (event) => {

@@ -56,8 +56,6 @@ export class GoogleSigninService {
         // We need to register an Observer on Firebase Auth to make sure auth is initialized.
         var authStateUnsubscribe = this.FirebaseAuth.auth.onAuthStateChanged((firebaseUser) => {
           authStateUnsubscribe()
-          console.log(firebase.auth);
-
           // Check if we are already signed-in Firebase with the correct user.
           if (!isUserEqual(gapi.auth2.getAuthInstance().currentUser.get(), firebaseUser)) {
             // Build Firebase credential with the Google ID token.

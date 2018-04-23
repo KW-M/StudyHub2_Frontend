@@ -19,6 +19,7 @@ import { EventBoardService } from './services/event-board.service';
 import { DataHolderService } from './services/data-holder.service';
 import { GoogleSigninService } from './services/google-signin.service';
 import { ExternalApisService } from './services/external-apis.service';
+import { AlgoliaApisService } from './services/algolia-apis.service'
 import { StudyhubServerApisService } from './services/studyhub-server-apis.service';
 
 import { AppComponent } from './app.component';
@@ -32,6 +33,7 @@ import { PostCardComponent } from './post-card/post-card.component';
 import { PostCardMiniComponent } from './post-card-mini/post-card-mini.component';
 import { NewPostBarComponent } from './new-post-bar/new-post-bar.component';
 import { SigninPromptComponent } from './signin-prompt/signin-prompt.component';
+import { ClassSelectorComponent } from './class-selector/class-selector.component'
 
 import { ScrollToElementDirective } from './directives/scroll-to-element.directive';
 import { FeedPageComponent } from './pages/feed-page/feed-page.component';
@@ -56,6 +58,7 @@ import { ObjKeysPipe } from './obj-keys.pipe';
     ClassPageComponent,
     SearchPageComponent,
     SigninPromptComponent,
+    ClassSelectorComponent,
     ObjKeysPipe,
   ],
   imports: [
@@ -78,6 +81,7 @@ import { ObjKeysPipe } from './obj-keys.pipe';
     DataHolderService,
     GoogleSigninService,
     ExternalApisService,
+    AlgoliaApisService,
     StudyhubServerApisService
   ],
   bootstrap: [AppComponent]

@@ -16,18 +16,21 @@ export class AlgoliaApisService {
   searchHelper: any;
   searchBasic: any;
   algoliaClient: any;
-  constructor(private http: HttpClient, private Router: Router) {
-    this.algoliaClient = algoliasearch('E4ZO0GZETF', '86abcc5769205165e5da838c20e882c4');
+  constructor(private http: HttpClient, private Router: Router) { }
+
+  initializeAlgolia(algoliaAPIKey) {
+    this.algoliaClient = algoliasearch('E4ZO0GZETF', algoliaAPIKey);
     this.searchHelper = algoliasearchHelper(this.algoliaClient, 'Posts', this.searchConfig);
-    console.log(this.searchHelper);
   }
   setQueryStateFromUrl() {
     var newState = algoliasearchHelper.url.getStateFromQueryString(window.location.search)
     if (newState) this.searchHelper.setState(Object.assign(newState, this.searchConfig, { index: 'Posts' }));
   }
   updateURLQueryParams() {
-    console.log(this.Router.routerState.snapshot.root.firstChild.url[0].path)
     this.Router.navigateByUrl("/" + this.Router.routerState.snapshot.root.firstChild.url[0].path + "?" + algoliasearchHelper.url.getQueryStringFromState(this.searchHelper.getState()));
+  }
+  clearURLQueryParams() {
+    this.Router.navigateByUrl("/" + this.Router.routerState.snapshot.root.firstChild.url[0].path);
   }
   getOtherURLQueryParams() {
     return algoliasearchHelper.url.getUnrecognizedParametersInQueryString(window.location.search);
@@ -44,11 +47,26 @@ export class AlgoliaApisService {
   runSearch() {
     this.searchHelper.search()
   }
-  setCreatedByFilter(creatorName) {
-    this.searchHelper.addDisjunctiveFacetRefinement('creator.name', creatorName)
+  searchFacet(facet, query) {
+    return this.searchHelper.searchForFacetValues(facet, query)
   }
-  setClassFilter(className) {
-    this.searchHelper.addDisjunctiveFacetRefinement('classes', className)
+  setCreatedByFilter(creatorName) {
+    this.searchHelper.clearRefinements('creator.name')
+    if (creatorName) this.searchHelper.addDisjunctiveFacetRefinement('creator.name', creatorName)
+  }
+  setClassFilter(classNames) {
+    console.log(classNames);
+    this.searchHelper.clearRefinements('classes')
+    for (let filterIndex = 0; filterIndex < classNames.length; filterIndex++) {
+      this.searchHelper.addDisjunctiveFacetRefinement('classes', classNames[filterIndex]);
+    }
+    console.log(this.searchHelper);
+  }
+  toggleLabelFilter(labelText) {
+    if (labelText) this.searchHelper.toggleFacetRefinement('labels', labelText)
+  }
+  clearFilter(filterName) {
+    this.searchHelper.clearRefinements(filterName)
   }
   removeQueryParam() {
 

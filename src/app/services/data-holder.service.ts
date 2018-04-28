@@ -18,7 +18,7 @@ export class DataHolderService {
     yorkClasses;
     yorkGroups;
     labelList;
-    loadingPostsSubscription;
+    loadingPosts = false;
     linkPreviewCache = {};
     allLoadedPosts;
     currentPage;
@@ -31,6 +31,8 @@ export class DataHolderService {
     };
     currentSortMethod = 'magic'; //byDate byLikes byViews
 
+    private startupCompleteStateSource = new ReplaySubject(1);
+    startupCompleteState$ = this.startupCompleteStateSource.asObservable();
     private currentUserStateSource = new ReplaySubject(1);
     currentUserState$ = this.currentUserStateSource.asObservable();
     private visiblePostsStateSource = new ReplaySubject(1);
@@ -51,6 +53,7 @@ export class DataHolderService {
         private Router: Router,
         public snackBar: MatSnackBar) {
         //constructor functions
+
         FirebaseAuth.authState.subscribe((signedIn) => {
             if (signedIn != null && signedIn.email) {
                 this.ServerAPIs.getUserFromServer(signedIn.email).then((userObj) => {
@@ -62,6 +65,10 @@ export class DataHolderService {
                     this.currentUserStateSource.next(this.signedinUser)
                     if (this.currentPage && this.signedinUser) this.updateVisiblePosts();
                 }).catch(console.warn)
+                this.ServerAPIs.getStartupInfo().then((startupInfo: any) => {
+                    this.AlgoliaApis.initializeAlgolia(startupInfo.AlgoliaAPIKey)
+                    this.startupCompleteStateSource.next(true)
+                })
             } else {
                 console.log('Fire Not Signed In');
                 this.signedinUser = null;
@@ -75,37 +82,47 @@ export class DataHolderService {
             this.classAndGroupStateSource.next(response);
         })
 
-        this.otherQueryParams = this.AlgoliaApis.getOtherURLQueryParams();
-        this.AlgoliaApis.setQueryStateFromUrl();
-        Router.events.filter(event => event instanceof NavigationEnd).subscribe((newRoute) => {
-            this.currentPage = this.Router.routerState.snapshot.root.firstChild.url[0].path;
-            if (this.currentPage && this.signedinUser) this.updateVisiblePosts();
-        });
 
         var handleSearchResult = (searchResult) => {
             console.log(searchResult);
-            console.log(this.AlgoliaApis.searchHelper)
-            // if (searchResult.page === 0) {
-            this.currentPosts = searchResult.hits.map((post) => {
+            var newPosts = searchResult.hits.map((post) => {
                 post.id = post.objectID
                 delete post.objectID
                 return post
             })
-            // } else {
-            //     this.currentPosts = this.currentPosts.concat(searchResult.hits);
-            // };
+            console.log("facets", )
+            if (searchResult.page === 0) {
+                this.currentPosts = newPosts;
+            } else {
+                this.currentPosts = this.currentPosts.concat(newPosts);
+            };
             this.visiblePostsStateSource.next({
-                posts: searchResult.hits,
+                posts: this.currentPosts,
                 page: searchResult.page,
                 totalPages: searchResult.nbPages,
+                facets: {
+                    creators: searchResult.getFacetValues('creator.name') || [],
+                    labels: searchResult.getFacetValues('labels') || []
+                }
             })
             if (searchResult.page <= searchResult.nbPages - 1 && window.document.body.scrollHeight === window.document.body.clientHeight) {
+                this.loadingPosts = true;
                 this.AlgoliaApis.searchHelper.nextPage()
                 this.AlgoliaApis.runSearch()
             }
         }
 
-        this.AlgoliaApis.searchHelper.on('result', handleSearchResult);
+        this.startupCompleteState$.first().toPromise().then(() => {
+            this.AlgoliaApis.searchHelper.on('result', handleSearchResult);
+            this.otherQueryParams = this.AlgoliaApis.getOtherURLQueryParams();
+            this.AlgoliaApis.setQueryStateFromUrl();
+        })
+        Router.events.filter(event => event instanceof NavigationEnd).subscribe((newRoute) => {
+            this.startupCompleteState$.first().toPromise().then(() => {
+                this.currentPage = this.Router.routerState.snapshot.root.firstChild.url[0].path;
+                if (this.currentPage && this.signedinUser) this.updateVisiblePosts();
+            })
+        });
 
         this.ServerAPIs.getLabels().then((labelsResponse: any) => {
             console.log('labels:', labelsResponse)
@@ -134,6 +151,7 @@ export class DataHolderService {
     }
 
     updateVisiblePosts() {
+        if (this.currentPage !== "Search") this.AlgoliaApis.clearURLQueryParams()
         switch (this.currentPage) {
             case 'All Posts':
                 this.AlgoliaApis.clearSearchRefinements()
@@ -163,11 +181,10 @@ export class DataHolderService {
                 break;
             default:
                 this.AlgoliaApis.clearSearchRefinements()
-                this.AlgoliaApis.setClassFilter(this.currentPage)
+                this.AlgoliaApis.setClassFilter([this.currentPage])
                 this.AlgoliaApis.runSearch()
                 break;
         }
-        this.AlgoliaApis.updateURLQueryParams()
     }
 
     updateSearchFilters(postFilters, sortMethod) {
@@ -208,12 +225,12 @@ export class DataHolderService {
         this.linkPreviewCache[postId] = linkPreview;
     }
     getCachedLinkPreview(postId) {
-        console.log("linkPreviewData", this.linkPreviewCache);
         return this.linkPreviewCache[postId];
     }
     getClassObj(className: string) {
-        var classObj = this.yorkClasses[className]
+        var classObj = this.yorkClasses[className] || this.yorkGroups[className] || {}
         classObj.name = className;
+        classObj.color = classObj.color || { h: 0, s: 0, l: 100 }
         return classObj;
     }
     findPost(postId) {

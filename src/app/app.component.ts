@@ -6,14 +6,11 @@ import { Component, ViewEncapsulation, ChangeDetectionStrategy, } from '@angular
    <app-toolbar></app-toolbar>
     <app-sidenav></app-sidenav>
     <app-speeddial></app-speeddial>
-
     <app-post-modal-frame></app-post-modal-frame>
-
     <div class="main-content">
-      <!--<router-outlet></router-outlet>-->
+      <router-outlet></router-outlet>
       <app-signin-prompt></app-signin-prompt>
     </div>
-
   `,
   styleUrls: ['./app.component.scss', './post-general-styles.scss'],
   encapsulation: ViewEncapsulation.None,

@@ -16,7 +16,7 @@ import { AlgoliaApisService } from '../services/algolia-apis.service';
   encapsulation: ViewEncapsulation.None,
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ToolbarComponent implements OnInit {
+export class ToolbarComponent {
   mobileSearchOpen: boolean = false;
   currentPage;
   lastState = {
@@ -53,8 +53,6 @@ export class ToolbarComponent implements OnInit {
       ChangeDetector.detectChanges()
     });
     Router.events.filter(event => event instanceof NavigationEnd).subscribe((newRoute) => {
-      console.log(this);
-
       var newPath = this.Router.routerState.snapshot.root.firstChild.url[0].path || "Feed";
       if (newPath !== this.currentPage) this.lastState = {
         page: this.currentPage || "Feed",
@@ -62,9 +60,14 @@ export class ToolbarComponent implements OnInit {
       };
       if (newPath === 'Search') this.EventBoard.setSideNavOpen(false)
       this.currentPage = newPath
-      this.searchText = this.AlgoliaApis.getSearchQuery() || '';
+      this.DataHolder.startupCompleteState$.first().toPromise().then(() => {
+        this.searchText = this.AlgoliaApis.getSearchQuery() || '';
+      })
       ChangeDetector.detectChanges()
     });
+    this.DataHolder.startupCompleteState$.first().toPromise().then(() => {
+      this.searchText = this.AlgoliaApis.getSearchQuery() || '';
+    })
   }
 
   updateSearch(query) {
@@ -82,7 +85,13 @@ export class ToolbarComponent implements OnInit {
 
   setSearchModeOpen(open) {
     if (open === true && this.currentPage !== 'Search') {
-      this.Router.navigate(['Search'], { queryParamsHandling: 'preserve' })
+      if (this.currentPage !== "All Posts" && this.currentPage !== "My Posts" && this.currentPage !== "Bookmarks" && this.currentPage !== "Feed") {
+        this.AlgoliaApis.setClassFilter([this.currentPage])
+        console.log(this.AlgoliaApis.searchHelper);
+      } else {
+        this.AlgoliaApis.clearFilter('classes')
+      }
+      this.Router.navigate(['Search'], { queryParamsHandling: 'preserve' }).then(() => { this.AlgoliaApis.updateURLQueryParams() })
     } else if (open === false) {
       this.clearSearch()
       console.log(this.lastState)
@@ -102,10 +111,6 @@ export class ToolbarComponent implements OnInit {
 
   signOut() {
     this.GSignin.handleSignOutClick()
-  }
-
-  ngOnInit() {
-    this.searchText = this.AlgoliaApis.getSearchQuery() || '';
   }
 }
 

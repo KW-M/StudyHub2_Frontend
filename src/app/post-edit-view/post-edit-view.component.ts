@@ -36,7 +36,6 @@ export class PostEditViewComponent implements OnInit, OnDestroy {
   labels = [];
   yorkGroups;
   formattedYorkClasses;
-  classAndGroupObserver;
   signedinUserObserver;
   labelsObserver
   backupSetIntervalRef;
@@ -229,7 +228,6 @@ export class PostEditViewComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    this.classAndGroupObserver.unsubscribe()
     this.signedinUserObserver.unsubscribe()
     this.labelsObserver.unsubscribe()
     if (this.currentPost.title || this.currentPost.description || this.currentPost.link) window.localStorage.setItem("postDraftBackup", JSON.stringify(this.currentPost));

@@ -15,6 +15,7 @@ import { AlgoliaApisService } from '../../services/algolia-apis.service';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class SearchPageComponent implements OnDestroy {
+  creatorList: any = [];
   favoriteClasses: any;
   formattedYorkClasses: any;
   labelScrollPercentage: number = 0;
@@ -30,6 +31,7 @@ export class SearchPageComponent implements OnDestroy {
   findTags;
   classFilters = [];
   classSearchText = '';
+  creatorFilter = '';
   findClass = '';
 
   constructor(public EventBoard: EventBoardService,
@@ -38,10 +40,62 @@ export class SearchPageComponent implements OnDestroy {
     public WindowFrame: WindowService,
     private ChangeDetector: ChangeDetectorRef,
     private nativeElementRef: ElementRef) {
+    this.DataHolder.startupCompleteState$.first().toPromise().then(() => {
+      window.onresize = () => {
+        if (this.posts.length > 0) {
+          this.postsGrid = this.getPostsGrid(this.posts, false) || this.postsGrid;
+          this.ChangeDetector.detectChanges();
+        }
+      };
+
+      this.sideNavOpenObserver = this.EventBoard.sideNavOpen$.subscribe(() => {
+        if (this.posts.length > 0) {
+          this.postsGrid = this.getPostsGrid(this.posts, false) || this.postsGrid;
+          this.ChangeDetector.detectChanges();
+        }
+      })
+
+      var labelsScrollElm = document.getElementById('scrollable_class_labels')
+      labelsScrollElm.onscroll = () => {
+        this.labelScrollPercentage = labelsScrollElm.scrollLeft / (labelsScrollElm.scrollWidth - labelsScrollElm.clientWidth);
+        this.ChangeDetector.markForCheck()
+      }
+
+      this.visiblePostsObserver = this.DataHolder.visiblePostsState$.subscribe((result: any) => {
+        this.posts = result.posts
+        this.creatorList = result.facets.creators;
+        this.labels = result.facets.labels;
+        console.log(this.labels);
+
+        console.log(this.creatorList);
+        if (this.posts.length > 0) {
+          this.postsGrid = this.getPostsGrid(this.posts, true);
+        } else {
+          this.postsGrid = [];
+        }
+        // console.log("final Postgrid page" + result.page + "/" + result.totalPages, this.postsGrid);
+        this.ChangeDetector.detectChanges();
+        this.DataHolder.loadingPosts = false;
+      })
+
+      // this.labelsObserver = this.DataHolder.labelsState$.subscribe((labels) => {
+      //   for (var key in labels) {
+      //     labels[key].label = key;
+      //     this.labels.push(labels[key]);
+      //   }
+      //   this.ChangeDetector.detectChanges();
+      // })
+      var refinements = this.AlgoliaApis.searchHelper.getQueryParameter('disjunctiveFacetsRefinements')
+      this.classFilters = refinements.classes || [];
+      console.log(this.classFilters);
+
+      this.creatorFilter = (refinements['creator.name'] || [''])[0];
+      this.ChangeDetector.detectChanges();
+    })
     this.DataHolder.classAndGroupState$.first().toPromise().then((classesAndGroups) => {
       this.formattedYorkClasses = classesAndGroups['formattedClasses'];
       this.ChangeDetector.detectChanges();
-      //only put here so that york classes must ha`  ve loaded>
+      //only put here so that york classes must have loaded>
       this.DataHolder.currentUserState$.subscribe((user: any) => {
         if (user) {
           this.favoriteClasses = []
@@ -50,51 +104,15 @@ export class SearchPageComponent implements OnDestroy {
               this.favoriteClasses.push(this.DataHolder.getClassObj(favClass))
             }
           }
-          console.log(this.favoriteClasses)
           this.ChangeDetector.detectChanges();
         }
       })
     })
   }
 
-  ngOnInit() {
-    window.onresize = () => {
-      if (this.posts.length > 0) {
-        this.postsGrid = this.getPostsGrid(this.posts, false) || this.postsGrid;
-        this.ChangeDetector.detectChanges();
-      }
-    };
-
-    this.sideNavOpenObserver = this.EventBoard.sideNavOpen$.subscribe(() => {
-      if (this.posts.length > 0) {
-        this.postsGrid = this.getPostsGrid(this.posts, false) || this.postsGrid;
-        this.ChangeDetector.detectChanges();
-      }
-    })
-
-    var labelsScrollElm = document.getElementById('scrollable_class_labels')
-    labelsScrollElm.onscroll = () => {
-      this.labelScrollPercentage = labelsScrollElm.scrollLeft / (labelsScrollElm.scrollWidth - labelsScrollElm.clientWidth);
-      this.ChangeDetector.markForCheck()
-    }
-
-    this.labelsObserver = this.DataHolder.labelsState$.subscribe((labels) => {
-      for (var key in labels) {
-        labels[key].label = key;
-        this.labels.push(labels[key]);
-      }
-      this.ChangeDetector.detectChanges();
-    })
-
-    this.AlgoliaApis.searchHelper.on('result', (searchResult) => {
-      console.log('searchResult', searchResult)
-    });
-  }
-
   getPostsGrid(inputArray, skipColCheck) {
     var numOfColumns = Math.floor(this.nativeElementRef.nativeElement.clientWidth / 320);
     this.columnWidth = (this.nativeElementRef.nativeElement.clientWidth - 12) / numOfColumns
-    console.dir(this.nativeElementRef.nativeElement, numOfColumns);
     if (skipColCheck || numOfColumns !== this.numOfColumns) {
       this.numOfColumns = numOfColumns;
       var columnArray = [];
@@ -103,7 +121,6 @@ export class SearchPageComponent implements OnDestroy {
       }
       this.gridColumns = columnArray;
       var colCounter = 0;
-      console.log("final Postgrid colm", columnArray);
       for (var postCounter = 0; postCounter < inputArray.length; postCounter++) {
         var column = columnArray[colCounter]
         column.push(inputArray[postCounter])
@@ -127,13 +144,52 @@ export class SearchPageComponent implements OnDestroy {
     return post.id
   }
 
-  updateSearchClass(className) {
+  trackByLabelFn(index, label) {
+    return label.label
+  }
 
+  // findInString(searchString, text) {
+  //   return (text.toLowerCase().indexOf(searchString.toLowerCase()) !== -1)
+  // }
+
+  onCreatorFilterInput(searchText) {
+    if (searchText && searchText.length > 0) {
+      this.AlgoliaApis.searchFacet('creator.name', searchText).then((facetResult) => {
+        console.log(facetResult);
+        this.creatorList = facetResult.facetHits;
+      })
+    } else {
+      this.filterByCreator(null)
+    }
+  }
+
+  filterByClass(classNames) {
+    this.classFilters = classNames;
+    if (this.AlgoliaApis.searchHelper) {
+      this.AlgoliaApis.setClassFilter(classNames)
+      this.AlgoliaApis.updateURLQueryParams()
+      this.AlgoliaApis.runSearch()
+    }
+  }
+  filterByCreator(creatorName) {
+    if (this.AlgoliaApis.searchHelper) {
+      this.AlgoliaApis.setCreatedByFilter(creatorName)
+      this.AlgoliaApis.updateURLQueryParams()
+      this.AlgoliaApis.runSearch()
+    }
+  }
+  filterByLabel(labelName) {
+    if (this.AlgoliaApis.searchHelper) {
+      this.AlgoliaApis.toggleLabelFilter(labelName)
+      this.AlgoliaApis.updateURLQueryParams()
+      this.AlgoliaApis.runSearch()
+    }
   }
 
   ngOnDestroy() {
     console.log('searchDestoryed')
     // for me I was detecting changes inside "subscribe" so was enough for me to just unsubscribe;
+    this.visiblePostsObserver.unsubscribe()
     this.sideNavOpenObserver.unsubscribe()
   }
 

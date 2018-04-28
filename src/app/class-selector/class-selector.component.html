@@ -11,10 +11,8 @@
       <h3 mat-subheader [ngStyle]="{'background': 'linear-gradient(152deg,hsl('+category?.color.h+','+category?.color.s+'%,'+category?.color.l+'%), white)'}"
         style="margin-top: 0;">{{category.category}}</h3>
     </div>
-    <ng-container *ngFor="let class of category.classes; trackBy:trackByClassNameFn">
-      <mat-list-option [value]="class.name" *ngIf="class.hidden != true">
-        <h4 mat-line [ngStyle]="{'color': 'hsl('+category?.color.h+','+category?.color.s+'%,40%)'}">{{class.name}}</h4>
-      </mat-list-option>
-    </ng-container>
+    <mat-list-option [value]="class.name" *ngFor="let class of category.classes; trackBy:trackByClassNameFn" [style.display]="class.hidden === true ? 'none':'block'">
+      <h4 mat-line [ngStyle]="{'color': 'hsl('+category?.color.h+','+category?.color.s+'%,40%)'}">{{class.name}}</h4>
+    </mat-list-option>
   </ng-container>
 </mat-selection-list>

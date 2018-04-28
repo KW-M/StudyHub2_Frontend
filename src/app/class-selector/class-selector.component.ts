@@ -19,7 +19,6 @@ export class ClassSelectorComponent implements OnInit, OnDestroy {
   searchText = '';
 
   @Input('filter-search') set filterText(text: string) {
-    console.log('got name: ', text);
     this.searchText = text
     this.formattedYorkClasses.forEach(category => {
       category.classes.forEach(function (classObj) {
@@ -44,14 +43,12 @@ export class ClassSelectorComponent implements OnInit, OnDestroy {
     });
   }
   @Input() get selection() {
-    console.log('hello')
-    return ''//this.selectionValue;
+    return this.selectionValue;
   }
-  @Output() selectionChange = new EventEmitter();
+  @Output('selection-change') selectionChange = new EventEmitter();
   set selection(value) {
-    console.log('by')
-    //this.selectionValue = value;
-    //this.selectionChange.emit(this.selectionValue);
+    this.selectionValue = value;
+    this.selectionChange.emit(this.selectionValue);
   }
 
   ngOnInit() {
@@ -63,7 +60,6 @@ export class ClassSelectorComponent implements OnInit, OnDestroy {
   }
 
   getClassColorString(className: string) {
-    console.log(this.selection)
     let colorObj = this.DataHolder.getClassObj(className).color
     if (colorObj) return 'hsl(' + colorObj.h + ',' + colorObj.s + '%,40%)'
   }

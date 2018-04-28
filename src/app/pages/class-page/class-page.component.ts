@@ -24,52 +24,51 @@ export class ClassPageComponent implements OnInit, OnDestroy {
   findTags;
   findClass;
   constructor(private DataHolder: DataHolderService, private EventBoard: EventBoardService, private ChangeDetector: ChangeDetectorRef, private nativeElementRef: ElementRef) {
+    this.DataHolder.startupCompleteState$.first().toPromise().then(() => {
+      this.visiblePostsObserver = this.DataHolder.visiblePostsState$.subscribe((result: any) => {
+        this.posts = result.posts;
+        if (this.posts.length > 0) {
+          this.postsGrid = this.getPostsGrid(this.posts, true);
+        } else {
+          this.postsGrid = [];
+        }
+        console.log("final Postgrid page" + result.page + "/" + result.totalPages, this.postsGrid);
+        this.ChangeDetector.detectChanges();
+        this.DataHolder.loadingPosts = false;
+      })
 
+      window.onresize = () => {
+        if (this.posts.length > 0) {
+          this.postsGrid = this.getPostsGrid(this.posts, false) || this.postsGrid;
+          this.ChangeDetector.detectChanges();
+        }
+      };
+
+      var labelsScrollElm = document.getElementById('scrollable_class_labels')
+      labelsScrollElm.onscroll = () => {
+        this.labelScrollPercentage = labelsScrollElm.scrollLeft / (labelsScrollElm.scrollWidth - labelsScrollElm.clientWidth);
+        this.ChangeDetector.markForCheck()
+      }
+
+      this.sideNavOpenObserver = this.EventBoard.sideNavOpen$.subscribe(() => {
+        if (this.posts.length > 0) {
+          this.postsGrid = this.getPostsGrid(this.posts, false) || this.postsGrid;
+          this.ChangeDetector.detectChanges();
+        }
+      })
+
+      this.labelsObserver = this.DataHolder.labelsState$.subscribe((labels) => {
+        for (var key in labels) {
+          labels[key].label = key;
+          this.labels.push(labels[key]);
+        }
+        this.ChangeDetector.detectChanges();
+      })
+    })
   }
 
   ngOnInit() {
-    this.visiblePostsObserver = this.DataHolder.visiblePostsState$.subscribe((result: any) => {
-      if (result.page === 0) {
-        this.posts = result.posts;
-      } else {
-        this.posts = this.posts.concat(result.posts);
-      };
-      if (this.posts.length > 0) {
-        this.postsGrid = this.getPostsGrid(this.posts, true);
-      } else {
-        this.postsGrid = [];
-      }
-      console.log("final Postgrid page" + result.page + "/" + result.totalPages, this.postsGrid);
-      this.ChangeDetector.detectChanges();
-    })
 
-    window.onresize = () => {
-      if (this.posts.length > 0) {
-        this.postsGrid = this.getPostsGrid(this.posts, false) || this.postsGrid;
-        this.ChangeDetector.detectChanges();
-      }
-    };
-
-    var labelsScrollElm = document.getElementById('scrollable_class_labels')
-    labelsScrollElm.onscroll = () => {
-      this.labelScrollPercentage = labelsScrollElm.scrollLeft / (labelsScrollElm.scrollWidth - labelsScrollElm.clientWidth);
-      this.ChangeDetector.markForCheck()
-    }
-
-    this.sideNavOpenObserver = this.EventBoard.sideNavOpen$.subscribe(() => {
-      if (this.posts.length > 0) {
-        this.postsGrid = this.getPostsGrid(this.posts, false) || this.postsGrid;
-        this.ChangeDetector.detectChanges();
-      }
-    })
-
-    this.labelsObserver = this.DataHolder.labelsState$.subscribe((labels) => {
-      for (var key in labels) {
-        labels[key].label = key;
-        this.labels.push(labels[key]);
-      }
-      this.ChangeDetector.detectChanges();
-    })
   }
 
   getPostsGrid(inputArray, skipColCheck) {
@@ -83,7 +82,6 @@ export class ClassPageComponent implements OnInit, OnDestroy {
       }
       this.gridColumns = columnArray;
       var colCounter = 0;
-      console.log("final Postgrid colm", columnArray);
       for (var postCounter = 0; postCounter < inputArray.length; postCounter++) {
         var column = columnArray[colCounter]
         column.push(inputArray[postCounter])
@@ -111,8 +109,6 @@ export class ClassPageComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    //  this.ChangeDetector.detach(); // try this
-    console.log('classDestoryed')
     // for me I was detecting changes inside "subscribe" so was enough for me to just unsubscribe;
     this.visiblePostsObserver.unsubscribe();
     this.sideNavOpenObserver.unsubscribe()

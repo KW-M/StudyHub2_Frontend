@@ -62,7 +62,7 @@ export class SidenavComponent implements OnInit {
   ngOnInit() {
     this.EventBoard.setSideNavOpen(window.matchMedia("(min-width: 960px)").matches) //sync the initial state with the eventboard service
     window.matchMedia("(min-width: 960px)").addListener((event) => {
-      this.EventBoard.setSideNavOpen(event.matches)
+      if (window.location.pathname !== "/Search") this.EventBoard.setSideNavOpen(event.matches)
     });
     //Establish Element refrences.
     this.sideNavContainerElm = this.sideNavComponentElem.nativeElement.children[0];

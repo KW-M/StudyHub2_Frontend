@@ -21,18 +21,12 @@ export class GoogleSigninService {
   }
 
   googleAuthInit() {
-    // gapi.client.init({
-    //   apiKey: "AIzaSyDspTvXbOLF-3jBKJbZ9ZDPkdWIkmaGQOk",
-    //   clientId: "675428000879-vqiopon2kmg1jtal4jpk8j23fnjk6rv9.apps.googleusercontent.com",
-    //   discoveryDocs: ["https://people.googleapis.com/$discovery/rest"],
-    //   scope: "profile"
-    // })
     gapi.load("auth2", () => {
       setTimeout(() => {
         gapi.auth2.init({
           client_id: "191304458473-pkjgflqvuk0n7u7q3smb5r7ul6l3cevn.apps.googleusercontent.com",
           hosted_domain: "york.org",
-          scope: "profile https://www.googleapis.com/auth/drive"
+          scope: "profile https://www.googleapis.com/auth/drive.readonly.metadata"
         }).then(() => {
           console.log('gauth innited');
           //Handle the initial sign-in state.
@@ -62,10 +56,10 @@ export class GoogleSigninService {
             var credential = firebase.auth.GoogleAuthProvider.credential(this.getGUserToken());
             // Sign in with credential from the Google user.
             firebase.auth().signInWithCredential(credential).catch(function (error) {
-              console.log(error);
+              console.warn(error);
             });
           } else {
-            console.log('User already signed-in Firebase.');
+            console.log('User already signed-in to Firebase.');
           }
         });
       }

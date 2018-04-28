@@ -45,6 +45,10 @@ export class StudyhubServerApisService {
     })
   }
 
+  getStartupInfo() {
+    return this.FireDB.object('startupInfo').valueChanges().first().toPromise()
+  }
+
   getAllPosts(sortBy) {
     return this.FireStore.collection('posts')
   }

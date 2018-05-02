@@ -11,32 +11,35 @@ import * as firebase from 'firebase/app';
 
 @Injectable()
 export class StudyhubServerApisService {
-  serverURLBase: string = 'https://fir-test-156302.firebaseio.com/';
+  serverURLBase: string = 'https://studyhub-2.firebaseio.com/';
   constructor(private http: HttpClient,
     private sanitizer: DomSanitizer,
     private FireDB: AngularFireDatabase,
     private FireAuth: AngularFireAuth,
-    private FireStore: AngularFirestore) { }
+    private FireStore: AngularFirestore) {
+    FireStore.app.firestore().settings({ timestampsInSnapshots: true });
+  }
 
   getUserFromServer(email) {
     return new Promise((resolve, reject) => {
       email = this.removeFirebaseKeyIllegalChars(email)
-      this.FireDB.object('users/' + email).valueChanges().first().toPromise().then((userObj) => {
-        if (userObj === null) {
+      console.log(email);
+      this.FireDB.object('users/' + email).valueChanges().first().toPromise().then((userObj: any) => {
+        if (userObj === null || !userObj.uid) {
+          userObj = userObj || {}
           let newUserObj = {
             'name': this.FireAuth.auth.currentUser.displayName,
             'uid': this.FireAuth.auth.currentUser.uid,
-            'moderator': false,
-            'favorites': {
-              'Other': true
-            },
-            'bookmarks': {},
-            'visitCount': 1,
-            'contributionCount': 0
+            'moderator': userObj.moderator === undefined ? false : userObj.moderator,
+            'favorites': userObj.favorites === undefined ? {} : userObj.favorites,
+            'bookmarks': userObj.bookmarks === undefined ? {} : userObj.bookmarks,
+            'visitCount': userObj.visitCount === undefined ? 1 : userObj.visitCount,
+            'contributionCount': userObj.contributionCount === undefined ? 0 : userObj.contributionCount
           }
+          console.log(newUserObj);
           this.FireDB.object('users/' + email).set(newUserObj).then((dbResp: any) => {
             resolve(newUserObj)
-          }).catch(reject)
+          }).catch(console.log)//reject)
         } else {
           resolve(userObj)
           this.FireDB.object('users/' + email + '/visitCount').query.ref.transaction(visits => { return visits ? visits + 1 : 1; }).then(console.log).catch(console.warn)
@@ -60,7 +63,6 @@ export class StudyhubServerApisService {
       lastPost: lastPost
     })
     return this.FireStore.collection("posts", (ref) => {
-      console.log(lastPost);
       let query: firebase.firestore.CollectionReference | firebase.firestore.Query = ref;
       if (!postFilters.userEmail) query = query.where("flagged", "==", postFilters.flagged || false)
       if (postFilters.className) {
@@ -76,26 +78,14 @@ export class StudyhubServerApisService {
       return query.limit(pageSize || 4);
     }).snapshotChanges().map(actions => {
       return actions.map((changeSnapshot) => {
-        console.log(changeSnapshot);
         const data = changeSnapshot.payload.doc.data();
         data.id = changeSnapshot.payload.doc.id;
-        data.classes = this.objToArray(data.classes)
+        data.updateDate = data.updateDate.toDate();
+        data.creationDate = data.creationDate.toDate();
+        console.log(data, changeSnapshot);
         return data
       });
     })
-  }
-
-  getFeedPosts(favorites) {
-    var requestArray = []
-    for (const favClass in favorites) {
-      if (favorites.hasOwnProperty(favClass)) {
-        console.log(favClass);
-        requestArray.push(this.getPosts({
-          className: favClass
-        }, null, null, 4).first().toPromise())
-      }
-    }
-    return Promise.all(requestArray)
   }
 
   getUserBookmarks(email) {
@@ -119,10 +109,11 @@ export class StudyhubServerApisService {
     var requestArray = []
     postIdArray.forEach(postId => {
       requestArray.push(this.FireStore.collection('posts').doc(postId).snapshotChanges().map((changeSnapshot) => {
-        console.log(changeSnapshot);
         const data = changeSnapshot.payload.data();
         data.id = changeSnapshot.payload.id;
-        data.classes = this.objToArray(data.classes)
+        data.updateDate = data.updateDate.toDate();
+        data.creationDate = data.creationDate.toDate();
+        console.log(data, changeSnapshot);
         return data
       }).first().toPromise())
     });
@@ -154,44 +145,18 @@ export class StudyhubServerApisService {
     })
   }
 
-  getLabels() {
-    return this.FireDB.object('labels/').valueChanges().first().toPromise()
-  }
-
   submitPost(postObj) { // send a new or updated post object to the server
     postObj.likeCount = postObj.likeUsers.length || 0
     var convertedPost: any = {}
     convertedPost = Object.assign({}, postObj);
     delete convertedPost.id;
-    convertedPost.classes = this.arrayToObj(convertedPost.classes)
     convertedPost.updateDate = firebase.firestore.FieldValue.serverTimestamp()
     console.log(convertedPost);
-    this.updateLabels(postObj.labels, postObj.classes)
     if (postObj.id) {
-      //  return new Promise((resolve, reject) => { this.FireStore.collection('posts').doc(postObj.id).set(convertedPost).then(resolve as any).catch(reject) })
       return this.FireStore.collection('posts').doc(postObj.id).set(convertedPost) as any;
     } else {
       convertedPost.creationDate = firebase.firestore.FieldValue.serverTimestamp()
       return this.FireStore.collection('posts').add(convertedPost)
-    }
-  }
-
-  updateLabels(labelList, classes) {
-    var finalPromise
-    for (const label in labelList) {
-      console.log(label, classes);
-      this.FireDB.object('labels/' + label).query.ref.transaction(labelObj => {
-        if (!labelObj) labelObj = { usage: {}, totalUsage: 0 }
-        classes.forEach(className => {
-          labelObj.usage[className] = labelObj.usage[className] + 1 || 1;
-        });
-        var totalUsage = 0
-        for (const classKey in labelObj.usage) {
-          totalUsage = totalUsage + labelObj.usage[classKey];
-        }
-        labelObj.totalUsage = totalUsage
-        return labelObj
-      }).then(console.log).catch(console.warn)
     }
   }
 
@@ -237,6 +202,10 @@ export class StudyhubServerApisService {
         return recents;
       })
     })
+  }
+
+  setQuizletUsername(userName) {
+    return this.FireDB.object('users/' + this.removeFirebaseKeyIllegalChars(this.FireAuth.auth.currentUser.email) + "/quizletUsername").set(userName)
   }
 
   setFavorites(favoritesObj) {

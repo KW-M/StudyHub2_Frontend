@@ -13,13 +13,13 @@ import { AlgoliaApisService } from "./algolia-apis.service";
 
 @Injectable()
 export class DataHolderService {
+    allLabels: any;
     otherQueryParams: any;
     signedinUser;
     yorkClasses;
     yorkGroups;
     labelList;
     loadingPosts = false;
-    linkPreviewCache = {};
     allLoadedPosts;
     currentPage;
     currentPosts;
@@ -41,8 +41,8 @@ export class DataHolderService {
     feedPostsState$ = this.visiblePostsStateSource.asObservable();
     private classAndGroupStateSource = new ReplaySubject(1);
     classAndGroupState$ = this.classAndGroupStateSource.asObservable();
-    private labelsStateSource = new ReplaySubject(1);
-    labelsState$ = this.labelsStateSource.asObservable();
+    // private labelsStateSource = new ReplaySubject(1);
+    // labelsState$ = this.labelsStateSource.asObservable();
 
     constructor(public EventBoard: EventBoardService,
         private GSignin: GoogleSigninService,
@@ -66,8 +66,12 @@ export class DataHolderService {
                     if (this.currentPage && this.signedinUser) this.updateVisiblePosts();
                 }).catch(console.warn)
                 this.ServerAPIs.getStartupInfo().then((startupInfo: any) => {
+                    console.log('startupCompleate')
                     this.AlgoliaApis.initializeAlgolia(startupInfo.AlgoliaAPIKey)
                     this.startupCompleteStateSource.next(true)
+                    this.AlgoliaApis.runIsolatedFacetSearch("labels", "").then((searchResult) => {
+                        this.allLabels = searchResult.facetHits || [];
+                    })
                 })
             } else {
                 console.log('Fire Not Signed In');
@@ -84,18 +88,17 @@ export class DataHolderService {
 
 
         var handleSearchResult = (searchResult) => {
-            console.log(searchResult);
-            var newPosts = searchResult.hits.map((post) => {
-                post.id = post.objectID
-                delete post.objectID
-                return post
-            })
-            console.log("facets", )
+            console.log('searchResult:', searchResult);
+            var newPosts = searchResult.hits.map(this.convertAlgoliaHitToPost)
             if (searchResult.page === 0) {
                 this.currentPosts = newPosts;
             } else {
                 this.currentPosts = this.currentPosts.concat(newPosts);
             };
+            this.currentPage = {
+                page: searchResult.page,
+                totalPages: searchResult.nbPages,
+            }
             this.visiblePostsStateSource.next({
                 posts: this.currentPosts,
                 page: searchResult.page,
@@ -105,7 +108,7 @@ export class DataHolderService {
                     labels: searchResult.getFacetValues('labels') || []
                 }
             })
-            if (searchResult.page <= searchResult.nbPages - 1 && window.document.body.scrollHeight === window.document.body.clientHeight) {
+            if (searchResult.page < searchResult.nbPages - 1 && window.document.body.scrollHeight === window.document.body.clientHeight) {
                 this.loadingPosts = true;
                 this.AlgoliaApis.searchHelper.nextPage()
                 this.AlgoliaApis.runSearch()
@@ -124,25 +127,15 @@ export class DataHolderService {
             })
         });
 
-        this.ServerAPIs.getLabels().then((labelsResponse: any) => {
-            console.log('labels:', labelsResponse)
-            this.labelList = labelsResponse;
-            this.labelsStateSource.next(labelsResponse);
-        }).catch((err) => {
-            this.labelsStateSource.error(err);
-            console.warn(err);
-        })
-        // this.ServerAPIs.getUserBookmarks().toPromise().then((bookmarksResponse: any) => {
-        //     this.labelsStateSource.next(labelsResponse);
-        //     console.log('labels:', labelsResponse)
-        //     this.labelList = labelsResponse;
-        // }).catch((err) => {
-        //     this.labelsStateSource.error(err);
-        //     console.warn(err);
-        // })
-
         window.onscroll = (event) => {
-            if ((window.scrollY > window.document.body.scrollHeight - window.document.body.clientHeight / 2) && this.AlgoliaApis.searchHelper.hasPendingRequests() === false) {
+            console.log("scrolling", {
+                sh: window.document.body.scrollHeight,
+                ch: window.document.body.clientHeight,
+                sc: window.scrollY,
+                min: window.document.body.scrollHeight - window.document.body.clientHeight
+            })
+            if ((window.scrollY > window.document.body.scrollHeight - window.document.body.clientHeight * 1.5 && this.AlgoliaApis.searchHelper.hasPendingRequests() === false && this.loadingPosts === false && this.currentPage.page < this.currentPage.totalPages - 1)) {
+                console.log('searching');
                 this.AlgoliaApis.searchHelper.nextPage()
                 this.AlgoliaApis.runSearch()
             }
@@ -194,8 +187,22 @@ export class DataHolderService {
         // this.getNextPostSet(null)
     }
 
+    updateCurrentUserObserver(newUserObj) {
+        this.currentUserStateSource.next(Object.assign(this.signedinUser, newUserObj))
+    }
+
     getFeedPosts() {
-        return this.ServerAPIs.getFeedPosts(this.signedinUser.favorites)
+        var requestArray = []
+        for (const favClass in this.signedinUser.favorites) {
+            if (this.signedinUser.favorites.hasOwnProperty(favClass)) {
+                requestArray.push(this.AlgoliaApis.runIsolatedSearch({
+                    hitsPerPage: 4,
+                    "disjunctiveFacets": ["classes"],
+                    "disjunctiveFacetsRefinements": { "classes": [favClass] },
+                }))
+            }
+        }
+        return Promise.all(requestArray)
     }
 
     getRecentlyViewedPosts() {
@@ -220,13 +227,6 @@ export class DataHolderService {
             }
         })
     }
-
-    setCachedLinkPreview(postId, linkPreview) {
-        this.linkPreviewCache[postId] = linkPreview;
-    }
-    getCachedLinkPreview(postId) {
-        return this.linkPreviewCache[postId];
-    }
     getClassObj(className: string) {
         var classObj = this.yorkClasses[className] || this.yorkGroups[className] || {}
         classObj.name = className;
@@ -237,6 +237,11 @@ export class DataHolderService {
         for (let arrayIndex = 0; arrayIndex < this.currentPosts.length; arrayIndex++) {
             if (this.currentPosts[arrayIndex].id === postId) return arrayIndex
         }
+    }
+    convertAlgoliaHitToPost(hit) {
+        hit.id = hit.objectID
+        delete hit.objectID
+        return hit;
     }
     objToArray(input) {
         var output = []

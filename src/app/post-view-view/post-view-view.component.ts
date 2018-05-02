@@ -63,38 +63,18 @@ export class PostViewViewComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.currentPost = this.inputPost
-    // this.currentPost['color'] = this.DataHolder.getClassColor(this.currentPost.classes[0]);
+    this.currentPost['color'] = this.DataHolder.getClassObj(this.currentPost.classes[0]).color;
     console.log(this.currentPost);
-
-    // if (this.currentPost.link) {
-    //   this.currentLinkPreview = this.DataHolder.getCachedLinkPreview(this.currentPost.id) || this.currentLinkPreview
-    //   console.log("gotLinkPreview", this.currentLinkPreview);
-    //   if (this.currentLinkPreview.thumbnail === null) {
-    //     let driveFileId = this.currentPost.link.match(/(?:(?:\/(?:d|s|file|folder|folders)\/)|(?:id=)|(?:open=))([-\w]{25,})/)
-    //     if (driveFileId) {
-    //       console.log('driveURL', driveFileId)
-    //       // this.ExternalAPIs.getDrivePreview(driveFileId[0])
-    //     } else {
-    //       this.websitePreviewObserver = this.ExternalAPIs.getWebsitePreview(this.currentPost.link).subscribe((websitePreview) => {
-    //         this.currentLinkPreview['thumbnail'] = websitePreview['image'];
-    //         this.currentLinkPreview['icon'] = websitePreview['icon'];
-    //         this.DataHolder.setCachedLinkPreview(this.currentPost.id, this.currentLinkPreview)
-    //         this.currentPost.attachmentName = websitePreview['title'] || this.currentPost.attachmentName;
-    //         this.ChangeDetector.detectChanges();
-    //       }, (err) => { console.warn(err) })
-    //     }
-    //   }
-    // }
   }
 
   closeModal() {
     this.EventBoard.closePostModal()
   }
 
-  getClassColorString(className: string) {
-    let colorObj = this.DataHolder.getClassObj(className).color
-    if (colorObj) return 'hsl(' + colorObj.h + ',' + colorObj.s + '%,40%)'
-  }
+  // getClassColorString(className: string) {
+  //   let colorObj = this.DataHolder.getClassObj(className).color
+  //   if (colorObj) return 'hsl(' + colorObj.h + ',' + colorObj.s + '%,40%)'
+  // }
 
   ngOnDestroy() {
     this.signedinUserObserver.unsubscribe()

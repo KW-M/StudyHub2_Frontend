@@ -1,13 +1,7 @@
 <app-new-post-bar></app-new-post-bar>
 <div class="post-chip-list" id="scrollable_class_labels">
-  <mat-chip color="accent" class="chip-gradient" *ngFor="let label of labels;">
-    {{label?.label}}
-  </mat-chip>
-  <mat-chip color="accent" class="chip-gradient" *ngFor="let label of labels;">
-    {{label?.label}}
-  </mat-chip>
-  <mat-chip color="accent" class="chip-gradient" *ngFor="let label of labels;">
-    {{label?.label}}
+  <mat-chip color="accent" class="chip-gradient" *ngFor="let label of labels;" (click)="filterByLabel(label.name)">
+    {{label?.name}}
   </mat-chip>
   <span style="flex:none;width: 12px;height: 10px;"></span>
 </div>
@@ -23,12 +17,24 @@
     </button>
   </div>
 </div>
-<div class="class-preview-posts-grid-container">
-  <div class="class-preview-posts" *ngFor="let column of gridColumns; let i = index, trackBy:trackByIndex">
+<div class="posts-grid-container">
+  <div class="posts-grid-column" *ngFor="let column of gridColumns; let i = index, trackBy:trackByIndex">
     <app-post-card *ngFor="let post of postsGrid[i]; let indexy = index; trackBy:trackByPostIdFn" [input-post]="post"></app-post-card>
-    <!-- <div *ngFor="let post of postsGrid[i]; let indexy = index;">{{post.toString()}}</div> -->
   </div>
   <!-- spacer grid items at the end keep the other grid items equal width -->
-  <div class="class-preview-posts"></div>
-  <div class="class-preview-posts"></div>
+  <div class="posts-grid-column"></div>
+  <div class="posts-grid-column"></div>
+</div>
+<div class="no-posts-area">
+  <ng-container *ngIf="!postResult || (postResult?.totalPages !== 0 && postResult?.totalPages > postResult?.page + 1)">
+    <mat-progress-spinner mode="indeterminate" color="accent" diameter="36"></mat-progress-spinner>
+  </ng-container>
+  <ng-container *ngIf="postResult?.totalPages !== 0 && postResult?.totalPages === postResult?.page + 1">
+    <h3>That's all folks.</h3>
+  </ng-container>
+  <ng-container *ngIf="postResult?.totalPages === 0">
+    <h3>It's so lonely here</h3>
+    <p>Be the first to post.</p>
+    <img src="assets/Lonely Island.png">
+  </ng-container>
 </div>

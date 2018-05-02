@@ -25,7 +25,6 @@ export class SearchPageComponent implements OnDestroy {
   gridColumns;
   numOfColumns;
   columnWidth;
-  labelsObserver;
   visiblePostsObserver;
   sideNavOpenObserver;
   findTags;
@@ -66,7 +65,6 @@ export class SearchPageComponent implements OnDestroy {
         this.creatorList = result.facets.creators;
         this.labels = result.facets.labels;
         console.log(this.labels);
-
         console.log(this.creatorList);
         if (this.posts.length > 0) {
           this.postsGrid = this.getPostsGrid(this.posts, true);

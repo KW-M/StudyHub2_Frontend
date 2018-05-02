@@ -5,9 +5,12 @@ app-toolbar {
 }
 
 .main-content {
+    position: relative;
+    display: flex;
     margin-top: 64px;
     width: auto;
     min-width: 0;
+    height: auto;
     flex: 1;
 }
 
@@ -27,9 +30,33 @@ app-post-modal-frame {
     z-index: 11;
 }
 
+app-feed-page,
 app-class-page,
-app-search-page {
-    display: block;
+app-search-page,
+app-quizlet-page {
+    display: flex;
+    width: 100%;
+    flex-direction: column;
+}
+
+.algolia-credit {
+    position: absolute;
+    top: 3px;
+    right: 3px;
+    z-index: 5;
+    span {
+        vertical-align: middle;
+        font-size: 13px;
+    }
+    a {
+        position: relative;
+        display: inline-block;
+        height: 18px;
+        vertical-align: middle;
+        img {
+            height: 18px;
+        }
+    }
 }
 
 @media (max-width: 600px) {

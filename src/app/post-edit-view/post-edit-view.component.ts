@@ -6,6 +6,7 @@ import { EventBoardService } from "../services/event-board.service";
 import { DataHolderService } from "../services/data-holder.service";
 import { ExternalApisService } from "../services/external-apis.service";
 import { StudyhubServerApisService } from '../services/studyhub-server-apis.service';
+import { AlgoliaApisService } from '../services/algolia-apis.service';
 
 @Component({
   selector: 'app-post-edit-view',
@@ -20,10 +21,10 @@ export class PostEditViewComponent implements OnInit, OnDestroy {
   visibleLabels: any;
   websitePreviewObserver;
   @Input('input-post') inputPost;
-  @ViewChildren('labelChip') labelChip;
   @ViewChild('descriptionHTML') descriptionElm: ElementRef;
   labelChipList = [];
   currentPost;
+  selectedClassObj: any = {};
   currentLinkPreview = {
     thumbnail: null,
     icon: null
@@ -37,7 +38,6 @@ export class PostEditViewComponent implements OnInit, OnDestroy {
   yorkGroups;
   formattedYorkClasses;
   signedinUserObserver;
-  labelsObserver
   backupSetIntervalRef;
   currentSnackBarRef;
   throttleTimer = {
@@ -45,6 +45,7 @@ export class PostEditViewComponent implements OnInit, OnDestroy {
   };
   constructor(private EventBoard: EventBoardService,
     private ExternalAPIs: ExternalApisService,
+    private AlgoliaApis: AlgoliaApisService,
     private ServerAPIs: StudyhubServerApisService,
     private componentElem: ElementRef,
     private ChangeDetector: ChangeDetectorRef,
@@ -60,7 +61,7 @@ export class PostEditViewComponent implements OnInit, OnDestroy {
       "likeUsers": [],//<-
       "viewCount": 0,//<-
       "ranking": 0,//<-
-      "labels": {},
+      "labels": [],
       "classes": [],
       "creator": {
         "email": null,
@@ -71,15 +72,6 @@ export class PostEditViewComponent implements OnInit, OnDestroy {
       "creationDate": new Date(),
       "updateDate": new Date(),
     }
-
-    this.labelsObserver = this.DataHolder.labelsState$.subscribe((labels) => {
-      for (var key in labels) {
-        labels[key].label = key;
-        this.labels.push(labels[key]);
-      }
-      this.ChangeDetector.markForCheck();
-    })
-
     let backupPost = window.localStorage.getItem("postDraftBackup")
     let snackBarAction = null
     if (backupPost && !this.currentPost.id) {
@@ -145,6 +137,15 @@ export class PostEditViewComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.currentPost = this.inputPost
+    var tempLabels = this.currentPost.labels
+    console.log(tempLabels);
+
+    this.currentPost.labels = {}
+    tempLabels.forEach(label => {
+      this.currentPost.labels[label] = true;
+    });
+    tempLabels = undefined
+    this.labels = this.DataHolder.allLabels || []
     this.DataHolder.classAndGroupState$.first().toPromise().then((classesAndGroups) => {
       this.formattedYorkClasses = classesAndGroups['formattedClasses'];
       this.yorkGroups = classesAndGroups['groups'];
@@ -165,24 +166,27 @@ export class PostEditViewComponent implements OnInit, OnDestroy {
     });
   }
 
+  classSelected(classes) {
+    console.log(classes);
+    this.currentPost.classes = classes;
+    if (classes[0] !== this.selectedClassObj.name) this.selectedClassObj = this.DataHolder.getClassObj(classes[0]);
+    this.AlgoliaApis.runIsolatedFacetSearch("labels", "").then((searchResult) => {
+      this.labels = (searchResult.facetHits || []).concat(this.DataHolder.allLabels);
+      console.log(this.labels);
+    })
+  }
+
   onLabelAndClassSearchInput(searchText) {
     this.labelAndClassSearchText = searchText;
     let currentPostLabels = this.currentPost.labels;
     let currentPostClasses = this.currentPost.classes;
     this.labelMissing = true;
     this.labels = this.labels.map((label) => {
-      label.hidden = label.label.toLowerCase().indexOf(searchText.toLowerCase()) === -1 || undefined //!(currentPostLabels.includes(label.label) || !(label.label.toLowerCase().indexOf(searchText.toLowerCase()) === -1)) || undefined;
+      label.hidden = label.value.toLowerCase().indexOf(searchText.toLowerCase()) === -1 || undefined //!(currentPostLabels.includes(label.label) || !(label.label.toLowerCase().indexOf(searchText.toLowerCase()) === -1)) || undefined;
       if (label.hidden === undefined) this.labelMissing = false;
       return label;
     })
     if (this.classChooserExpanded === true) { }
-    // for (const groupName in this.yorkGroups) {
-    //   if (groupName.toLowerCase().indexOf(searchText.toLowerCase()) === -1) {
-    //     this.yorkGroups[groupName].hidden = true;
-    //   } else {
-    //     delete this.yorkGroups[groupName].hidden;
-    //   }
-    // }
     //clearTimeout(this.throttleTimer['onLabelAndClassSearchInput']);
   }
 
@@ -190,10 +194,9 @@ export class PostEditViewComponent implements OnInit, OnDestroy {
     if (this.currentPost.labels[label] === true) {
       delete this.currentPost.labels[label]
     } else {
-      this.currentPost.labels[label] = true;
+      this.currentPost.labels[label] = true
       setTimeout(() => {
         console.log(document.getElementById("class_label_chips"));
-
         document.getElementById("class_label_chips").lastElementChild.scrollIntoView({ behavior: "smooth", block: "center", inline: "center" });
       }, 30)
     }
@@ -202,15 +205,18 @@ export class PostEditViewComponent implements OnInit, OnDestroy {
   createLabel(newLabelText) {
     this.onLabelAndClassSearchInput('')
     this.currentPost.labels[newLabelText] = true;
-    var usage = {}
-    usage[this.currentPost.classes[0]] = 1
-    this.labels.push({ label: newLabelText, usage: usage, totalUsage: this.currentPost.classes.length, new: true });
     this.labelMissing = false;
     this.ChangeDetector.detectChanges()
   }
 
   submitPost() {
     this.currentPost.description = this.descriptionElm.nativeElement.innerHTML
+    var tempLabels = this.currentPost.labels
+    this.currentPost.labels = []
+    for (const label in tempLabels) {
+      if (tempLabels[label] === true) this.currentPost.labels.push(label)
+    }
+    tempLabels = undefined
     console.log(this.currentPost)
     this.ServerAPIs.submitPost(this.currentPost).then((response: any) => {
       console.log(response);
@@ -229,7 +235,6 @@ export class PostEditViewComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     this.signedinUserObserver.unsubscribe()
-    this.labelsObserver.unsubscribe()
     if (this.currentPost.title || this.currentPost.description || this.currentPost.link) window.localStorage.setItem("postDraftBackup", JSON.stringify(this.currentPost));
     if (this.websitePreviewObserver) this.websitePreviewObserver.unsubscribe();
     if (this.currentSnackBarRef) this.currentSnackBarRef.dismiss()

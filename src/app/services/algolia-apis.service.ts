@@ -17,9 +17,8 @@ export class AlgoliaApisService {
   searchBasic: any;
   algoliaClient: any;
   constructor(private http: HttpClient, private Router: Router) { }
-
   initializeAlgolia(algoliaAPIKey) {
-    this.algoliaClient = algoliasearch('E4ZO0GZETF', algoliaAPIKey);
+    this.algoliaClient = algoliasearch('DCEEQTUL2M', algoliaAPIKey);
     this.searchHelper = algoliasearchHelper(this.algoliaClient, 'Posts', this.searchConfig);
   }
   setQueryStateFromUrl() {
@@ -46,6 +45,36 @@ export class AlgoliaApisService {
   }
   runSearch() {
     this.searchHelper.search()
+  }
+  runIsolatedSearch(searchParams) {
+    var blankParams = {
+      "index": "Posts",
+      "query": "",
+      "page": 0,
+      "facets": [],
+      "disjunctiveFacets": [],
+      "facetsRefinements": {},
+      "disjunctiveFacetsRefinements": {},
+    }
+    // {hitsPerPage: 1}
+    // "facets": ["labels"],
+    // "disjunctiveFacets": ["classes", "creator.name"],
+    // "facetsRefinements": { "labels": ["Notes"] },
+    // "disjunctiveFacetsRefinements": { "classes": ["English IV"], "creator.name": ["Jared AldapeDuron"] },
+    console.log(Object.assign(blankParams, searchParams));
+    return this.searchHelper.searchOnce(Object.assign(blankParams, searchParams))
+  }
+  runIsolatedFacetSearch(facet, query) {
+    var blankParams = {
+      "index": "Posts",
+      "query": "",
+      "page": 0,
+      "facets": [facet],
+      "disjunctiveFacets": [],
+      "facetsRefinements": undefined,
+      "disjunctiveFacetsRefinements": undefined,
+    }
+    return this.searchHelper.searchForFacetValues(facet, query, blankParams)
   }
   searchFacet(facet, query) {
     return this.searchHelper.searchForFacetValues(facet, query)

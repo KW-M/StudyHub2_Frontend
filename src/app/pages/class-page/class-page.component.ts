@@ -1,6 +1,8 @@
 import { Component, ViewEncapsulation, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef, ViewChild, ElementRef } from '@angular/core';
 import { DataHolderService } from '../../services/data-holder.service';
 import { EventBoardService } from '../../services/event-board.service';
+import { Router } from '@angular/router';
+import { AlgoliaApisService } from '../../services/algolia-apis.service';
 
 
 @Component({
@@ -11,6 +13,7 @@ import { EventBoardService } from '../../services/event-board.service';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ClassPageComponent implements OnInit, OnDestroy {
+  postResult: any;
   labels: any = [];
   posts: any = [];
   labelScrollPercentage = 0;
@@ -18,15 +21,18 @@ export class ClassPageComponent implements OnInit, OnDestroy {
   gridColumns;
   numOfColumns;
   columnWidth;
-  labelsObserver;
   visiblePostsObserver;
   sideNavOpenObserver;
   findTags;
   findClass;
-  constructor(private DataHolder: DataHolderService, private EventBoard: EventBoardService, private ChangeDetector: ChangeDetectorRef, private nativeElementRef: ElementRef) {
+  constructor(private DataHolder: DataHolderService, private EventBoard: EventBoardService, private ChangeDetector: ChangeDetectorRef, private nativeElementRef: ElementRef, private Router: Router, private AlgoliaApis: AlgoliaApisService) {
     this.DataHolder.startupCompleteState$.first().toPromise().then(() => {
       this.visiblePostsObserver = this.DataHolder.visiblePostsState$.subscribe((result: any) => {
+        this.postResult = result;
+        console.log(this.postResult);
+
         this.posts = result.posts;
+        this.labels = result.facets.labels;
         if (this.posts.length > 0) {
           this.postsGrid = this.getPostsGrid(this.posts, true);
         } else {
@@ -55,14 +61,6 @@ export class ClassPageComponent implements OnInit, OnDestroy {
           this.postsGrid = this.getPostsGrid(this.posts, false) || this.postsGrid;
           this.ChangeDetector.detectChanges();
         }
-      })
-
-      this.labelsObserver = this.DataHolder.labelsState$.subscribe((labels) => {
-        for (var key in labels) {
-          labels[key].label = key;
-          this.labels.push(labels[key]);
-        }
-        this.ChangeDetector.detectChanges();
       })
     })
   }
@@ -98,6 +96,13 @@ export class ClassPageComponent implements OnInit, OnDestroy {
   }
   trackByIndex(index, post) {
     return index
+  }
+
+  filterByLabel(label) {
+    if (this.AlgoliaApis.searchHelper) {
+      this.AlgoliaApis.toggleLabelFilter(label)
+      this.Router.navigate(['Search'], { queryParamsHandling: 'preserve' }).then(() => { this.AlgoliaApis.updateURLQueryParams() })
+    }
   }
 
   scrollLabels(direction) {

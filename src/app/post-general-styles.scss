@@ -18,10 +18,8 @@ section.post-header {
     width: 100%;
     z-index: 5;
     overflow: hidden;
-    flex: 0 0 auto;
-    background: url(https://material-components-web.appspot.com/images/16-9.jpg);
-    background-size: cover;
-    background-repeat: no-repeat; //height: 12.313rem;
+    flex: 0 0 auto; // background-size: cover;
+    background-color: #42424956; // background-repeat: no-repeat;background: url(https://material-components-web.appspot.com/images/16-9.jpg); //height: 12.313rem;
     cursor: pointer;
     user-select: none;
 }
@@ -111,6 +109,7 @@ section.post-header {
     width: 100%;
     box-sizing: border-box;
     border: 0;
+    background: transparent;
     letter-spacing: normal;
     font-weight: 400;
     font-size: 1.5rem;
@@ -251,14 +250,18 @@ section.post-header {
         transition: box-shadow 280ms cubic-bezier(0.4, 0, 0.2, 1);
         align-items: center;
     }
-    mat-chip.mat-chip.chip-gradient {
-        background: #311b92;
-        color: #ffffff;
+    mat-chip.mat-chip.chip-gradient:not(:hover):not(.label-selected) {
+        border: 1px solid #311b92;
+        background: #ffffff !important;
+        color: #000000;
         opacity: 0.7;
     }
     mat-chip.mat-chip.chip-gradient.mat-chip-selected,
+    mat-chip.mat-chip.chip-gradient.label-selected,
     mat-chip.mat-chip.chip-gradient:hover {
+        border: 1px solid transparent;
         box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.14), 0 2px 1px -1px rgba(0, 0, 0, 0.12), 0 1px 3px 0 rgba(0, 0, 0, 0.2);
+        color: #ffffff;
         opacity: 1;
     }
     mat-chip.mat-chip.chip-gradient:nth-child(16n) {
@@ -308,5 +311,58 @@ section.post-header {
     }
     mat-chip.mat-chip.chip-gradient:nth-child(16n+8) {
         background: linear-gradient(to left, #c51161, #c5194e);
+    }
+}
+
+//page styles
+.posts-grid-container {
+    display: flex;
+    margin: 0 6px;
+    flex: none;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.posts-grid-column {
+    display: block;
+    margin: 0 6px;
+    min-width: 312px;
+    flex: 1 1 300px;
+}
+
+.label-bar-overlay {
+    position: relative;
+    margin-top: -46px;
+    width: 100%;
+    height: 46px;
+    z-index: 2;
+    flex: none;
+    pointer-events: none;
+    .scroll-button {
+        position: absolute;
+        display: none;
+        top: 0;
+        width: 46px;
+        height: 46px;
+        background: rgba(255, 255, 255, 0.9);
+        pointer-events: all;
+        button {
+            margin: 3px;
+        }
+    }
+    .scroll-button.right {
+        right: 0;
+        border-radius: 30px 0 0 30px;
+    }
+    .scroll-button.left {
+        left: 0;
+        border-radius: 0 30px 30px 0;
+    }
+}
+
+#scrollable_class_labels:hover+.label-bar-overlay,
+.label-bar-overlay:hover {
+    .scroll-button {
+        display: block;
     }
 }

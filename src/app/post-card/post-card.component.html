@@ -1,6 +1,6 @@
 <div class="post-card post-styles mat-elevation-z3" [ngStyle]="{'background-color':'hsl('+currentPost?.color?.h+','+currentPost?.color?.s+'%,'+currentPost?.color?.l+'%)'}">
   <section class="post-header" matRipple *ngIf="currentPost?.link" (click)="viewLink()">
-    <img src="https://material-components-web.appspot.com/images/16-9.jpg" style="width:100%;height:100%">
+    <img src="/assets/16x9_placeholder.png" style="width:100%;height:100%">
     <img [src]="currentLinkPreview?.thumbnail" *ngIf="currentLinkPreview?.thumbnail" class="post-header-preview-image">
     <div class="post-header-overlay bottom-overlay">
       <div class="link-chip">

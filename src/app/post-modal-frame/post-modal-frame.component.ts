@@ -62,7 +62,7 @@ export class PostModalFrameComponent {
           "likeUsers": [],//<-
           "viewCount": 0,//<-
           "ranking": 0,//<-
-          "labels": {},
+          "labels": [],
           "classes": [],
           "creator": {
             "email": null,

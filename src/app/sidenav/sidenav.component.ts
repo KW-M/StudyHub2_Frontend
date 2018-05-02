@@ -5,6 +5,8 @@ import { WindowService } from "../services/window.service";
 import { EventBoardService } from "../services/event-board.service";
 import { DataHolderService } from "../services/data-holder.service";
 import { StudyhubServerApisService } from '../services/studyhub-server-apis.service';
+import { Router } from '@angular/router';
+
 @Component({
   selector: 'app-sidenav',
   templateUrl: './sidenav.component.html',
@@ -37,7 +39,7 @@ export class SidenavComponent implements OnInit {
 
   };
 
-  constructor(private EventBoard: EventBoardService, private ServerAPIs: StudyhubServerApisService, private DataHolder: DataHolderService, public sideNavComponentElem: ElementRef, private zone: NgZone, private ChangeDetector: ChangeDetectorRef) {
+  constructor(private EventBoard: EventBoardService, private ServerAPIs: StudyhubServerApisService, private DataHolder: DataHolderService, public sideNavComponentElem: ElementRef, private zone: NgZone, private ChangeDetector: ChangeDetectorRef, private Router: Router) {
     //Get notified by the event board service of the sideNavOpen Observable and set it to the local variable sidenavOpen.
     EventBoard.sideNavOpen$.subscribe((open) => {
       this.sidenavOpen = open;
@@ -53,6 +55,8 @@ export class SidenavComponent implements OnInit {
     DataHolder.currentUserState$.subscribe((user) => {
       if (user) {
         this.favoriteClasses = user['favorites'] || {};
+        console.log(this.favoriteClasses);
+
         this.ChangeDetector.detectChanges();
       }
     })
@@ -137,6 +141,7 @@ export class SidenavComponent implements OnInit {
   setFavorite(className) {
     const serverSync = () => {
       this.ServerAPIs.setFavorites(this.favoriteClasses).then((serverResponse) => {
+        this.DataHolder.updateCurrentUserObserver({ favorites: this.favoriteClasses })
         console.log(serverResponse)
       }).catch((e) => {
         console.warn(e);
@@ -178,6 +183,12 @@ export class SidenavComponent implements OnInit {
       if (this.showAllGroups === false) this.showAllGroups = true
     }
     //clearTimeout(this.throttleTimer['onLabelAndClassSearchInput']);
+  }
+
+  openQuizlet() {
+    if (this.DataHolder.signedinUser.quizletUsername) {
+      window.open('https://quizlet.com/join/nVZb4UAU9')
+    }
   }
 
   closeSideNav() {

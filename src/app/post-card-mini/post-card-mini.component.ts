@@ -47,24 +47,12 @@ export class PostCardMiniComponent implements OnInit, OnDestroy {
       "updateDate": new Date(),
     }, this.inputPost);
     this.currentPost['color'] = this.dataHolder.getClassObj(this.currentPost.classes[0]).color;
-    if (this.currentPost.link) {
-      this.currentLinkPreview = this.dataHolder.getCachedLinkPreview(this.currentPost.id) || this.currentLinkPreview
-      if (this.currentLinkPreview.thumbnail === null) {
-        let driveFileId = this.currentPost.link.match(/(?:(?:\/(?:d|s|file|folder|folders)\/)|(?:id=)|(?:open=))([-\w]{25,})/)
-        if (driveFileId) {
-          // console.log('driveURL', driveFileId)
-          // this.ExternalAPIs.getDrivePreview(driveFileId[0])
-        } else {
-          this.websitePreviewObserver = this.ExternalAPIs.getWebsitePreview(this.currentPost.link).subscribe((websitePreview) => {
-            this.currentLinkPreview['thumbnail'] = websitePreview['image'];
-            this.currentLinkPreview['icon'] = websitePreview['icon'];
-            this.dataHolder.setCachedLinkPreview(this.currentPost.id, this.currentLinkPreview)
-            this.currentPost.attachmentName = websitePreview['title'] || this.currentPost.attachmentName;
-            this.changeDetector.detectChanges();
-          }, (err) => { console.warn(err) })
-        }
-      }
-    }
+    if (this.currentPost.link) this.ExternalAPIs.getPreview(this.currentPost.link, this.currentPost.id).then((websitePreview) => {
+      this.currentLinkPreview.thumbnail = websitePreview['thumbnail'];
+      this.currentLinkPreview.icon = websitePreview['icon'];
+      this.currentPost.attachmentName = websitePreview['title'] || this.currentPost.attachmentName;
+      this.changeDetector.detectChanges();
+    }, (err) => { console.warn(err) })
   }
   viewPost() {
     this.ServerAPIS.viewPost(this.currentPost.id).then(console.log).catch(console.warn)

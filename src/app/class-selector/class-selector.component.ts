@@ -31,6 +31,7 @@ export class ClassSelectorComponent implements OnInit, OnDestroy {
     this.DataHolder.classAndGroupState$.first().toPromise().then((classesAndGroups) => {
       this.formattedYorkClasses = classesAndGroups['formattedClasses'];
       this.yorkGroups = classesAndGroups['groups'];
+      console.log(this.yorkGroups)
       this.signedinUserObserver = this.DataHolder.currentUserState$.subscribe((userObj: any) => {
         this.favoriteClasses = []
         for (const favClass in userObj.favorites) {

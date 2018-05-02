@@ -9,26 +9,19 @@
         <mat-icon mat-list-icon>person</mat-icon>
         <h4 mat-line>My Posts</h4>
       </mat-list-item>
-      <mat-list-item routerLinkActive="route-active" [routerLink]="'Bookmarks'">
+      <!-- <mat-list-item routerLinkActive="route-active" [routerLink]="'Bookmarks'">
         <mat-icon mat-list-icon>bookmark</mat-icon>
         <h4 mat-line>Bookmarks</h4>
-      </mat-list-item>
+      </mat-list-item> -->
       <mat-list-item routerLinkActive="route-active" [routerLink]="'All Posts'">
         <mat-icon mat-list-icon>inbox</mat-icon>
         <h4 mat-line>All Posts</h4>
       </mat-list-item>
-      <div>
-        <mat-list-item>
-          <mat-icon mat-list-icon>
-            <img src="assets/quizlet_logo.svg" alt="" srcset="">
-          </mat-icon>
-          <h4 mat-line>York Quizlet</h4>
-        </mat-list-item>
-      </div>
-      <mat-list-item style="height: 30px">
-        <span style="display: flex;justify-content: center;width:100%">
-          <mat-icon>keyboard_arrow_down</mat-icon>
-        </span>
+      <mat-list-item routerLinkActive="route-active" [routerLink]="'Quizlet'" (click)="openQuizlet()">
+        <mat-icon mat-list-icon>
+          <img src="assets/quizlet_logo.svg" alt="" srcset="">
+        </mat-icon>
+        <h4 mat-line>York Quizlet</h4>
       </mat-list-item>
     </mat-nav-list>
     <section #stickyHeader class="sticky-header">
@@ -46,6 +39,9 @@
       </div>
     </section>
     <mat-nav-list class="class-list" [ngClass]="{'all-shown': showAllClasses === true}">
+      <ng-container *ngIf="!favoriteClasses || favoriteClasses == {}">
+        <h6 style="margin:2px 12px">Tap Edit to choose your favorite classes.</h6>
+      </ng-container>
       <ng-container *ngFor="let category of formattedYorkClasses; ">
         <div class="sidenav-class-category-header" *ngIf="!classSearchText" [ngStyle]="{'background': 'linear-gradient(152deg,hsl('+category?.color.h+','+category?.color.s+'%,'+category?.color.l+'%), white)'}">
           <h3 mat-subheader style="margin-top: 0;">{{ category?.category }}</h3>
@@ -59,13 +55,13 @@
           </mat-list-item>
         </ng-container>
       </ng-container>
-      <mat-list-item style="height: 30px" (click)="showAllClasses = !showAllClasses;">
+      <!-- <mat-list-item style="height: 30px" (click)="showAllClasses = !showAllClasses;">
         <span style="display: flex;justify-content: center;width:100%">
           <mat-icon>{{showAllClasses? 'keyboard_arrow_up' :'keyboard_arrow_down'}}</mat-icon>
         </span>
-      </mat-list-item>
+      </mat-list-item> -->
     </mat-nav-list>
-    <!-- <div class="sidenav-buttons-header">
+    <div class="sidenav-buttons-header">
       <button mat-icon-button class="expand-arrow" [ngClass]="{'expanded': showAllGroups === true}" (click)="showAllGroups = !showAllGroups; showAllClasses = (editingFavorites && showAllClasses);">
         <mat-icon>keyboard_arrow_right</mat-icon>
       </button>
@@ -83,12 +79,12 @@
           <mat-icon *ngIf="editingFavorites">{{ favoriteClasses[group] ? 'star': 'star_outline' }}</mat-icon>
         </mat-list-item>
       </ng-container>
-      <mat-list-item style="height: 30px" (click)="showAllGroups = !showAllGroups">
+      <mat-list-item style="height: 30px" (click)="showAllGroups = !showAllGroups;showAllClasses = !showAllClasses">
         <span style="display: flex;justify-content: center;width:100%">
           <mat-icon>{{showAllGroups? 'keyboard_arrow_up' :'keyboard_arrow_down'}}</mat-icon>
         </span>
       </mat-list-item>
-    </mat-nav-list> -->
+    </mat-nav-list>
   </div>
   <div class="backdrop" (click)="closeSideNav()"></div>
 </div>

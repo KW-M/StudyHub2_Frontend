@@ -16,3 +16,9 @@
     </mat-list-option>
   </ng-container>
 </mat-selection-list>
+<mat-selection-list [ngModel]="selection" (ngModelChange)="selection = $event">
+  <h3 matSubheader>Groups</h3>
+  <mat-list-option [value]="group" *ngFor="let group of yorkGroups | objKeys" (keydown)="$event.stopPropagation()">
+    <h4 mat-line>{{group}}</h4>
+  </mat-list-option>
+</mat-selection-list>

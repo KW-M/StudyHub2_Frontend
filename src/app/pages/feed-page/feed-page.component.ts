@@ -17,17 +17,21 @@ export class FeedPageComponent implements OnDestroy {
   // visiblePostsObserver: any;
   currentUserObserver;
   windowSize: any;
+  classSearchText = "";
   windowSizeObserver;
   classAndGroupObserver;
+  selectedFavorites = [];
   recentPosts = [];
   currentPostsGrid = [];
 
-  constructor(public EventBoard: EventBoardService, private DataHolder: DataHolderService, public WindowFrame: WindowService, private ChangeDetector: ChangeDetectorRef) {
+  constructor(public EventBoard: EventBoardService, private DataHolder: DataHolderService, public WindowFrame: WindowService, private ChangeDetector: ChangeDetectorRef, private ServerAPIs: StudyhubServerApisService) {
     this.windowSize = this.WindowFrame.getMediaQueries(null);
     this.windowSizeObserver = WindowFrame.mdWindowSize$.subscribe((sizes) => {
       this.windowSize = sizes;
     });
     this.currentUserObserver = DataHolder.currentUserState$.subscribe((userObj: any) => {
+      console.log(userObj);
+
       if (userObj.recentlyViewed && userObj.recentlyViewed.length != 0) {
         this.DataHolder.getRecentlyViewedPosts().then((posts) => {
           this.recentPosts = posts
@@ -35,24 +39,49 @@ export class FeedPageComponent implements OnDestroy {
         }).catch(console.warn)
       } else {
         this.recentPosts = null;
+        this.ChangeDetector.markForCheck();
       }
-      if (userObj.favorites && userObj.favorites.length != 0) {
-        this.DataHolder.getFeedPosts().then((postGrid) => {
-          var counter = 0
-          for (const favClass in userObj.favorites) {
-            if (userObj.favorites.hasOwnProperty(favClass)) {
-              postGrid[counter] = { className: favClass, posts: postGrid[counter] }
-              counter++
+      if (userObj.favorites && Object.keys(userObj.favorites).length !== 0) {
+        this.DataHolder.startupCompleteState$.first().toPromise().then(() => {
+          this.DataHolder.getFeedPosts().then((postGrid) => {
+            var counter = 0
+            for (const favClass in userObj.favorites) {
+              if (userObj.favorites.hasOwnProperty(favClass)) {
+                postGrid[counter] = { className: favClass, posts: postGrid[counter].content.hits.map(this.DataHolder.convertAlgoliaHitToPost) }
+                counter++
+              }
             }
-          }
-          console.log(postGrid);
-          this.currentPostsGrid = postGrid
-          this.ChangeDetector.detectChanges();
-        }).catch(console.warn)
+            console.log(postGrid);
+            this.currentPostsGrid = postGrid
+            this.ChangeDetector.detectChanges();
+          }).catch(console.warn)
+        })
       } else {
+        console.log('startupNullcurposts')
         this.currentPostsGrid = null;
+        this.ChangeDetector.detectChanges();
       }
     });
+  }
+
+  updateSelectedFavorites(favs) {
+    console.log(favs);
+
+    this.selectedFavorites = favs;
+    this.ChangeDetector.detectChanges();
+  }
+
+  setFavorites() {
+    var tempFavs = []
+    this.selectedFavorites.forEach((fav) => {
+      tempFavs[fav] = true;
+    })
+    this.ServerAPIs.setFavorites(tempFavs).then((serverResponse) => {
+      this.DataHolder.updateCurrentUserObserver({ favorites: tempFavs })
+      console.log(serverResponse)
+    }).catch((e) => {
+      console.warn(e);
+    })
   }
 
   trackByPostIdFn(index, post) {

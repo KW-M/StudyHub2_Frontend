@@ -1,0 +1,19 @@
+.no-posts-area {
+    display: flex;
+    margin: 24px;
+    padding: 12px;
+    min-height: 100px;
+    flex-direction: column;
+    flex: 1;
+    vertical-align: middle;
+    align-items: center;
+    justify-content: center;
+    p,
+    h3 {
+        margin: 2px;
+    }
+    img {
+        padding-top: 8px;
+        width: 280px;
+    }
+}

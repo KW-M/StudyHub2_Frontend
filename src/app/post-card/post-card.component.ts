@@ -26,6 +26,10 @@ export class PostCardComponent implements OnInit, OnDestroy {
     private ServerAPIS: StudyhubServerApisService,
     private dataHolder: DataHolderService,
     private eventBoard: EventBoardService) {
+    function getRandomInt(min, max) {
+      return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+    this.currentLinkPreview.thumbnail = '/assets/Material_Backgrounds/' + getRandomInt(1, 15) + '.png'
   }
 
   ngOnInit() {
@@ -49,24 +53,15 @@ export class PostCardComponent implements OnInit, OnDestroy {
       "updateDate": new Date(),
     }, this.inputPost);
     this.currentPost['color'] = this.dataHolder.getClassObj(this.currentPost.classes[0]).color;
-    if (this.currentPost.link) {
-      this.currentLinkPreview = this.dataHolder.getCachedLinkPreview(this.currentPost.id) || this.currentLinkPreview
-      if (this.currentLinkPreview.thumbnail === null) {
-        let driveFileId = this.currentPost.link.match(/(?:(?:\/(?:d|s|file|folder|folders)\/)|(?:id=)|(?:open=))([-\w]{25,})/)
-        // console.log('driveURL', driveFileId)
-        if (driveFileId && driveFileId[1]) {
-          this.ExternalAPIs.getDrivePreview(driveFileId[1])
-        } else {
-          this.websitePreviewObserver = this.ExternalAPIs.getWebsitePreview(this.currentPost.link).subscribe((websitePreview) => {
-            this.currentLinkPreview['thumbnail'] = websitePreview['image'];
-            this.currentLinkPreview['icon'] = websitePreview['icon'];
-            this.dataHolder.setCachedLinkPreview(this.currentPost.id, this.currentLinkPreview)
-            this.currentPost.attachmentName = websitePreview['title'] || this.currentPost.attachmentName;
-            this.changeDetector.detectChanges();
-          }, (err) => { console.warn(err) })
-        }
-      }
-    }
+    console.log(this.currentPost.link);
+
+    if (this.currentPost.link) this.ExternalAPIs.getPreview(this.currentPost.link, false).then((websitePreview) => {
+      console.log(websitePreview);
+      this.currentLinkPreview.thumbnail = websitePreview['thumbnail'] || this.currentLinkPreview.thumbnail;
+      this.currentLinkPreview.icon = websitePreview['icon'] || this.currentLinkPreview.icon;
+      this.currentPost.attachmentName = websitePreview['title'] || this.currentPost.attachmentName;
+      this.changeDetector.detectChanges();
+    }, (err) => { console.warn(err) })
   }
 
   likePost() {

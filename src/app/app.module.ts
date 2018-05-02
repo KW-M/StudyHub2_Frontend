@@ -11,7 +11,7 @@ import { AngularFirestoreModule } from 'angularfire2/firestore';
 import { AngularFireStorageModule } from 'angularfire2/storage';
 import { AngularFireDatabaseModule } from 'angularfire2/database'
 import { AngularFireAuthModule } from 'angularfire2/auth';
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClientModule, HttpClientJsonpModule } from '@angular/common/http';
 import { FormsModule } from '@angular/forms'
 
 import { WindowService } from './services/window.service';
@@ -39,6 +39,7 @@ import { ScrollToElementDirective } from './directives/scroll-to-element.directi
 import { FeedPageComponent } from './pages/feed-page/feed-page.component';
 import { ClassPageComponent } from './pages/class-page/class-page.component';
 import { SearchPageComponent } from './pages/search-page/search-page.component';
+import { QuizletPageComponent } from './pages/quizlet-page/quizlet-page.component'
 import { ObjKeysPipe } from './obj-keys.pipe';
 
 @NgModule({
@@ -59,6 +60,7 @@ import { ObjKeysPipe } from './obj-keys.pipe';
     SearchPageComponent,
     SigninPromptComponent,
     ClassSelectorComponent,
+    QuizletPageComponent,
     ObjKeysPipe,
   ],
   imports: [
@@ -66,12 +68,13 @@ import { ObjKeysPipe } from './obj-keys.pipe';
     AppRoutingModule,
     FormsModule,
     HttpClientModule,
+    HttpClientJsonpModule,
     BrowserAnimationsModule,
     AngularMaterialModule,
     //ServiceWorkerModule,//.register('/ngsw-worker.js', { enabled: environment.production }), //
     AngularFireModule.initializeApp(environment.firebase), // imports firebase/app needed for everything
     AngularFireDatabaseModule,
-    AngularFirestoreModule.enablePersistence(), // imports firebase/firestore, only needed for database features
+    AngularFirestoreModule,//.enablePersistence(), // imports firebase/firestore, only needed for database features
     AngularFireAuthModule, // imports firebase/auth, only needed for auth features,
     AngularFireStorageModule, // imports firebase/storage only needed for storage features
   ],
@@ -86,4 +89,6 @@ import { ObjKeysPipe } from './obj-keys.pipe';
   ],
   bootstrap: [AppComponent]
 })
-export class AppModule { }
+export class AppModule {
+
+}

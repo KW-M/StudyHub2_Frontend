@@ -1,5 +1,5 @@
 <div class="no-posts-area">
-    <ng-container *ngIf="currentUser.quizletUsername">
+    <ng-container *ngIf="quizletUsername">
         <button (click)="openQuizlet()" mat-button color="accent">Go to York Quizlet
             <mat-icon>open_in_new</mat-icon>
         </button>
@@ -8,7 +8,7 @@
 
         </button>
     </ng-container>
-    <ng-container *ngIf="!currentUser.quizletUsername">
+    <ng-container *ngIf="!quizletUsername">
         <h4>
             <ng-container *ngIf="quizletUserAutocomplete.length === 0 && usernameSearch">Can't find that username, check your spelling</ng-container>.
         </h4>

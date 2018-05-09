@@ -15,14 +15,19 @@ import { DataHolderService } from '../../services/data-holder.service';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class QuizletPageComponent implements OnDestroy {
+  quizletUsername: any;
   currentUser: any = {};
   debounce: number;
   quizletUserAutocomplete = []
   constructor(private ExternalAPIs: ExternalApisService, private ServerAPIs: StudyhubServerApisService, private DataHolder: DataHolderService, private ChangeDetector: ChangeDetectorRef) {
-    this.DataHolder.currentUserState$.first().toPromise().then((userObj) => {
-      this.currentUser = userObj
-      this.ChangeDetector.detectChanges()
-    })
+    if (this.DataHolder.quizletUsername) {
+      this.quizletUsername = this.DataHolder.quizletUsername;
+    } else {
+      // this.ServerAPIs.getQuizletUsername().then((username) => {
+      //   this.quizletUsername = username;
+      //   this.ChangeDetector.detectChanges()
+      // })
+    }
   }
 
   onInput(inputValue) {
@@ -53,7 +58,7 @@ export class QuizletPageComponent implements OnDestroy {
   }
 
   editUsername() {
-    this.currentUser.quizletUsername = null;
+    this.quizletUsername = null;
     this.ChangeDetector.detectChanges()
   }
 

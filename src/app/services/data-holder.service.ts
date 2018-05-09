@@ -13,6 +13,7 @@ import { AlgoliaApisService } from "./algolia-apis.service";
 
 @Injectable()
 export class DataHolderService {
+    quizletUsername: any;
     currentResultPage = {
         page: 0,
         totalPages: 0,
@@ -67,6 +68,11 @@ export class DataHolderService {
                     })
                     console.log("Fire Signin Sucsessful! User: ", userObj);
                     this.currentUserStateSource.next(this.signedinUser)
+                    this.ServerAPIs.getQuizletUsername(signedIn.displayName).then((username) => {
+                        this.quizletUsername = username;
+                        console.log(username);
+
+                    })
                     if (this.currentPage && this.signedinUser) this.updateVisiblePosts();
                 }).catch(console.warn)
                 this.ServerAPIs.getStartupInfo().then((startupInfo: any) => {
@@ -84,9 +90,19 @@ export class DataHolderService {
                     //    // this.allLabels = searchResult.facetHits || [];
                     // })
                     console.log(this.otherQueryParams)
-                    if (this.otherQueryParams && this.otherQueryParams.state) {
-                        console.log(JSON.parse(this.otherQueryParams.state))
+                    var driveQueryParams = this.otherQueryParams.state || this.otherQueryParams["?state"]
+                    if (this.otherQueryParams && driveQueryParams) {
+                        console.log(JSON.parse(driveQueryParams))
+                        this.EventBoard.openPostModal({
+                            link: 'https://drive.google.com/open?id=' + driveQueryParams.ids[0]
+                        }, 'edit')
                     }
+                    // if (this.otherQueryParams && driveQueryParams) {
+                    //     console.log(JSON.parse(driveQueryParams))
+                    //     this.EventBoard.openPostModal({
+                    //         link: 'https://drive.google.com/open?id=' + driveQueryParams.ids[0]
+                    //     }, 'edit')
+                    // }
                 })
             } else {
                 console.log('Fire Not Signed In');
@@ -100,7 +116,6 @@ export class DataHolderService {
             this.yorkGroups = response['groups'];
             this.classAndGroupStateSource.next(response);
         })
-
 
         var handleSearchResult = (searchResult) => {
             console.log('searchResult:', searchResult);
@@ -152,8 +167,8 @@ export class DataHolderService {
                 this.AlgoliaApis.runSearch()
             }
         }
-
     }
+
 
     updateVisiblePosts() {
         if (this.currentPage !== "Search") this.AlgoliaApis.clearURLQueryParams()

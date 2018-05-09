@@ -35,7 +35,7 @@
 <div class="post-chip-list" id="scrollable_class_labels">
   <!-- class="chip-gradient" -->
   <mat-chip color="accent" *ngFor="let label of labels;" (click)="filterByLabel(label.name)" class="chip-gradient" [ngClass]="{'label-selected':label?.isRefined}">
-    {{label?.name +' '+label?.isRefined}}
+    {{label?.name}}
   </mat-chip>
   <span style="flex:none;width: 12px;height: 10px;"></span>
 </div>

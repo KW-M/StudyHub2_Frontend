@@ -239,6 +239,6 @@ export class ExternalApisService {
   }
 
   quizletUserSearch(userName) {
-    return this.http.jsonp("https://api.quizlet.com/2.0/search/universal?q=" + userName + "&autocomplete=true&client_id=" + this.quizletApiClientId, 'callback').first().toPromise()
+    return this.http.jsonp("https://api.quizlet.com/2.0/search/universal?q=" + userName + "&client_id=" + this.quizletApiClientId, 'callback').first().toPromise()
   }
 }

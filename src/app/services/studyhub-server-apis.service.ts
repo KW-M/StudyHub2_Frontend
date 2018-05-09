@@ -226,6 +226,10 @@ export class StudyhubServerApisService {
     })
   }
 
+  getQuizletUsername(name) {
+    return this.FireDB.object('quzletUsers/' + name + "/username").valueChanges().first().toPromise()
+  }
+
   setQuizletUsername(userName) {
     return this.FireDB.object('quzletUsers/' + this.removeFirebaseKeyIllegalChars(this.FireAuth.auth.currentUser.email) + "/username").set(userName)
   }

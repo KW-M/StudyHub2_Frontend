@@ -13,6 +13,10 @@ import { AlgoliaApisService } from "./algolia-apis.service";
 
 @Injectable()
 export class DataHolderService {
+    currentResultPage = {
+        page: 0,
+        totalPages: 0,
+    }
     allLabels: any;
     otherQueryParams: any;
     signedinUser;
@@ -66,12 +70,23 @@ export class DataHolderService {
                     if (this.currentPage && this.signedinUser) this.updateVisiblePosts();
                 }).catch(console.warn)
                 this.ServerAPIs.getStartupInfo().then((startupInfo: any) => {
-                    console.log('startupCompleate')
                     this.AlgoliaApis.initializeAlgolia(startupInfo.AlgoliaAPIKey)
-                    this.startupCompleteStateSource.next(true)
-                    this.AlgoliaApis.runIsolatedFacetSearch("labels", "").then((searchResult) => {
+                    this.AlgoliaApis.searchHelper.on('result', handleSearchResult);
+                    this.otherQueryParams = this.AlgoliaApis.getOtherURLQueryParams();
+                    this.AlgoliaApis.setQueryStateFromUrl();
+                    this.startupCompleteStateSource.next(true);
+                    console.log('Algolia Initialization Complete', this.AlgoliaApis.searchHelper)
+                    this.AlgoliaApis.runIsolatedFacetSearch("labels", "", { facets: ["labels"], "facetsRefinements": { labels: undefined } }).then((searchResult) => {
                         this.allLabels = searchResult.facetHits || [];
+                        console.log(this.allLabels);
                     })
+                    // this.AlgoliaApis.runIsolatedFacetSearch(null, "", ["creator.name"], true).then((searchResult) => {
+                    //    // this.allLabels = searchResult.facetHits || [];
+                    // })
+                    console.log(this.otherQueryParams)
+                    if (this.otherQueryParams && this.otherQueryParams.state) {
+                        console.log(JSON.parse(this.otherQueryParams.state))
+                    }
                 })
             } else {
                 console.log('Fire Not Signed In');
@@ -89,13 +104,15 @@ export class DataHolderService {
 
         var handleSearchResult = (searchResult) => {
             console.log('searchResult:', searchResult);
-            var newPosts = searchResult.hits.map(this.convertAlgoliaHitToPost)
+            var newPosts = searchResult.hits.map(this.convertAlgoliaHitToPost).filter((post) => {
+                return (post.classes.indexOf("Memes") === -1 || this.currentPage === "Memes")
+            })
             if (searchResult.page === 0) {
                 this.currentPosts = newPosts;
             } else {
                 this.currentPosts = this.currentPosts.concat(newPosts);
             };
-            this.currentPage = {
+            this.currentResultPage = {
                 page: searchResult.page,
                 totalPages: searchResult.nbPages,
             }
@@ -115,11 +132,6 @@ export class DataHolderService {
             }
         }
 
-        this.startupCompleteState$.first().toPromise().then(() => {
-            this.AlgoliaApis.searchHelper.on('result', handleSearchResult);
-            this.otherQueryParams = this.AlgoliaApis.getOtherURLQueryParams();
-            this.AlgoliaApis.setQueryStateFromUrl();
-        })
         Router.events.filter(event => event instanceof NavigationEnd).subscribe((newRoute) => {
             this.startupCompleteState$.first().toPromise().then(() => {
                 this.currentPage = this.Router.routerState.snapshot.root.firstChild.url[0].path;
@@ -128,13 +140,13 @@ export class DataHolderService {
         });
 
         window.onscroll = (event) => {
-            console.log("scrolling", {
-                sh: window.document.body.scrollHeight,
-                ch: window.document.body.clientHeight,
-                sc: window.scrollY,
-                min: window.document.body.scrollHeight - window.document.body.clientHeight
-            })
-            if ((window.scrollY > window.document.body.scrollHeight - window.document.body.clientHeight * 1.5 && this.AlgoliaApis.searchHelper.hasPendingRequests() === false && this.loadingPosts === false && this.currentPage.page < this.currentPage.totalPages - 1)) {
+            // console.log("scrolling", {
+            //     sh: window.document.body.scrollHeight,
+            //     ch: window.document.body.clientHeight,
+            //     sc: window.scrollY,
+            //     min: window.document.body.scrollHeight - window.document.body.clientHeight
+            // })
+            if ((window.scrollY > window.document.body.scrollHeight - window.document.body.clientHeight * 1.5 && this.AlgoliaApis.searchHelper.hasPendingRequests() === false && this.loadingPosts === false && this.currentResultPage.page < this.currentResultPage.totalPages - 1)) {
                 console.log('searching');
                 this.AlgoliaApis.searchHelper.nextPage()
                 this.AlgoliaApis.runSearch()
@@ -184,7 +196,6 @@ export class DataHolderService {
         this.currentSortMethod = sortMethod || this.currentSortMethod;
         this.currentPostFilters = Object.assign(this.currentPostFilters, postFilters)
         console.log(this.currentPostFilters);
-        // this.getNextPostSet(null)
     }
 
     updateCurrentUserObserver(newUserObj) {
@@ -240,6 +251,8 @@ export class DataHolderService {
     }
     convertAlgoliaHitToPost(hit) {
         hit.id = hit.objectID
+        hit.creationDate = new Date(hit.creationDate)
+        hit.updateDate = new Date(hit.updateDate)
         delete hit.objectID
         return hit;
     }

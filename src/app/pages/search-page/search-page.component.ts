@@ -64,29 +64,21 @@ export class SearchPageComponent implements OnDestroy {
         this.posts = result.posts
         this.creatorList = result.facets.creators;
         this.labels = result.facets.labels;
-        console.log(this.labels);
-        console.log(this.creatorList);
         if (this.posts.length > 0) {
           this.postsGrid = this.getPostsGrid(this.posts, true);
         } else {
           this.postsGrid = [];
         }
-        // console.log("final Postgrid page" + result.page + "/" + result.totalPages, this.postsGrid);
+        console.log("Displaying page " + result.page + "+1 of " + result.totalPages, {
+          result: result,
+          grid: this.postsGrid
+        });
         this.ChangeDetector.detectChanges();
         this.DataHolder.loadingPosts = false;
       })
 
-      // this.labelsObserver = this.DataHolder.labelsState$.subscribe((labels) => {
-      //   for (var key in labels) {
-      //     labels[key].label = key;
-      //     this.labels.push(labels[key]);
-      //   }
-      //   this.ChangeDetector.detectChanges();
-      // })
       var refinements = this.AlgoliaApis.searchHelper.getQueryParameter('disjunctiveFacetsRefinements')
       this.classFilters = refinements.classes || [];
-      console.log(this.classFilters);
-
       this.creatorFilter = (refinements['creator.name'] || [''])[0];
       this.ChangeDetector.detectChanges();
     })
@@ -109,7 +101,7 @@ export class SearchPageComponent implements OnDestroy {
   }
 
   getPostsGrid(inputArray, skipColCheck) {
-    var numOfColumns = Math.floor(this.nativeElementRef.nativeElement.clientWidth / 320);
+    var numOfColumns = Math.floor(this.nativeElementRef.nativeElement.clientWidth / 320) || 1;
     this.columnWidth = (this.nativeElementRef.nativeElement.clientWidth - 12) / numOfColumns
     if (skipColCheck || numOfColumns !== this.numOfColumns) {
       this.numOfColumns = numOfColumns;

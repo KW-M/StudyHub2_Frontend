@@ -4,8 +4,8 @@
     "name": "York StudyHub",
     "short_name": "StudyHub",
     "display": "standalone",
-    "start_url": "/",
-    "theme_color": "#fff",
+    "start_url": "/Feed",
+    "theme_color": "#be0c1d",
     "background_color": "#fff",
     "description": "A sharing and learning platform designed for the York community.",
     "icons": [

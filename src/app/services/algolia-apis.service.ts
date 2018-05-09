@@ -22,7 +22,7 @@ export class AlgoliaApisService {
     this.searchHelper = algoliasearchHelper(this.algoliaClient, 'Posts', this.searchConfig);
   }
   setQueryStateFromUrl() {
-    var newState = algoliasearchHelper.url.getStateFromQueryString(window.location.search)
+    var newState = algoliasearchHelper.url.getStateFromQueryString(window.location.search.replace("?", ""))
     if (newState) this.searchHelper.setState(Object.assign(newState, this.searchConfig, { index: 'Posts' }));
   }
   updateURLQueryParams() {
@@ -35,6 +35,8 @@ export class AlgoliaApisService {
     return algoliasearchHelper.url.getUnrecognizedParametersInQueryString(window.location.search);
   }
   getSearchQuery() {
+    console.log(this.searchHelper.getState());
+
     return this.searchHelper.getState().getQueryParameter('query')
   }
   getCurrentPage() {
@@ -64,17 +66,24 @@ export class AlgoliaApisService {
     console.log(Object.assign(blankParams, searchParams));
     return this.searchHelper.searchOnce(Object.assign(blankParams, searchParams))
   }
-  runIsolatedFacetSearch(facet, query) {
+  runIsolatedFacetSearch(facet, query, searchParams) {
     var blankParams = {
       "index": "Posts",
       "query": "",
       "page": 0,
-      "facets": [facet],
+      "facets": [],
       "disjunctiveFacets": [],
       "facetsRefinements": undefined,
       "disjunctiveFacetsRefinements": undefined,
+      "numericFilter": undefined,
     }
-    return this.searchHelper.searchForFacetValues(facet, query, blankParams)
+    // "facets": facet ? [facet] : [],
+    // "disjunctiveFacets": dusjuntiveFacets ? dusjuntiveFacets : [],
+    // "facetsRefinements": undefined,
+    // "disjunctiveFacetsRefinements": undefined,
+    // "numericFilter": dateRange ? ["updateDate>=" + (new Date(Date.now() + -67 * 24 * 3600 * 1000))] : undefined
+    console.log(searchParams, Object.assign(blankParams, searchParams))
+    return this.searchHelper.searchForFacetValues(facet, query, 100, Object.assign(blankParams, searchParams))
   }
   searchFacet(facet, query) {
     return this.searchHelper.searchForFacetValues(facet, query)
@@ -84,12 +93,13 @@ export class AlgoliaApisService {
     if (creatorName) this.searchHelper.addDisjunctiveFacetRefinement('creator.name', creatorName)
   }
   setClassFilter(classNames) {
-    console.log(classNames);
-    this.searchHelper.clearRefinements('classes')
+    //this.searchHelper.getState().getQueryParameter('disjunctiveFacetsRefinements')
+    if (classNames.length === 0) this.searchHelper.clearRefinements('classes')
     for (let filterIndex = 0; filterIndex < classNames.length; filterIndex++) {
+      console.log(classNames[filterIndex])
       this.searchHelper.addDisjunctiveFacetRefinement('classes', classNames[filterIndex]);
     }
-    console.log(this.searchHelper);
+    console.log(this.searchHelper.getState().getQueryParameter('disjunctiveFacetsRefinements'))
   }
   toggleLabelFilter(labelText) {
     if (labelText) this.searchHelper.toggleFacetRefinement('labels', labelText)

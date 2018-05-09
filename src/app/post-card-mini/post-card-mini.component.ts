@@ -12,7 +12,6 @@ import { EventBoardService } from '../services/event-board.service';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class PostCardMiniComponent implements OnInit, OnDestroy {
-  websitePreviewObserver: any;
   @Input('input-post') inputPost;
   currentLinkPreview = {
     thumbnail: null,
@@ -47,7 +46,7 @@ export class PostCardMiniComponent implements OnInit, OnDestroy {
       "updateDate": new Date(),
     }, this.inputPost);
     this.currentPost['color'] = this.dataHolder.getClassObj(this.currentPost.classes[0]).color;
-    if (this.currentPost.link) this.ExternalAPIs.getPreview(this.currentPost.link, this.currentPost.id).then((websitePreview) => {
+    if (this.currentPost.link) this.ExternalAPIs.getPreview(this.currentPost.link).then((websitePreview) => {
       this.currentLinkPreview.thumbnail = websitePreview['thumbnail'];
       this.currentLinkPreview.icon = websitePreview['icon'];
       this.currentPost.attachmentName = websitePreview['title'] || this.currentPost.attachmentName;
@@ -63,6 +62,5 @@ export class PostCardMiniComponent implements OnInit, OnDestroy {
     }
   }
   ngOnDestroy() {
-    if (this.websitePreviewObserver) this.websitePreviewObserver.unsubscribe()
   }
 }

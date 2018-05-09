@@ -1,4 +1,4 @@
-import { Component, ViewEncapsulation, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import { Component, ViewEncapsulation, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef, OnInit } from '@angular/core';
 
 import { WindowService } from "../../services/window.service";
 import { EventBoardService } from "../../services/event-board.service";
@@ -13,7 +13,7 @@ import { StudyhubServerApisService } from '../../services/studyhub-server-apis.s
   encapsulation: ViewEncapsulation.None,
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class FeedPageComponent implements OnDestroy {
+export class FeedPageComponent implements OnInit, OnDestroy {
   // visiblePostsObserver: any;
   currentUserObserver;
   windowSize: any;
@@ -29,10 +29,11 @@ export class FeedPageComponent implements OnDestroy {
     this.windowSizeObserver = WindowFrame.mdWindowSize$.subscribe((sizes) => {
       this.windowSize = sizes;
     });
-    this.currentUserObserver = DataHolder.currentUserState$.subscribe((userObj: any) => {
-      console.log(userObj);
+  }
 
-      if (userObj.recentlyViewed && userObj.recentlyViewed.length != 0) {
+  ngOnInit() {
+    this.currentUserObserver = this.DataHolder.currentUserState$.subscribe((userObj: any) => {
+      if (userObj && userObj.recentlyViewed && userObj.recentlyViewed.length != 0) {
         this.DataHolder.getRecentlyViewedPosts().then((posts) => {
           this.recentPosts = posts
           this.ChangeDetector.detectChanges();
@@ -41,7 +42,7 @@ export class FeedPageComponent implements OnDestroy {
         this.recentPosts = null;
         this.ChangeDetector.markForCheck();
       }
-      if (userObj.favorites && Object.keys(userObj.favorites).length !== 0) {
+      if (userObj && userObj.favorites && Object.keys(userObj.favorites).length !== 0) {
         this.DataHolder.startupCompleteState$.first().toPromise().then(() => {
           this.DataHolder.getFeedPosts().then((postGrid) => {
             var counter = 0
@@ -61,24 +62,25 @@ export class FeedPageComponent implements OnDestroy {
         this.currentPostsGrid = null;
         this.ChangeDetector.detectChanges();
       }
+      this.ChangeDetector.detectChanges();
     });
   }
 
   updateSelectedFavorites(favs) {
     console.log(favs);
-
     this.selectedFavorites = favs;
     this.ChangeDetector.detectChanges();
   }
 
   setFavorites() {
-    var tempFavs = []
+    var tempFavs = {}
     this.selectedFavorites.forEach((fav) => {
       tempFavs[fav] = true;
     })
-    this.ServerAPIs.setFavorites(tempFavs).then((serverResponse) => {
-      this.DataHolder.updateCurrentUserObserver({ favorites: tempFavs })
+    console.log(tempFavs)
+    if (this.selectedFavorites.length !== 0) this.ServerAPIs.setFavorites(tempFavs).then((serverResponse) => {
       console.log(serverResponse)
+      this.DataHolder.updateCurrentUserObserver({ favorites: tempFavs })
     }).catch((e) => {
       console.warn(e);
     })

@@ -19,7 +19,7 @@
 </div>
 <div class="posts-grid-container">
   <div class="posts-grid-column" *ngFor="let column of gridColumns; let i = index, trackBy:trackByIndex">
-    <app-post-card *ngFor="let post of postsGrid[i]; let indexy = index; trackBy:trackByPostIdFn" [input-post]="post"></app-post-card>
+    <app-post-card *ngFor="let post of postsGrid[i]; trackBy:trackByPostIdFn" [input-post]="post"></app-post-card>
   </div>
   <!-- spacer grid items at the end keep the other grid items equal width -->
   <div class="posts-grid-column"></div>

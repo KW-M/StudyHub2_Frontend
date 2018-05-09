@@ -2,7 +2,7 @@
   <button mat-button [matMenuTriggerFor]="menu">{{classFilters.length === 0 ? 'Filter by Class': classFilters.join(', ')}}
     <mat-icon *ngIf="classFilters.length === 0" style="font-size: 24px">arrow_drop_down</mat-icon>
     <mat-icon *ngIf="classFilters.length !== 0" style="padding: 6px 0 6px 6px;font-size: 18px;height: 18px;width: 18px;color:black;opacity:0.6"
-      (click)="classFilters = []">cancel</mat-icon>
+      (click)="classFilters = [];filterByClass([])">cancel</mat-icon>
   </button>
   <mat-menu #menu="matMenu" overlapTrigger="false" (closed)="classSearchText = ''" class="search-class-filter-menu">
     <app-class-selector (click)="$event.stopPropagation()" [selection]="classFilters" (selection-change)="filterByClass($event)"

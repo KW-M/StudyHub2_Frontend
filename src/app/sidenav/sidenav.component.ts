@@ -32,7 +32,7 @@ export class SidenavComponent implements OnInit {
   classSearchText: string;
 
   signedinUser: any;
-  yorkGroups: Array<any> = [];
+  yorkGroups = {};
   formattedYorkClasses: Array<any> = [];
   favoriteClasses: Array<any> = [];
   throttleTimer = {
@@ -55,8 +55,6 @@ export class SidenavComponent implements OnInit {
     DataHolder.currentUserState$.subscribe((user) => {
       if (user) {
         this.favoriteClasses = user['favorites'] || {};
-        console.log(this.favoriteClasses);
-
         this.ChangeDetector.detectChanges();
       }
     })
@@ -188,6 +186,18 @@ export class SidenavComponent implements OnInit {
   openQuizlet() {
     if (this.DataHolder.signedinUser.quizletUsername) {
       window.open('https://quizlet.com/join/nVZb4UAU9')
+    }
+  }
+
+  addGroup() {
+    var groupName = prompt("Enter a name for this group", "");
+    if (groupName != null && groupName.length !== 0) {
+      this.ServerAPIs.addGroup(groupName).then((resp) => {
+        console.log(this.DataHolder.yorkGroups);
+        this.DataHolder.yorkGroups[groupName] = { creator: "Me" }
+        this.yorkGroups[groupName] = { creator: "Me" }
+        this.ChangeDetector.detectChanges()
+      }).catch(console.warn)
     }
   }
 

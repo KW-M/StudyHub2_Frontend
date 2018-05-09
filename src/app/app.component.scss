@@ -39,6 +39,35 @@ app-quizlet-page {
     flex-direction: column;
 }
 
+.cdk-overlay-container {
+    z-index: 2147493645;
+}
+
+.highest-z-layer {
+    z-index: 2147493646;
+}
+
+.shr-c-shr-d-shr-ac-shr-r,
+.shr-c-shr-d-shr-x-shr-r,
+.shr-c-shr-d-shr-r {
+    overflow: hidden;
+}
+
+.shr-c-shr-d-shr-ac-shr-r:before,
+.shr-c-shr-d-shr-x-shr-r:before,
+.shr-c-shr-d-shr-r:before {
+    position: absolute;
+    display: block;
+    top: -134px;
+    right: -113px;
+    width: 356px;
+    height: 356px;
+    border-radius: 50%;
+    background: radial-gradient(#0000 12%, #44ad48cc 1%);
+    content: '';
+    pointer-events: none;
+}
+
 .algolia-credit {
     position: absolute;
     top: 3px;

@@ -28,7 +28,7 @@ export class ToolbarComponent {
   user = {
     name: 'York Student',
     email: ' . . . @york.org',
-    photoURL: 'http://studyhub.york.org/images/accountPic.jpg',
+    photoURL: 'assets/defaultAccount.jpg',
   };
   throttleTimer = {
 
@@ -49,7 +49,7 @@ export class ToolbarComponent {
       ChangeDetector.detectChanges()
     });
     DataHolder.currentUserState$.subscribe((userObj: any) => {
-      this.user = userObj || { photoURL: 'http://studyhub.york.org/images/accountPic.jpg', name: 'York Student', email: ' . . . @york.org' };
+      this.user = userObj || { photoURL: 'assets/defaultAccount.jpg', name: 'York Student', email: ' . . . @york.org' };
       ChangeDetector.detectChanges()
     });
     Router.events.filter(event => event instanceof NavigationEnd).subscribe((newRoute) => {
@@ -67,6 +67,7 @@ export class ToolbarComponent {
     });
     this.DataHolder.startupCompleteState$.first().toPromise().then(() => {
       this.searchText = this.AlgoliaApis.getSearchQuery() || '';
+      this.ChangeDetector.detectChanges()
     })
   }
 
@@ -85,9 +86,9 @@ export class ToolbarComponent {
 
   setSearchModeOpen(open) {
     if (open === true && this.currentPage !== 'Search') {
+      console.log('searchOpening');
       if (this.currentPage !== "All Posts" && this.currentPage !== "My Posts" && this.currentPage !== "Bookmarks" && this.currentPage !== "Feed") {
         this.AlgoliaApis.setClassFilter([this.currentPage])
-        console.log(this.AlgoliaApis.searchHelper);
       } else {
         this.AlgoliaApis.clearFilter('classes')
       }
@@ -105,9 +106,15 @@ export class ToolbarComponent {
     this.EventBoard.toggleSideNavOpen();
   }
 
-  signIn() {
-    this.GSignin.handleSignInClick()
+  openFeedback() {
+    var top = (window.innerHeight || document.documentElement.clientHeight || screen.height) / 2 + (window.screenTop || window.screenY) - 300;
+    var left = (window.innerWidth || document.documentElement.clientWidth || screen.width) / 2 + (window.screenLeft || window.screenX) - 300;
+    window.open('https://docs.google.com/forms/d/e/1FAIpQLSctToJKWAnKR_Y0alWolQtreBJP-GLlxsD20zbAYgKaMcVXNQ/viewform?usp=sf_link', "_blank", 'status=no,menubar=no,toolbar=no,width=600,height=600,top=' + top + ',left=' + left)
   }
+
+  // signIn() {
+  //   this.GSignin.handleSignInClick()
+  // }
 
   signOut() {
     this.GSignin.handleSignOutClick()

@@ -2,7 +2,7 @@
   <section class="post-card-mini-header" *ngIf="currentPost.link">
     <div class="post-header-overlay bottom-overlay">
       <div class="link-chip">
-        <img src="https://drive-thirdparty.googleusercontent.com/16/type/application/pdf" class="link-favicon">
+        <img src="currentLinkPreview?.icon || https://drive-thirdparty.googleusercontent.com/16/type/application/pdf" class="link-favicon">
         <span class="link-name">{{currentPost.attachmentName}}</span>
       </div>
     </div>

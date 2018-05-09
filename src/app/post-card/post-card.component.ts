@@ -12,7 +12,7 @@ import { StudyhubServerApisService } from '../services/studyhub-server-apis.serv
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class PostCardComponent implements OnInit, OnDestroy {
-  websitePreviewObserver: any;
+  randomInt: any;
   @Input('input-post') inputPost;
   postBodyTextShown: boolean = false;
   currentLinkPreview = {
@@ -26,10 +26,8 @@ export class PostCardComponent implements OnInit, OnDestroy {
     private ServerAPIS: StudyhubServerApisService,
     private dataHolder: DataHolderService,
     private eventBoard: EventBoardService) {
-    function getRandomInt(min, max) {
-      return Math.floor(Math.random() * (max - min + 1)) + min;
-    }
-    this.currentLinkPreview.thumbnail = '/assets/Material_Backgrounds/' + getRandomInt(1, 15) + '.png'
+    this.randomInt = Math.floor(Math.random() * (15 - 1 + 1)) + 1;
+    this.currentLinkPreview.thumbnail = '/assets/Material_Backgrounds/' + this.randomInt + '.png'
   }
 
   ngOnInit() {
@@ -52,16 +50,19 @@ export class PostCardComponent implements OnInit, OnDestroy {
       "creationDate": new Date(),
       "updateDate": new Date(),
     }, this.inputPost);
-    this.currentPost['color'] = this.dataHolder.getClassObj(this.currentPost.classes[0]).color;
-    console.log(this.currentPost.link);
-
-    if (this.currentPost.link) this.ExternalAPIs.getPreview(this.currentPost.link, false).then((websitePreview) => {
-      console.log(websitePreview);
-      this.currentLinkPreview.thumbnail = websitePreview['thumbnail'] || this.currentLinkPreview.thumbnail;
-      this.currentLinkPreview.icon = websitePreview['icon'] || this.currentLinkPreview.icon;
-      this.currentPost.attachmentName = websitePreview['title'] || this.currentPost.attachmentName;
-      this.changeDetector.detectChanges();
-    }, (err) => { console.warn(err) })
+    if (this.currentPost.link) {
+      this.ExternalAPIs.getPreview(this.currentPost.link).then((websitePreview) => {
+        this.currentLinkPreview.thumbnail = websitePreview['thumbnail'] || this.currentLinkPreview.thumbnail;
+        this.currentLinkPreview.icon = websitePreview['icon'] || this.currentLinkPreview.icon;
+        this.currentPost.attachmentName = websitePreview['title'] || this.currentPost.attachmentName;
+        this.changeDetector.markForCheck()
+      }, (err) => { console.warn(err) })
+    }
+    if (this.dataHolder.yorkGroups) {
+      this.currentPost['color'] = this.dataHolder.getClassObj(this.currentPost.classes[0]).color;
+    } else {
+      this.dataHolder.classAndGroupState$.first().toPromise().then(() => { this.currentPost['color'] = this.dataHolder.getClassObj(this.currentPost.classes[0]).color; this.changeDetector.markForCheck() })
+    }
   }
 
   likePost() {
@@ -101,7 +102,6 @@ export class PostCardComponent implements OnInit, OnDestroy {
   };
 
   ngOnDestroy() {
-    if (this.websitePreviewObserver) this.websitePreviewObserver.unsubscribe();
   }
 
 }

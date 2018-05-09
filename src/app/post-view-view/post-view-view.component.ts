@@ -15,7 +15,6 @@ import { StudyhubServerApisService } from '../services/studyhub-server-apis.serv
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class PostViewViewComponent implements OnInit, OnDestroy {
-  websitePreviewObserver;
   @Input('input-post') inputPost;
   labelChipList = [];
   currentPost;
@@ -65,6 +64,14 @@ export class PostViewViewComponent implements OnInit, OnDestroy {
     this.currentPost = this.inputPost
     this.currentPost['color'] = this.DataHolder.getClassObj(this.currentPost.classes[0]).color;
     console.log(this.currentPost);
+    if (this.currentPost.link) {
+      this.ExternalAPIs.getPreview(this.currentPost.link).then((websitePreview) => {
+        this.currentLinkPreview.thumbnail = websitePreview['thumbnail'] || this.currentLinkPreview.thumbnail;
+        this.currentLinkPreview.icon = websitePreview['icon'] || this.currentLinkPreview.icon;
+        this.currentPost.attachmentName = websitePreview['title'] || this.currentPost.attachmentName;
+        this.ChangeDetector.markForCheck()
+      }, (err) => { console.warn(err) })
+    }
   }
 
   closeModal() {
@@ -78,7 +85,6 @@ export class PostViewViewComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     this.signedinUserObserver.unsubscribe()
-    if (this.websitePreviewObserver) this.websitePreviewObserver.unsubscribe();
   }
 }
 

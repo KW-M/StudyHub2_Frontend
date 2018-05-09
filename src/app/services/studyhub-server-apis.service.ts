@@ -7,6 +7,7 @@ import 'rxjs/add/operator/first';
 import { HttpClient, HttpParams, HttpHeaders } from "@angular/common/http";
 import { AngularFireAuth } from 'angularfire2/auth';
 import * as firebase from 'firebase/app';
+import '@firebase/functions'
 
 
 @Injectable()
@@ -76,6 +77,29 @@ export class StudyhubServerApisService {
       }
       if (lastPost) { query = query.startAfter(lastPost) }
       return query.limit(pageSize || 4);
+    }).snapshotChanges().map(actions => {
+      return actions.map((changeSnapshot) => {
+        const data = changeSnapshot.payload.doc.data();
+        data.id = changeSnapshot.payload.doc.id;
+        data.updateDate = data.updateDate.toDate();
+        data.creationDate = data.creationDate.toDate();
+        console.log(data, changeSnapshot);
+        return data
+      });
+    })
+  }
+
+  getPostChangeFeed(postFilters, sortBy, lastPost, pageSize) {
+    console.log({
+      filters: postFilters,
+      sortingOrder: sortBy,
+      lastPost: lastPost
+    })
+    return this.FireStore.collection("posts", (ref) => {
+      let query: firebase.firestore.CollectionReference | firebase.firestore.Query = ref;
+      query = query.orderBy("updateDate", "desc")
+      query = query.startAfter(new Date())
+      return query.limit(2);
     }).snapshotChanges().map(actions => {
       return actions.map((changeSnapshot) => {
         const data = changeSnapshot.payload.doc.data();
@@ -161,8 +185,6 @@ export class StudyhubServerApisService {
   }
 
   updateLikes(postId, userEmail) {
-    console.log(postId, userEmail);
-
     return this.FireStore.firestore.runTransaction((transaction) => {
       // This code may get re-run multiple times if there are conflicts.
       return transaction.get(this.FireStore.collection("posts").doc(postId).ref).then((post) => {
@@ -205,16 +227,26 @@ export class StudyhubServerApisService {
   }
 
   setQuizletUsername(userName) {
-    return this.FireDB.object('users/' + this.removeFirebaseKeyIllegalChars(this.FireAuth.auth.currentUser.email) + "/quizletUsername").set(userName)
+    return this.FireDB.object('quzletUsers/' + this.removeFirebaseKeyIllegalChars(this.FireAuth.auth.currentUser.email) + "/username").set(userName)
   }
 
   setFavorites(favoritesObj) {
     return this.FireDB.object('users/' + this.removeFirebaseKeyIllegalChars(this.FireAuth.auth.currentUser.email) + "/favorites").set(favoritesObj)
   }
 
+  addGroup(groupName) {
+    return this.FireDB.object('yorkGroups/' + groupName).set({ creator: this.FireAuth.auth.currentUser.displayName })
+  }
+
   deletePost(postId) {
     return this.FireStore.collection("posts").doc(postId).delete()
   }
+
+  // runCloudFunction() {
+  //   console.log(firebase['functions'], this.FireStore.app['functions']())
+  //   var functiony = this.FireStore.app['functions']().httpsCallable('testCall')
+  //   functiony({ 'hi': 'by' }).then();
+  // }
 
   removeFirebaseKeyIllegalChars(inputString) {
     return inputString.replace('.', '').replace('\\', '').replace('#', '').replace('$', '').replace('[', '').replace(']', '')

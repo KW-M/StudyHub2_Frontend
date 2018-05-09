@@ -12,7 +12,7 @@ import { Subscription } from 'rxjs';
 export class ClassSelectorComponent implements OnInit, OnDestroy {
   selectionValue: any;
   signedinUserObserver: Subscription;
-  yorkGroups: any;
+  yorkGroups: any = [];
   classAndGroupObserver: Subscription;
   formattedYorkClasses = [];
   favoriteClasses = [];
@@ -31,15 +31,16 @@ export class ClassSelectorComponent implements OnInit, OnDestroy {
     this.DataHolder.classAndGroupState$.first().toPromise().then((classesAndGroups) => {
       this.formattedYorkClasses = classesAndGroups['formattedClasses'];
       this.yorkGroups = classesAndGroups['groups'];
-      console.log(this.yorkGroups)
       this.signedinUserObserver = this.DataHolder.currentUserState$.subscribe((userObj: any) => {
-        this.favoriteClasses = []
-        for (const favClass in userObj.favorites) {
-          if (userObj.favorites.hasOwnProperty(favClass)) {
-            this.favoriteClasses.push(this.DataHolder.getClassObj(favClass))
+        if (userObj) {
+          this.favoriteClasses = []
+          for (const favClass in userObj.favorites) {
+            if (userObj.favorites.hasOwnProperty(favClass)) {
+              this.favoriteClasses.push(this.DataHolder.getClassObj(favClass))
+            }
           }
+          this.ChangeDetector.detectChanges();
         }
-        this.ChangeDetector.detectChanges();
       });
     });
   }
@@ -66,6 +67,6 @@ export class ClassSelectorComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    this.signedinUserObserver.unsubscribe()
+    if (this.signedinUserObserver) this.signedinUserObserver.unsubscribe()
   }
 }

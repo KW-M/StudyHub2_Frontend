@@ -1,6 +1,7 @@
 //Component uses onPush change detection, things may not update automatically.
 import { Component, OnInit, ViewEncapsulation, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { EventBoardService } from "../services/event-board.service";
+import { ExternalApisService } from '../services/external-apis.service';
 
 @Component({
   selector: 'app-speeddial',
@@ -11,7 +12,7 @@ import { EventBoardService } from "../services/event-board.service";
 export class SpeeddialComponent implements OnInit {
   fab_open: boolean = false;
   fab_hidden: boolean = false;
-  constructor(private EventBoard: EventBoardService, private changeDetector: ChangeDetectorRef) { }
+  constructor(private EventBoard: EventBoardService, private changeDetector: ChangeDetectorRef, private ExternalAPIs: ExternalApisService) { }
 
   setFabOpen(open) {
     setTimeout(() => {
@@ -24,8 +25,17 @@ export class SpeeddialComponent implements OnInit {
     this.EventBoard.openPostModal({}, 'edit')
   }
 
-  newRost() {
-    this.EventBoard.openPostModal({ id: '3' }, 'edit')
+  openDrivePicker() {
+    this.ExternalAPIs.openDriveFilePicker().then((selectedFile) => {
+      console.log(selectedFile);
+      if (selectedFile) this.EventBoard.openPostModal(selectedFile, 'edit')
+    })
+  }
+  openUploadPicker() {
+    this.ExternalAPIs.openFileUploadPicker().then((selectedFile) => {
+      console.log(selectedFile);
+      if (selectedFile) this.EventBoard.openPostModal(selectedFile, 'edit')
+    })
   }
 
   ngOnInit() {

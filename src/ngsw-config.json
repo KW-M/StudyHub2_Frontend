@@ -32,15 +32,18 @@
   ],
   "dataGroups": [
     {
-      "name": "algolia-api",
+      "name": "linkPreviewImages",
       "version": 0,
       "urls": [
-        "https://e4zo0gzetf-dsn.algolia.net/1/indexes/**"
+        "https://docs.google.com/a/york.org/feeds/vt**",
+        "https://lh3.googleusercontent.com/*s540",
+        "https://www.google.com/s2/favicons?**",
+        "https://www.googleapis.com/pagespeedonline/v2/runPagespeed?**"
       ],
       "cacheConfig": {
-        "strategy": "freshness",
-        "maxSize": 80,
-        "maxAge": "10d",
+        "strategy": "performance",
+        "maxSize": 120,
+        "maxAge": "20d",
         "timeout": "2s"
       }
     },

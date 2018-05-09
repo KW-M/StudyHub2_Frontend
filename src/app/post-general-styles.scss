@@ -177,7 +177,8 @@ section.post-header {
     flex-direction: column;
     flex: 1 100;
     @media (max-width: 599px) {
-        max-height: calc(100vh - 52px);
+        height: calc(100vh - 52px);
+        max-height: unset;
     }
 }
 

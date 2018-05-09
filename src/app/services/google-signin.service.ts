@@ -26,7 +26,7 @@ export class GoogleSigninService {
         gapi.auth2.init({
           client_id: "848371898392-ghhd3b6ac0ilqddq12d2a96tm7joonpj.apps.googleusercontent.com",
           hosted_domain: "york.org",
-          scope: "profile https://www.googleapis.com/auth/drive.readonly.metadata https://www.googleapis.com/auth/drive.install"
+          scope: "profile https://www.googleapis.com/auth/drive https://www.googleapis.com/auth/drive.install"
         }).then(() => {
           console.log('gauth innited');
           //Handle the initial sign-in state.

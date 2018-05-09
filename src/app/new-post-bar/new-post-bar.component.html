@@ -1,7 +1,7 @@
 <div class="create-post-bar-top-container">
   <div class="create-post-bar-top">
     <div class="create-buttons">
-      <span mat-ripple class="create-post-bar-text create-post-bar-button">
+      <span mat-ripple class="create-post-bar-text create-post-bar-button" (click)="newPost()">
         <mat-icon style="padding-right: 12px;font-size: 24px;">add_circle</mat-icon>
         <span class="create-post-bar-top-text">Share a resource...</span>
       </span>
@@ -10,16 +10,16 @@
           <mat-icon>camera</mat-icon>
         </span> -->
         <span class="create-post-bar-button square-button" mat-ripple (click)="openDrivePicker()">
-          <img style="width:22px; height:22px;" src="http://studyhub.york.org/images/drive_icon.svg">
+          <img style="width:22px; height:22px;" src="assets/Drive_Icon.svg">
         </span>
-        <span class="create-post-bar-button square-button" mat-ripple (click)="openShareDialog('0B5NVuDykezpkYml4Wlc0Q3pldUU')">
+        <span class="create-post-bar-button square-button" mat-ripple (click)="openUploadPicker()">
           <mat-icon>cloud_upload</mat-icon>
         </span>
       </span>
     </div>
-    <span class="sort-buttons" mat-ripple [matRippleColor]="'#ffffff4a'">
+    <!-- <span class="sort-buttons" mat-ripple [matRippleColor]="'#ffffff4a'">
       <mat-icon>sort</mat-icon>
       <mat-icon>arrow_drop_down</mat-icon>
-    </span>
+    </span> -->
   </div>
 </div>

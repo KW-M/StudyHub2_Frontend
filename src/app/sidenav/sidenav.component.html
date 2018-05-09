@@ -26,7 +26,7 @@
     </mat-nav-list>
     <section #stickyHeader class="sticky-header">
       <div class="sidenav-buttons-header" style="height: 48px;">
-        <button mat-icon-button class="expand-arrow" [ngClass]="{'expanded': showAllClasses === true}" (click)="showAllClasses = !showAllClasses; showAllGroups = (editingFavorites && showAllGroups)">
+        <button mat-icon-button class="expand-arrow" [ngClass]="{'expanded': showAllClasses === true}" (click)="showAllClasses = !showAllClasses; showAllGroups ? showAllGroups = false : '';">
           <mat-icon>keyboard_arrow_right</mat-icon>
         </button>
         <h4 class="sidenav-header-text"> {{ showAllClasses ? 'All Classes': 'Favorites' }}</h4>
@@ -62,12 +62,12 @@
       </mat-list-item> -->
     </mat-nav-list>
     <div class="sidenav-buttons-header">
-      <button mat-icon-button class="expand-arrow" [ngClass]="{'expanded': showAllGroups === true}" (click)="showAllGroups = !showAllGroups; showAllClasses = (editingFavorites && showAllClasses);">
+      <button mat-icon-button class="expand-arrow" [ngClass]="{'expanded': showAllGroups === true}" (click)="showAllGroups = !showAllGroups; showAllClasses ? showAllClasses = false : '';">
         <mat-icon>keyboard_arrow_right</mat-icon>
       </button>
       <h4 class="sidenav-header-text">Groups</h4>
       <mat-icon style="margin: 0 12px 0 auto" *ngIf="editingFavorites === false">people</mat-icon>
-      <button mat-button *ngIf="editingFavorites === true" (click)="showCreateGroupPopover($event)" style="margin-left:auto" class="square-icon-button">
+      <button mat-button *ngIf="editingFavorites === true" style="margin-left:auto" class="square-icon-button" (click)="addGroup()">
         <mat-icon color="accent">add</mat-icon>
       </button>
     </div>
@@ -79,9 +79,9 @@
           <mat-icon *ngIf="editingFavorites">{{ favoriteClasses[group] ? 'star': 'star_outline' }}</mat-icon>
         </mat-list-item>
       </ng-container>
-      <mat-list-item style="height: 30px" (click)="showAllGroups = !showAllGroups;showAllClasses = !showAllClasses">
+      <mat-list-item style="height: 30px" (click)="showAllGroups = !(showAllGroups||showAllClasses); showAllClasses = !showAllClasses">
         <span style="display: flex;justify-content: center;width:100%">
-          <mat-icon>{{showAllGroups? 'keyboard_arrow_up' :'keyboard_arrow_down'}}</mat-icon>
+          <mat-icon>{{(showAllGroups && showAllClasses)? 'keyboard_arrow_up' :'keyboard_arrow_down'}}</mat-icon>
         </span>
       </mat-list-item>
     </mat-nav-list>

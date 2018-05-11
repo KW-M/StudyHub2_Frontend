@@ -23,10 +23,12 @@ export class QuizletPageComponent implements OnDestroy {
     if (this.DataHolder.quizletUsername) {
       this.quizletUsername = this.DataHolder.quizletUsername;
     } else {
-      // this.ServerAPIs.getQuizletUsername().then((username) => {
-      //   this.quizletUsername = username;
-      //   this.ChangeDetector.detectChanges()
-      // })
+      this.DataHolder.currentUserState$.first().toPromise().then((userObj) => {
+        setTimeout(() => {
+          this.quizletUsername = this.DataHolder.quizletUsername;
+          this.ChangeDetector.detectChanges()
+        }, 1200)
+      })
     }
   }
 
@@ -48,7 +50,7 @@ export class QuizletPageComponent implements OnDestroy {
   onSubmit(username) {
     if (window.confirm("Is " + username + " your York Quizlet account?")) console.log('submittedUserName', username)
     this.ServerAPIs.setQuizletUsername(username).then(() => {
-      this.currentUser.quizletUsername = username
+      this.quizletUsername = username
       this.ChangeDetector.detectChanges()
     })
   }

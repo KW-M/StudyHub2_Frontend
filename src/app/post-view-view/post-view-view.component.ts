@@ -40,7 +40,6 @@ export class PostViewViewComponent implements OnInit, OnDestroy {
       "title": "",
       "link": "",
       "description": "",
-      "likeCount": 0,//<-
       "likeUsers": [],//<-
       "viewCount": 0,//<-
       "ranking": 0,//<-
@@ -71,6 +70,12 @@ export class PostViewViewComponent implements OnInit, OnDestroy {
         this.currentPost.attachmentName = websitePreview['title'] || this.currentPost.attachmentName;
         this.ChangeDetector.markForCheck()
       }, (err) => { console.warn(err) })
+    }
+  }
+
+  openLink() {
+    if (this.currentPost.link) {
+      window.open(this.currentPost.link)
     }
   }
 

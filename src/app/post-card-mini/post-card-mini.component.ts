@@ -31,7 +31,6 @@ export class PostCardMiniComponent implements OnInit, OnDestroy {
       "title": "",
       "link": "",
       "description": "",
-      "likeCount": 0,//<-
       "likeUsers": [],//<-
       "viewCount": 0,//<-
       "ranking": 0,//<-

@@ -134,11 +134,13 @@ export class StudyhubServerApisService {
     postIdArray.forEach(postId => {
       requestArray.push(this.FireStore.collection('posts').doc(postId).snapshotChanges().map((changeSnapshot) => {
         const data = changeSnapshot.payload.data();
-        data.id = changeSnapshot.payload.id;
-        data.updateDate = data.updateDate.toDate();
-        data.creationDate = data.creationDate.toDate();
-        console.log(data, changeSnapshot);
-        return data
+        if (data) {
+          data.id = changeSnapshot.payload.id;
+          data.updateDate = data.updateDate.toDate();
+          data.creationDate = data.creationDate.toDate();
+          console.log(data, changeSnapshot);
+        }
+        return data || {}
       }).first().toPromise())
     });
     return Promise.all(requestArray)
@@ -170,7 +172,6 @@ export class StudyhubServerApisService {
   }
 
   submitPost(postObj) { // send a new or updated post object to the server
-    postObj.likeCount = postObj.likeUsers.length || 0
     var convertedPost: any = {}
     convertedPost = Object.assign({}, postObj);
     delete convertedPost.id;
@@ -192,15 +193,15 @@ export class StudyhubServerApisService {
           throw "Document does not exist!";
         } else {
           var likeUsers = post.data().likeUsers
+          console.log(likeUsers)
           var index = likeUsers.indexOf(userEmail)
           if (index === -1) {
             likeUsers.push(userEmail)
           } else {
             likeUsers.splice(index, 1)
           }
-          var likeCount = likeUsers.length;
         }
-        transaction.update(this.FireStore.collection("posts").doc(postId).ref, { likeUsers: likeUsers, likeCount: likeCount });
+        transaction.update(this.FireStore.collection("posts").doc(postId).ref, { likeUsers: likeUsers });
       });
     })
   }
@@ -227,11 +228,11 @@ export class StudyhubServerApisService {
   }
 
   getQuizletUsername(name) {
-    return this.FireDB.object('quzletUsers/' + name + "/username").valueChanges().first().toPromise()
+    return this.FireDB.object('quizletUsers/' + name + "/username").valueChanges().first().toPromise()
   }
 
   setQuizletUsername(userName) {
-    return this.FireDB.object('quzletUsers/' + this.removeFirebaseKeyIllegalChars(this.FireAuth.auth.currentUser.email) + "/username").set(userName)
+    return this.FireDB.object('quizletUsers/' + this.removeFirebaseKeyIllegalChars(this.FireAuth.auth.currentUser.email) + "/username").set(userName)
   }
 
   setFavorites(favoritesObj) {
@@ -246,11 +247,10 @@ export class StudyhubServerApisService {
     return this.FireStore.collection("posts").doc(postId).delete()
   }
 
-  // runCloudFunction() {
-  //   console.log(firebase['functions'], this.FireStore.app['functions']())
-  //   var functiony = this.FireStore.app['functions']().httpsCallable('testCall')
-  //   functiony({ 'hi': 'by' }).then();
-  // }
+  runReRankCloudFunction() {
+    var cloudFunction = this.FireStore.app['functions']().httpsCallable('testCall')
+    cloudFunction().then(console.log);
+  }
 
   removeFirebaseKeyIllegalChars(inputString) {
     return inputString.replace('.', '').replace('\\', '').replace('#', '').replace('$', '').replace('[', '').replace(']', '')

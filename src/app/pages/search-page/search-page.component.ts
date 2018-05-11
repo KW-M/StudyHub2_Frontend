@@ -61,20 +61,26 @@ export class SearchPageComponent implements OnDestroy {
       }
 
       this.visiblePostsObserver = this.DataHolder.visiblePostsState$.subscribe((result: any) => {
-        this.posts = result.posts
-        this.creatorList = result.facets.creators;
-        this.labels = result.facets.labels;
-        if (this.posts.length > 0) {
-          this.postsGrid = this.getPostsGrid(this.posts, true);
+        if (result) {
+          this.posts = result.posts
+          this.creatorList = result.facets.creators;
+          this.labels = result.facets.labels;
+          if (this.posts.length > 0) {
+            this.postsGrid = this.getPostsGrid(this.posts, true);
+          } else {
+            this.postsGrid = [];
+          }
+          console.log("Displaying page " + result.page + "+1 of " + result.totalPages, {
+            result: result,
+            grid: this.postsGrid
+          });
+          this.ChangeDetector.detectChanges();
+          this.DataHolder.loadingPosts = false;
         } else {
-          this.postsGrid = [];
+          this.posts = DataHolder.currentPosts
+          this.postsGrid = this.getPostsGrid(this.posts, true);
+          this.ChangeDetector.detectChanges();
         }
-        console.log("Displaying page " + result.page + "+1 of " + result.totalPages, {
-          result: result,
-          grid: this.postsGrid
-        });
-        this.ChangeDetector.detectChanges();
-        this.DataHolder.loadingPosts = false;
       })
 
       var refinements = this.AlgoliaApis.searchHelper.getQueryParameter('disjunctiveFacetsRefinements')

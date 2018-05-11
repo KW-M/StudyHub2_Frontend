@@ -12,6 +12,8 @@ import { StudyhubServerApisService } from '../services/studyhub-server-apis.serv
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class PostCardComponent implements OnInit, OnDestroy {
+  currentEmail: any;
+  deleted: boolean;
   randomInt: any;
   @Input('input-post') inputPost;
   postBodyTextShown: boolean = false;
@@ -31,6 +33,7 @@ export class PostCardComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
+    this.currentEmail = this.dataHolder.signedinUser.email
     this.currentPost = Object.assign({
       "id": null,
       "title": "",
@@ -58,6 +61,7 @@ export class PostCardComponent implements OnInit, OnDestroy {
         this.changeDetector.markForCheck()
       }, (err) => { console.warn(err) })
     }
+    this.currentPost.likeCount = this.currentPost.likeUsers.length;
     if (this.dataHolder.yorkGroups) {
       this.currentPost['color'] = this.dataHolder.getClassObj(this.currentPost.classes[0]).color;
     } else {
@@ -94,8 +98,9 @@ export class PostCardComponent implements OnInit, OnDestroy {
   editPost(post) {
     this.eventBoard.openPostModal(post, 'edit')
   };
-  deletePost(post) {
-    this.dataHolder.deletePost(post)
+  deletePost() {
+    this.deleted = true;
+    this.dataHolder.deletePost(this.currentPost)
   }
   debugPost(post) {
     console.log(post);

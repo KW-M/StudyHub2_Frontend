@@ -58,7 +58,6 @@ export class PostModalFrameComponent {
           "title": "",
           "link": "",
           "description": "",
-          "likeCount": 0,//<-
           "likeUsers": [],//<-
           "viewCount": 0,//<-
           "ranking": 0,//<-

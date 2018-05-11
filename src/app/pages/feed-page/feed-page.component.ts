@@ -35,7 +35,9 @@ export class FeedPageComponent implements OnInit, OnDestroy {
     this.currentUserObserver = this.DataHolder.currentUserState$.subscribe((userObj: any) => {
       if (userObj && userObj.recentlyViewed && userObj.recentlyViewed.length != 0) {
         this.DataHolder.getRecentlyViewedPosts().then((posts) => {
-          this.recentPosts = posts
+          this.recentPosts = posts.filter((post) => {
+            return (post.title && post.title.length != 0);
+          })
           this.ChangeDetector.detectChanges();
         }).catch(console.warn)
       } else {

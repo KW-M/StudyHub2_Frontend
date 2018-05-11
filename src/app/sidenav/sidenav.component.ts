@@ -184,7 +184,7 @@ export class SidenavComponent implements OnInit {
   }
 
   openQuizlet() {
-    if (this.DataHolder.signedinUser.quizletUsername) {
+    if (this.DataHolder.quizletUsername) {
       window.open('https://quizlet.com/join/nVZb4UAU9')
     }
   }

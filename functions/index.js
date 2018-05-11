@@ -30,10 +30,38 @@ exports.searchIndexEntry = functions.firestore.document('posts/{postId}').onWrit
     return 'done'
 });
 
+exports.reRankPosts = functions.https.onCall((data, context) => {
+    if (context.auth.token.email.indexOf("@york.org") !== -1) {
+        firebaseAdmin.database().ref('/startupInfo/lastReRankDate').once('value').then((snapshot) => {
+            if (snapshot.val() && (new Date().getTime() - snapshot.val()) > 86000000) {
+                var tempList = []
+                firebaseAdmin.firestore().collection("posts").where("flagged", "==", false).get().then((querySnapshot) => {
+                    firebaseAdmin.database().ref('/startupInfo/lastReRankDate').set(new Date().getTime());
+                    querySnapshot.forEach((doc) => {
+                        tempList.push({
+                            objectID: doc.id,
+                            ranking: computeRanking(doc.data())
+                        })
+                    });
+                    searchClient.initIndex('Posts').partialUpdateObjects(tempList, false, (result) => {
+                        console.log("reRanking Posts Completed", result)
+                    })
+                    return null
+                }).catch((error) => {
+                    console.warn("Error listing firestore documents: ", error);
+                });
+            }
+            return null
+        }).catch((error) => {
+            console.warn("Error retrieving lastReRankDate: ", error);
+        })
+    }
+});
+
 function addOrUpdateSearchIndexRecord(index, post, postId) {
-    post.id = postId
-    post.creationDate = new Date(hit.creationDate).getTime()
-    post.updateDate = new Date(hit.updateDate).getTime()
+    post.objectID = postId
+    post.creationDate = new Date(post.creationDate).getTime()
+    post.updateDate = new Date(post.updateDate).getTime()
     post.ranking = computeRanking(post)
     // Add or update object
     index.saveObject(post, (err, content) => {
@@ -53,6 +81,23 @@ function deleteSearchIndexRecord(index, postId) {
 }
 
 function computeRanking(post) {
-    //console.warn("ranking function")
-    return post.title.length;
+    //see: https://www.desmos.com/calculator/m8ace3kaeb
+    const daysSinceBeginingOfYear = (date) => {
+        const start = new Date(date.getFullYear(), 0, 0).getTime();
+        return Math.floor((date.getTime() - start) / 86400000);
+    }
+    const likesComponent = (likeCount) => {
+        return 2 * Math.pow(likeCount, 1.5);
+    }
+    const recencyComponent = (date) => {
+        const days = date.getTime() / 86400000
+        return 50 / (days + 1);
+    }
+    const recurringComponent = (date) => {
+        //based on how recently updated the post was realative to the start of the year.
+        const dayDifference = Math.abs(daysSinceBeginingOfYear(date) - daysSinceBeginingOfYear(new Date()))
+        return 0.3 + Math.pow(1.5, (0.25 * dayDifference) + 9)
+    }
+    const updateDate = new Date(post.updateDate)
+    return likesComponent(post.likeUsers.length) + recencyComponent(updateDate) + recurringComponent(updateDate);
 }

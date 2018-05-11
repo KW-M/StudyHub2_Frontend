@@ -57,7 +57,6 @@ export class PostEditViewComponent implements OnInit, OnDestroy {
       "title": "",
       "link": "",
       "description": "",
-      "likeCount": 0,//<-
       "likeUsers": [],//<-
       "viewCount": 0,//<-
       "ranking": 0,//<-
@@ -223,25 +222,37 @@ export class PostEditViewComponent implements OnInit, OnDestroy {
   }
 
   submitPost() {
-    this.submitting = true;
-    this.ExternalAPIs.getDriveSharingPermisions(this.currentPost.link).then((isShared) => {
-      var tempPost = this.currentPost
-      tempPost.description = this.descriptionElm.nativeElement.innerHTML
-      var tempLabels = tempPost.labels
-      tempPost.labels = []
-      for (const label in tempLabels) {
-        if (tempLabels[label] === true) tempPost.labels.push(label)
-      }
-      tempLabels = undefined
-      console.log("submitting post: ", tempPost)
-      this.ServerAPIs.submitPost(tempPost).then((response: any) => {
-        console.log(response);
-        window.localStorage.removeItem("postDraftBackup")
-        this.submitting = false;
-        this.EventBoard.closePostModal()
-        this.ChangeDetector.detectChanges()
-      });
-    })
+    if (!this.currentPost.title) {
+      let snackBar = this.snackBar.open('Please give this post a title.', 'Ok', {
+        duration: 8000,
+        horizontalPosition: "center"
+      })
+    } else if (this.currentPost.classes.length === 0) {
+      let snackBar = this.snackBar.open('Please choose a class for this post.', 'Ok', {
+        duration: 8000,
+        horizontalPosition: "center"
+      })
+    } else {
+      this.submitting = true;
+      this.ExternalAPIs.getDriveSharingPermisions(this.currentPost.link).then((isShared) => {
+        var tempPost = this.currentPost
+        delete tempPost.likeCount;
+        tempPost.description = this.descriptionElm.nativeElement.innerHTML
+        var tempLabels = tempPost.labels
+        tempPost.labels = []
+        for (const label in tempLabels) {
+          if (tempLabels[label] === true) tempPost.labels.push(label)
+        }
+        tempLabels = undefined
+        console.log("submitting post: ", tempPost)
+        this.ServerAPIs.submitPost(tempPost).then((response: any) => {
+          console.log(response);
+          window.localStorage.removeItem("postDraftBackup")
+          this.submitting = false;
+          this.EventBoard.closePostModal()
+        });
+      })
+    }
   }
 
   openDrivePicker() {

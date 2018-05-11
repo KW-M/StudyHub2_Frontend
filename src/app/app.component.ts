@@ -10,7 +10,7 @@ import { Component, ViewEncapsulation, ChangeDetectionStrategy, } from '@angular
     <div class="main-content">
       <router-outlet></router-outlet>
       <app-signin-prompt></app-signin-prompt>
-      <span class="algolia-credit"><span (click)="openCredits()">|Credits| & </span><a href="https://algolia.com" ><img src="https://www.algolia.com/static_assets/images/press/downloads/algolia-mark-blue.png"></a></span>
+      <span class="algolia-credit"><span (click)="openCredits()">|Credits| & </span><a href="https://algolia.com" ><img src="assets/algolia-mark-blue.png"></a></span>
     </div>
   `,
   styleUrls: ['./app.component.scss', './post-general-styles.scss'],

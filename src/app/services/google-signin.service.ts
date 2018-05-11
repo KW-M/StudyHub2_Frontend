@@ -46,9 +46,16 @@ export class GoogleSigninService {
     console.log("Signedin: ", isSignedIn);
     this.zone.run(() => { //need to get back into angular's detection zone since this function was called from outside (gapi context)
       this.signinStateSource.next(isSignedIn);
-      if (isSignedIn) {
+      console.log({
+        position: 'isSignedIn' + isSignedIn
+      }, gapi.auth2.getAuthInstance().currentUser.get());
+      if (isSignedIn === true) {
         // We need to register an Observer on Firebase Auth to make sure auth is initialized.
         var authStateUnsubscribe = this.FirebaseAuth.auth.onAuthStateChanged((firebaseUser) => {
+          console.log({
+            firebase: firebaseUser,
+            position: 'firbaseAuthChange'
+          }, gapi.auth2.getAuthInstance().currentUser.get());
           authStateUnsubscribe()
           // Check if we are already signed-in Firebase with the correct user.
           if (!isUserEqual(gapi.auth2.getAuthInstance().currentUser.get(), firebaseUser)) {
@@ -94,6 +101,12 @@ export class GoogleSigninService {
 
   handleSignOutClick() {
     if (gapi.auth2) gapi.auth2.getAuthInstance().signOut();
-    this.FirebaseAuth.auth.signOut().then(console.log);
+    this.FirebaseAuth.auth.signOut().then(() => {
+      var logout = document.createElement("img");
+      logout.setAttribute("src", "https://mail.google.com/mail/u/0/?logout&hl=en");
+      logout.style.display = "none";
+      var logoutImg = document.body.appendChild(logout);
+    });
+
   }
 }

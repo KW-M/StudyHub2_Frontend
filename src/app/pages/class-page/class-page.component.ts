@@ -28,20 +28,26 @@ export class ClassPageComponent implements OnInit, OnDestroy {
   constructor(private DataHolder: DataHolderService, private EventBoard: EventBoardService, private ChangeDetector: ChangeDetectorRef, private nativeElementRef: ElementRef, private Router: Router, private AlgoliaApis: AlgoliaApisService) {
     this.DataHolder.startupCompleteState$.first().toPromise().then(() => {
       this.visiblePostsObserver = this.DataHolder.visiblePostsState$.subscribe((result: any) => {
-        this.postResult = result;
-        this.posts = result.posts;
-        this.labels = result.facets.labels;
-        if (this.posts.length > 0) {
-          this.postsGrid = this.getPostsGrid(this.posts, true);
+        if (result) {
+          this.postResult = result;
+          this.posts = result.posts;
+          this.labels = result.facets.labels;
+          if (this.posts.length > 0) {
+            this.postsGrid = this.getPostsGrid(this.posts, true);
+          } else {
+            this.postsGrid = [];
+          }
+          console.log("Displaying page " + result.page + "+1 of " + result.totalPages, {
+            result: this.postResult,
+            grid: this.postsGrid
+          });
+          this.ChangeDetector.detectChanges();
+          this.DataHolder.loadingPosts = false;
         } else {
-          this.postsGrid = [];
+          this.posts = DataHolder.currentPosts
+          this.postsGrid = this.getPostsGrid(this.posts, true);
+          this.ChangeDetector.detectChanges();
         }
-        console.log("Displaying page " + result.page + "+1 of " + result.totalPages, {
-          result: this.postResult,
-          grid: this.postsGrid
-        });
-        this.ChangeDetector.detectChanges();
-        this.DataHolder.loadingPosts = false;
       })
 
       window.onresize = () => {

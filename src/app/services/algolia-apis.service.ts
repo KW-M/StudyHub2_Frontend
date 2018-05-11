@@ -29,7 +29,7 @@ export class AlgoliaApisService {
     this.Router.navigateByUrl("/" + this.Router.routerState.snapshot.root.firstChild.url[0].path + "?" + algoliasearchHelper.url.getQueryStringFromState(this.searchHelper.getState()));
   }
   clearURLQueryParams() {
-    this.Router.navigateByUrl("/" + this.Router.routerState.snapshot.root.firstChild.url[0].path);
+    this.Router.navigateByUrl("/" + this.Router.routerState.snapshot.root.firstChild.url[0].path + (this.Router.routerState.snapshot.root.fragment ? "#" + this.Router.routerState.snapshot.root.fragment : ''));
   }
   getOtherURLQueryParams() {
     return algoliasearchHelper.url.getUnrecognizedParametersInQueryString(window.location.search);

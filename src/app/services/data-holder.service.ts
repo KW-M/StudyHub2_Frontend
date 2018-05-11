@@ -68,11 +68,6 @@ export class DataHolderService {
                     })
                     console.log("Fire Signin Sucsessful! User: ", userObj);
                     this.currentUserStateSource.next(this.signedinUser)
-                    this.ServerAPIs.getQuizletUsername(signedIn.displayName).then((username) => {
-                        this.quizletUsername = username;
-                        console.log(username);
-
-                    })
                     if (this.currentPage && this.signedinUser) this.updateVisiblePosts();
                 }).catch(console.warn)
                 this.ServerAPIs.getStartupInfo().then((startupInfo: any) => {
@@ -97,13 +92,10 @@ export class DataHolderService {
                             link: 'https://drive.google.com/open?id=' + driveQueryParams.ids[0]
                         }, 'edit')
                     }
-                    // if (this.otherQueryParams && driveQueryParams) {
-                    //     console.log(JSON.parse(driveQueryParams))
-                    //     this.EventBoard.openPostModal({
-                    //         link: 'https://drive.google.com/open?id=' + driveQueryParams.ids[0]
-                    //     }, 'edit')
-                    // }
+                    /// 86400000 is the number of miliseconds in a day.
+                    //if ((new Date().getTime() - startupInfo.lastReRankDate) > 86400000) ServerAPIs.runReRankCloudFunction()
                 })
+                this.ServerAPIs.getQuizletUsername(signedIn.displayName).then((username) => { this.quizletUsername = username; })
             } else {
                 console.log('Fire Not Signed In');
                 this.signedinUser = null;
@@ -151,6 +143,13 @@ export class DataHolderService {
             this.startupCompleteState$.first().toPromise().then(() => {
                 this.currentPage = this.Router.routerState.snapshot.root.firstChild.url[0].path;
                 if (this.currentPage && this.signedinUser) this.updateVisiblePosts();
+                console.log(this.Router.routerState.snapshot.root)
+                if (this.Router.routerState.snapshot.root.fragment) {
+                    this.ServerAPIs.getPostsFromIds([this.Router.routerState.snapshot.root.fragment]).then((posts) => {
+                        console.log(posts);
+                        this.EventBoard.openPostModal(posts[0], 'view')
+                    })
+                }
             })
         });
 
@@ -236,23 +235,30 @@ export class DataHolderService {
     }
 
     deletePost(postObj) {
-        let postBackup = postObj;
-        let postIndex = this.findPost(postObj.id)
-        this.currentPosts.splice(postIndex, 1)
-        this.visiblePostsStateSource.next(this.currentPosts);
+        let postIndex = null
+        if (this.currentPosts) {
+            postIndex = this.findPost(postObj.id)
+            this.currentPosts.splice(postIndex, 1)
+            this.visiblePostsStateSource.next(null)
+        }
         let snackBar = this.snackBar.open('Deleting Post', 'Cancel', {
             duration: 5000,
             horizontalPosition: "start"
         })
-        snackBar.afterDismissed().toPromise().then((action) => {
-            if (action.dismissedByAction === true) {
-                this.currentPosts.splice(postIndex, 0, postBackup)
-                this.visiblePostsStateSource.next(this.currentPosts);
-            } else {
-                this.ServerAPIs.deletePost(postObj.id).then(console.log).catch(console.warn);
-            }
+        new Promise((resolve, reject) => {
+            snackBar.afterDismissed().toPromise().then((action) => {
+                if (action.dismissedByAction === true) {
+                    reject()
+                } else {
+                    this.ServerAPIs.deletePost(postObj.id).then((done) => { resolve() }).catch((err) => { console.log(err); reject(err) });
+                }
+            })
+        }).catch(() => {
+            if (this.currentPosts) this.currentPosts.splice(postIndex, 0, postObj)
+            this.visiblePostsStateSource.next(null)
         })
     }
+
     getClassObj(className: string) {
         var classObj = this.yorkClasses[className] || this.yorkGroups[className] || {}
         classObj.name = className;

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
-import { Subject } from "rxjs/Subject";
+import { Subject } from "rxjs";
 import { HttpClient, HttpHeaders } from "@angular/common/http";
 import { map, filter, scan } from 'rxjs/operators';
 import { MatSnackBar } from '@angular/material';
@@ -75,7 +75,6 @@ export class ExternalApisService {
               this.snackBar.open('Please enable link sharing on the attached file, so other students can view it.', 'Ok', {
                 duration: 20000,
                 horizontalPosition: "center",
-                extraClasses: ['highest-z-layer']
               })
             } else {
               this.snackBar.open('Please ask the owner of the attached file to enable link sharing, so other students can view it.', 'Ok', {

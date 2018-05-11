@@ -1,7 +1,7 @@
 import { Injectable } from "@angular/core";
 import { Router, NavigationEnd } from '@angular/router';
-import "rxjs/add/operator/filter";
-import { Subject } from "rxjs/Subject";
+import { Subject } from "rxjs";
+import { filter } from 'rxjs/operators';
 
 @Injectable()
 export class EventBoardService {

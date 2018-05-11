@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { Subject } from "rxjs/Subject";
-import 'rxjs/add/operator/first';
+import { Subject } from "rxjs";
+import { first } from 'rxjs/operators';
 import { Router } from '@angular/router';
 import { HttpClient, HttpParams, HttpHeaders } from "@angular/common/http";
 import * as algoliasearch from 'algoliasearch'

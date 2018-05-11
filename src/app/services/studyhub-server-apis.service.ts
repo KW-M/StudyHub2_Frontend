@@ -2,8 +2,8 @@ import { Injectable } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
 import { AngularFireDatabase } from 'angularfire2/database';
 import { AngularFirestore } from 'angularfire2/firestore';
-import { Subject } from "rxjs/Subject";
-import 'rxjs/add/operator/first';
+import { Subject } from "rxjs";
+import { first } from 'rxjs/operators';
 import { HttpClient, HttpParams, HttpHeaders } from "@angular/common/http";
 import { AngularFireAuth } from 'angularfire2/auth';
 import * as firebase from 'firebase/app';
@@ -18,7 +18,7 @@ export class StudyhubServerApisService {
     private FireDB: AngularFireDatabase,
     private FireAuth: AngularFireAuth,
     private FireStore: AngularFirestore) {
-    FireStore.app.firestore().settings({ timestampsInSnapshots: true });
+    FireStore.firestore.app.firestore().settings({ timestampsInSnapshots: true });
   }
 
   getUserFromServer(email) {
@@ -248,7 +248,7 @@ export class StudyhubServerApisService {
   }
 
   runReRankCloudFunction() {
-    var cloudFunction = this.FireStore.app['functions']().httpsCallable('testCall')
+    var cloudFunction = this.FireStore.firestore.app['functions']().httpsCallable('testCall')
     cloudFunction().then(console.log);
   }
 

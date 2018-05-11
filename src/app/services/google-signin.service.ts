@@ -1,7 +1,6 @@
 import { Injectable, NgZone } from "@angular/core";
-import { Subject } from "rxjs/Subject";
+import { Subject } from "rxjs";
 import { HttpClient } from "@angular/common/http";
-import { timeout } from "rxjs/operator/timeout";
 import { AngularFireAuth } from 'angularfire2/auth';
 import * as firebase from 'firebase/app';
 

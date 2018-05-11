@@ -1,7 +1,6 @@
 import { Injectable, OnInit, Output } from "@angular/core";
 import { Router, NavigationEnd, ActivatedRoute, RouterState } from '@angular/router';
-import { ReplaySubject } from "rxjs";
-import { Observable } from 'rxjs/Observable';
+import { ReplaySubject, Observable } from 'rxjs';
 import { EventBoardService } from "../services/event-board.service";
 import { GoogleSigninService } from "../services/google-signin.service";
 import { ExternalApisService } from "../services/external-apis.service";

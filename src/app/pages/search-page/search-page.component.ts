@@ -5,6 +5,7 @@ import { EventBoardService } from "../../services/event-board.service";
 import { GoogleSigninService } from "../../services/google-signin.service";
 import { DataHolderService } from "../../services/data-holder.service";
 import { AlgoliaApisService } from '../../services/algolia-apis.service';
+import { first } from 'rxjs/operators';
 
 
 @Component({
@@ -39,7 +40,7 @@ export class SearchPageComponent implements OnDestroy {
     public WindowFrame: WindowService,
     private ChangeDetector: ChangeDetectorRef,
     private nativeElementRef: ElementRef) {
-    this.DataHolder.startupCompleteState$.first().toPromise().then(() => {
+    this.DataHolder.startupCompleteState$.pipe(first()).toPromise().then(() => {
       window.onresize = () => {
         if (this.posts.length > 0) {
           this.postsGrid = this.getPostsGrid(this.posts, false) || this.postsGrid;
@@ -88,7 +89,7 @@ export class SearchPageComponent implements OnDestroy {
       this.creatorFilter = (refinements['creator.name'] || [''])[0];
       this.ChangeDetector.detectChanges();
     })
-    this.DataHolder.classAndGroupState$.first().toPromise().then((classesAndGroups) => {
+    this.DataHolder.classAndGroupState$.pipe(first()).toPromise().then((classesAndGroups) => {
       this.formattedYorkClasses = classesAndGroups['formattedClasses'];
       this.ChangeDetector.detectChanges();
       //only put here so that york classes must have loaded>

@@ -3,7 +3,7 @@ import { DomSanitizer } from '@angular/platform-browser';
 import { AngularFireDatabase } from 'angularfire2/database';
 import { AngularFirestore } from 'angularfire2/firestore';
 import { Subject } from "rxjs";
-import { first } from 'rxjs/operators';
+import { first, map } from 'rxjs/operators';
 import { HttpClient, HttpParams, HttpHeaders } from "@angular/common/http";
 import { AngularFireAuth } from 'angularfire2/auth';
 import * as firebase from 'firebase/app';
@@ -25,7 +25,7 @@ export class StudyhubServerApisService {
     return new Promise((resolve, reject) => {
       email = this.removeFirebaseKeyIllegalChars(email)
       console.log(email);
-      this.FireDB.object('users/' + email).valueChanges().first().toPromise().then((userObj: any) => {
+      this.FireDB.object('users/' + email).valueChanges().pipe(first()).toPromise().then((userObj: any) => {
         if (userObj === null || !userObj.uid) {
           userObj = userObj || {}
           let newUserObj = {
@@ -50,7 +50,7 @@ export class StudyhubServerApisService {
   }
 
   getStartupInfo() {
-    return this.FireDB.object('startupInfo').valueChanges().first().toPromise()
+    return this.FireDB.object('startupInfo').valueChanges().pipe(first()).toPromise()
   }
 
   getAllPosts(sortBy) {
@@ -77,16 +77,16 @@ export class StudyhubServerApisService {
       }
       if (lastPost) { query = query.startAfter(lastPost) }
       return query.limit(pageSize || 4);
-    }).snapshotChanges().map(actions => {
+    }).snapshotChanges().pipe(map(actions => {
       return actions.map((changeSnapshot) => {
-        const data = changeSnapshot.payload.doc.data();
+        const data: any = changeSnapshot.payload.doc.data();
         data.id = changeSnapshot.payload.doc.id;
         data.updateDate = data.updateDate.toDate();
         data.creationDate = data.creationDate.toDate();
         console.log(data, changeSnapshot);
         return data
-      });
-    })
+      })
+    }))
   }
 
   getPostChangeFeed(postFilters, sortBy, lastPost, pageSize) {
@@ -100,16 +100,16 @@ export class StudyhubServerApisService {
       query = query.orderBy("updateDate", "desc")
       query = query.startAfter(new Date())
       return query.limit(2);
-    }).snapshotChanges().map(actions => {
+    }).snapshotChanges().pipe(map(actions => {
       return actions.map((changeSnapshot) => {
-        const data = changeSnapshot.payload.doc.data();
+        const data: any = changeSnapshot.payload.doc.data();
         data.id = changeSnapshot.payload.doc.id;
         data.updateDate = data.updateDate.toDate();
         data.creationDate = data.creationDate.toDate();
         console.log(data, changeSnapshot);
         return data
       });
-    })
+    }))
   }
 
   getUserBookmarks(email) {
@@ -132,8 +132,8 @@ export class StudyhubServerApisService {
   getPostsFromIds(postIdArray) {
     var requestArray = []
     postIdArray.forEach(postId => {
-      requestArray.push(this.FireStore.collection('posts').doc(postId).snapshotChanges().map((changeSnapshot) => {
-        const data = changeSnapshot.payload.data();
+      requestArray.push(this.FireStore.collection('posts').doc(postId).snapshotChanges().pipe(map((changeSnapshot) => {
+        const data: any = changeSnapshot.payload.data();
         if (data) {
           data.id = changeSnapshot.payload.id;
           data.updateDate = data.updateDate.toDate();
@@ -141,7 +141,7 @@ export class StudyhubServerApisService {
           console.log(data, changeSnapshot);
         }
         return data || {}
-      }).first().toPromise())
+      })).pipe(first()).toPromise())
     });
     return Promise.all(requestArray)
   }
@@ -228,7 +228,7 @@ export class StudyhubServerApisService {
   }
 
   getQuizletUsername(name) {
-    return this.FireDB.object('quizletUsers/' + name + "/username").valueChanges().first().toPromise()
+    return this.FireDB.object('quizletUsers/' + name + "/username").valueChanges().pipe(first()).toPromise()
   }
 
   setQuizletUsername(userName) {

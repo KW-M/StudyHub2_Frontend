@@ -6,6 +6,7 @@ import { EventBoardService } from "../services/event-board.service";
 import { DataHolderService } from "../services/data-holder.service";
 import { StudyhubServerApisService } from '../services/studyhub-server-apis.service';
 import { Router } from '@angular/router';
+import { first } from 'rxjs/operators';
 
 @Component({
   selector: 'app-sidenav',
@@ -46,7 +47,7 @@ export class SidenavComponent implements OnInit {
       this.ChangeDetector.detectChanges();
     });
 
-    DataHolder.classAndGroupState$.first().toPromise().then((classesAndGroups) => {
+    DataHolder.classAndGroupState$.pipe(first()).toPromise().then((classesAndGroups) => {
       this.formattedYorkClasses = classesAndGroups['formattedClasses'];
       this.yorkGroups = classesAndGroups['groups'];
       this.ChangeDetector.detectChanges();

@@ -7,6 +7,7 @@ import { DataHolderService } from "../services/data-holder.service";
 import { ExternalApisService } from "../services/external-apis.service";
 import { StudyhubServerApisService } from '../services/studyhub-server-apis.service';
 import { AlgoliaApisService } from '../services/algolia-apis.service';
+import { first } from 'rxjs/operators';
 
 @Component({
   selector: 'app-post-edit-view',
@@ -142,7 +143,7 @@ export class PostEditViewComponent implements OnInit, OnDestroy {
     });
     tempLabels = undefined;
     this.labels = this.DataHolder.allLabels || []
-    this.DataHolder.classAndGroupState$.first().toPromise().then((classesAndGroups) => {
+    this.DataHolder.classAndGroupState$.pipe(first()).toPromise().then((classesAndGroups) => {
       this.formattedYorkClasses = classesAndGroups['formattedClasses'];
       this.yorkGroups = classesAndGroups['groups'];
       //only put here so that york classes must have loaded >

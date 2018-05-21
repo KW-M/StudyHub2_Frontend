@@ -9,6 +9,7 @@ import { AngularFireAuth } from "angularfire2/auth";
 import * as firebase from 'firebase/app';
 import { MatSnackBar } from "@angular/material";
 import { AlgoliaApisService } from "./algolia-apis.service";
+import { filter, first } from "rxjs/operators";
 
 @Injectable()
 export class DataHolderService {
@@ -138,8 +139,8 @@ export class DataHolderService {
             }
         }
 
-        Router.events.filter(event => event instanceof NavigationEnd).subscribe((newRoute) => {
-            this.startupCompleteState$.first().toPromise().then(() => {
+        Router.events.pipe(filter(event => event instanceof NavigationEnd)).subscribe((newRoute) => {
+            this.startupCompleteState$.pipe(first()).toPromise().then(() => {
                 this.currentPage = this.Router.routerState.snapshot.root.firstChild.url[0].path;
                 if (this.currentPage && this.signedinUser) this.updateVisiblePosts();
                 console.log(this.Router.routerState.snapshot.root)

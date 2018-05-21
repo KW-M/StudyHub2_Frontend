@@ -2,6 +2,7 @@ import { Component, ViewEncapsulation, OnInit, OnDestroy, ChangeDetectionStrateg
 import { ExternalApisService } from '../../services/external-apis.service';
 import { StudyhubServerApisService } from '../../services/studyhub-server-apis.service';
 import { DataHolderService } from '../../services/data-holder.service';
+import { first } from 'rxjs/operators';
 // import { DataHolderService } from '../../services/data-holder.service';
 // import { EventBoardService } from '../../services/event-board.service';
 // import { Router } from '@angular/router';
@@ -23,7 +24,7 @@ export class QuizletPageComponent implements OnDestroy {
     if (this.DataHolder.quizletUsername) {
       this.quizletUsername = this.DataHolder.quizletUsername;
     } else {
-      this.DataHolder.currentUserState$.first().toPromise().then((userObj) => {
+      this.DataHolder.currentUserState$.pipe(first()).toPromise().then((userObj) => {
         setTimeout(() => {
           this.quizletUsername = this.DataHolder.quizletUsername;
           this.ChangeDetector.detectChanges()

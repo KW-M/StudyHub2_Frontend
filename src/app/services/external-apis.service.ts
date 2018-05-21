@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
 import { Subject } from "rxjs";
 import { HttpClient, HttpHeaders } from "@angular/common/http";
-import { map, filter, scan } from 'rxjs/operators';
+import { map, filter, scan, first } from 'rxjs/operators';
 import { MatSnackBar } from '@angular/material';
 import * as Queue from 'p-queue'
 import { GoogleSigninService } from './google-signin.service';
@@ -116,7 +116,7 @@ export class ExternalApisService {
             resolve(currentLinkPreview)
           })
         } else {
-          this.getWebsitePreview(link).first().toPromise().then((websitePreview) => {
+          this.getWebsitePreview(link).pipe(first()).toPromise().then((websitePreview) => {
             currentLinkPreview.thumbnail = websitePreview['image'];
             currentLinkPreview.icon = websitePreview['icon'];
             currentLinkPreview.attachmentName = websitePreview['title'] || '';
@@ -230,14 +230,14 @@ export class ExternalApisService {
   }
 
   getDriveFileIsShared(fileId) {
-    return this.http.jsonp("https://script.google.com/macros/s/AKfycbxYwLgFvov0RfCPgUr_rTc5heMLBLFBaERo43kLlSYjLsGp5lfp/exec?fileId=" + fileId, 'callback').first().toPromise()
+    return this.http.jsonp("https://script.google.com/macros/s/AKfycbxYwLgFvov0RfCPgUr_rTc5heMLBLFBaERo43kLlSYjLsGp5lfp/exec?fileId=" + fileId, 'callback').pipe(first()).toPromise()
   }
 
   getQuizletUser(userName) {
-    return this.http.jsonp("https://api.quizlet.com/2.0/users/" + userName + "?client_id=" + this.quizletApiClientId, 'callback').first().toPromise()
+    return this.http.jsonp("https://api.quizlet.com/2.0/users/" + userName + "?client_id=" + this.quizletApiClientId, 'callback').pipe(first()).toPromise()
   }
 
   quizletUserSearch(userName) {
-    return this.http.jsonp("https://api.quizlet.com/2.0/search/universal?q=" + userName + "&client_id=" + this.quizletApiClientId, 'callback').first().toPromise()
+    return this.http.jsonp("https://api.quizlet.com/2.0/search/universal?q=" + userName + "&client_id=" + this.quizletApiClientId, 'callback').pipe(first()).toPromise()
   }
 }

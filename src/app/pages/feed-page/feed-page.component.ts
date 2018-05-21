@@ -5,6 +5,7 @@ import { EventBoardService } from "../../services/event-board.service";
 import { GoogleSigninService } from "../../services/google-signin.service";
 import { DataHolderService } from "../../services/data-holder.service";
 import { StudyhubServerApisService } from '../../services/studyhub-server-apis.service';
+import { first, map } from 'rxjs/operators';
 
 @Component({
   selector: 'app-feed-page',
@@ -45,7 +46,7 @@ export class FeedPageComponent implements OnInit, OnDestroy {
         this.ChangeDetector.markForCheck();
       }
       if (userObj && userObj.favorites && Object.keys(userObj.favorites).length !== 0) {
-        this.DataHolder.startupCompleteState$.first().toPromise().then(() => {
+        this.DataHolder.startupCompleteState$.pipe(first()).toPromise().then(() => {
           this.DataHolder.getFeedPosts().then((postGrid) => {
             var counter = 0
             for (const favClass in userObj.favorites) {

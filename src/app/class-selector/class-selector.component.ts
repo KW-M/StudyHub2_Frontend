@@ -1,6 +1,7 @@
 import { Component, OnInit, ViewEncapsulation, ChangeDetectionStrategy, Input, Output, EventEmitter, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { DataHolderService } from '../services/data-holder.service';
 import { Subscription } from 'rxjs';
+import { first } from 'rxjs/operators';
 
 @Component({
   selector: 'app-class-selector',
@@ -28,7 +29,7 @@ export class ClassSelectorComponent implements OnInit, OnDestroy {
   };
 
   constructor(private DataHolder: DataHolderService, private ChangeDetector: ChangeDetectorRef) {
-    this.DataHolder.classAndGroupState$.first().toPromise().then((classesAndGroups) => {
+    this.DataHolder.classAndGroupState$.pipe(first()).toPromise().then((classesAndGroups) => {
       this.formattedYorkClasses = classesAndGroups['formattedClasses'];
       this.yorkGroups = classesAndGroups['groups'];
       this.signedinUserObserver = this.DataHolder.currentUserState$.subscribe((userObj: any) => {

@@ -3,6 +3,7 @@ import { DataHolderService } from '../../services/data-holder.service';
 import { EventBoardService } from '../../services/event-board.service';
 import { Router } from '@angular/router';
 import { AlgoliaApisService } from '../../services/algolia-apis.service';
+import { first } from 'rxjs/operators';
 
 
 @Component({
@@ -26,7 +27,7 @@ export class ClassPageComponent implements OnInit, OnDestroy {
   findTags;
   findClass;
   constructor(private DataHolder: DataHolderService, private EventBoard: EventBoardService, private ChangeDetector: ChangeDetectorRef, private nativeElementRef: ElementRef, private Router: Router, private AlgoliaApis: AlgoliaApisService) {
-    this.DataHolder.startupCompleteState$.first().toPromise().then(() => {
+    this.DataHolder.startupCompleteState$.pipe(first()).toPromise().then(() => {
       this.visiblePostsObserver = this.DataHolder.visiblePostsState$.subscribe((result: any) => {
         if (result) {
           this.postResult = result;

@@ -7,6 +7,7 @@ import { WindowService } from "../services/window.service";
 import { Router, NavigationEnd } from '@angular/router';
 import { ExternalApisService } from '../services/external-apis.service';
 import { AlgoliaApisService } from '../services/algolia-apis.service';
+import { filter, first } from 'rxjs/operators';
 
 
 @Component({
@@ -52,7 +53,7 @@ export class ToolbarComponent {
       this.user = userObj || { photoURL: 'assets/defaultAccount.jpg', name: 'York Student', email: ' . . . @york.org' };
       ChangeDetector.detectChanges()
     });
-    Router.events.filter(event => event instanceof NavigationEnd).subscribe((newRoute) => {
+    Router.events.pipe(filter(event => event instanceof NavigationEnd)).subscribe((newRoute) => {
       var newPath = this.Router.routerState.snapshot.root.firstChild.url[0].path || "Feed";
       if (newPath !== this.currentPage) this.lastState = {
         page: this.currentPage || "Feed",
@@ -60,12 +61,12 @@ export class ToolbarComponent {
       };
       if (newPath === 'Search') this.EventBoard.setSideNavOpen(false)
       this.currentPage = newPath
-      this.DataHolder.startupCompleteState$.first().toPromise().then(() => {
+      this.DataHolder.startupCompleteState$.pipe(first()).toPromise().then(() => {
         this.searchText = this.AlgoliaApis.getSearchQuery() || '';
       })
       ChangeDetector.detectChanges()
     });
-    this.DataHolder.startupCompleteState$.first().toPromise().then(() => {
+    this.DataHolder.startupCompleteState$.pipe(first()).toPromise().then(() => {
       this.searchText = this.AlgoliaApis.getSearchQuery() || '';
       this.ChangeDetector.detectChanges()
     })

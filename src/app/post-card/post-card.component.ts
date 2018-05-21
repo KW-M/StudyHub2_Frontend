@@ -3,6 +3,7 @@ import { ExternalApisService } from '../services/external-apis.service';
 import { DataHolderService } from '../services/data-holder.service';
 import { EventBoardService } from '../services/event-board.service';
 import { StudyhubServerApisService } from '../services/studyhub-server-apis.service';
+import { first } from 'rxjs/operators';
 
 @Component({
   selector: 'app-post-card',
@@ -65,7 +66,7 @@ export class PostCardComponent implements OnInit, OnDestroy {
     if (this.dataHolder.yorkGroups) {
       this.currentPost['color'] = this.dataHolder.getClassObj(this.currentPost.classes[0]).color;
     } else {
-      this.dataHolder.classAndGroupState$.first().toPromise().then(() => { this.currentPost['color'] = this.dataHolder.getClassObj(this.currentPost.classes[0]).color; this.changeDetector.markForCheck() })
+      this.dataHolder.classAndGroupState$.pipe(first()).toPromise().then(() => { this.currentPost['color'] = this.dataHolder.getClassObj(this.currentPost.classes[0]).color; this.changeDetector.markForCheck() })
     }
   }
 

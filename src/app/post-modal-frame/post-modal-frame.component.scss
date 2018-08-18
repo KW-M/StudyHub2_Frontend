@@ -40,9 +40,16 @@
     right: 20px;
 }
 
-.modal-container.open-centered .modal-bg {
-    opacity: 0.5;
-    pointer-events: all;
+.modal-container.open-centered {
+    .post-modal-frame {
+        width: unset;
+        min-width: 420px;
+        max-width: calc(100vh - 109px);
+    }
+    .modal-bg {
+        opacity: 0.5;
+        pointer-events: all;
+    }
 }
 
 app-post-edit-view {

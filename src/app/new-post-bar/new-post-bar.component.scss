@@ -1,5 +1,5 @@
 .create-post-bar-top-container {
-    margin: 30px 4px 30px 4px;
+    margin: 30px 12px 30px 12px;
     z-index: 1;
     .create-post-bar-top {
         display: flex;
@@ -25,7 +25,7 @@
         height: 48px;
         border-radius: 0 3px 3px 0;
         background: rgba(0, 0, 0, 0.6);
-        color:white;
+        color: white;
         align-items: center;
     }
     .create-post-bar-text {

@@ -1,0 +1,22 @@
+<div id="overlay_background" style="z-index: 75;" *ngIf="bgShown">
+  <div id="welcome_dialog" *ngIf="dialogShown">
+    <div class="signin-dialog-padding">
+      <h1 class="signin-dialog-welcome">Welcome</h1>
+      <p style="margin:0">Sign in with your me@york.org email account.</p>
+    </div>
+    <div class="signin-button-container">
+      <div id="signin_button" class="signin-button" *ngIf="buttonShown" (click)="signin()">
+        <div class="signin-icon">
+          <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="logo" height="20" width="20">
+        </div>
+        <p class="signin-text">Sign in</p>
+      </div>
+      <mat-progress-spinner mode="indeterminate" style="margin:auto" color="accent" diameter="48" *ngIf="!buttonShown"></mat-progress-spinner>
+    </div>
+    <div class="signin-dialog-tip">
+      <h3>Tips:</h3>
+      <p id="tip_text">Share from GDrive, right-click &gt; Open With &gt; StudyHub.</p>
+    </div>
+  </div>
+  <a href="/Memes" id="dat_button">meme</a>
+</div>

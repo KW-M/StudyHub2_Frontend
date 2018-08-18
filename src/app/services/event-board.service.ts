@@ -1,19 +1,19 @@
 import { Injectable } from "@angular/core";
-import { Router,NavigationEnd } from '@angular/router';
-import "rxjs/add/operator/filter";
-import { Subject } from "rxjs/Subject";
+import { Router, NavigationEnd } from '@angular/router';
+import { Subject } from "rxjs";
+import { filter } from 'rxjs/operators';
 
 @Injectable()
 export class EventBoardService {
   constructor(private router: Router) {
     // router.events.filter(event => event instanceof NavigationEnd).subscribe((newRoute) => {});
   }
-  private sideNavOpen: boolean = true;
+  sideNavOpen: boolean = true;
   private sideNavOpenSource = new Subject<boolean>();
   sideNavOpen$ = this.sideNavOpenSource.asObservable();
   setSideNavOpen(open: boolean) {
-      this.sideNavOpen = open;
-      this.sideNavOpenSource.next(open);
+    this.sideNavOpen = open;
+    this.sideNavOpenSource.next(open);
   }
   toggleSideNavOpen() {
     this.sideNavOpen = !this.sideNavOpen;
@@ -21,10 +21,10 @@ export class EventBoardService {
   }
   private postModalSource = new Subject<any>();
   postModal$ = this.postModalSource.asObservable();
-  openPostModal(postObj:any,action:string) {
-    this.postModalSource.next({'action':action,'postObj':postObj});
+  openPostModal(postObj: any, action: string) {
+    this.postModalSource.next({ 'action': action, 'postObj': postObj });
   }
   closePostModal() {
-    this.postModalSource.next({'action':'close'});
+    this.postModalSource.next({ 'action': 'close' });
   }
 }

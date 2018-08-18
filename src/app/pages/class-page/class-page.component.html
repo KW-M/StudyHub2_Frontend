@@ -1,26 +1,40 @@
 <app-new-post-bar></app-new-post-bar>
-<div class="label-bar-container">
-  <mat-chip-list [multiple]="true" class="label-chips">
-    <!-- <mat-basic-chip [selectable]="false" class="class-expand-button">
-      <button mat-button color="primary" *ngIf="!classChooserExpanded" (click)="labelAreaExpanded = true;classChooserExpanded = true">
-        <span>Filter: up</span>
-        <mat-icon *ngIf="currentPost.classes.length === 0" style="padding-bottom: 4px">arrow_drop_down</mat-icon>
-        <mat-icon *ngIf="currentPost.classes.length !== 0" style="padding: 6px 0 6px 6px;font-size: 18px;height: 18px;width: 18px;color:black;opacity:0.6"
-          (click)="currentPost.classes = []">cancel</mat-icon>
-      </button>
-    </mat-basic-chip> -->
-    <!-- <span class="formatting-divider" style="order:-1;flex:none"></span> -->
-    <mat-chip color="accent" *ngFor="let label of posts; let chipIndex = index;">
-      {{label}}
-    </mat-chip>
-  </mat-chip-list>
+<div class="post-chip-list" id="scrollable_class_labels">
+  <mat-chip color="accent" class="chip-gradient" *ngFor="let label of labels;" (click)="filterByLabel(label.name)">
+    {{label?.name}}
+  </mat-chip>
+  <span style="flex:none;width: 12px;height: 10px;"></span>
 </div>
-<div class="label-bar-overlay"></div>
-<div class="class-preview-posts-grid-container">
-  <div class="class-preview-posts" *ngFor="let column of gridColumns; let i = index">
-    <app-post-card *ngFor="let post of postsGrid[i]; let indexy = index; trackBy:trackByPostIdFn" [input-post]="post"></app-post-card>
+<div class="label-bar-overlay">
+  <div class="scroll-button left mat-elevation-z2" *ngIf="labelScrollPercentage > 0.1">
+    <button mat-icon-button (click)="scrollLabels('left')">
+      <mat-icon>keyboard_arrow_left</mat-icon>
+    </button>
+  </div>
+  <div class="scroll-button right mat-elevation-z2" *ngIf="0.9 > labelScrollPercentage ">
+    <button mat-icon-button (click)="scrollLabels('right')">
+      <mat-icon>keyboard_arrow_right</mat-icon>
+    </button>
+  </div>
+</div>
+<div class="posts-grid-container">
+  <div class="posts-grid-column" *ngFor="let column of gridColumns; let i = index, trackBy:trackByIndex">
+    <app-post-card *ngFor="let post of postsGrid[i]; trackBy:trackByPostIdFn" [input-post]="post"></app-post-card>
   </div>
   <!-- spacer grid items at the end keep the other grid items equal width -->
-  <div class="class-preview-posts"></div>
-  <div class="class-preview-posts"></div>
+  <div class="posts-grid-column"></div>
+  <div class="posts-grid-column"></div>
+</div>
+<div class="no-posts-area">
+  <ng-container *ngIf="!postResult || (postResult?.totalPages !== 0 && postResult?.totalPages > postResult?.page + 1)">
+    <mat-progress-spinner mode="indeterminate" color="accent" diameter="36"></mat-progress-spinner>
+  </ng-container>
+  <ng-container *ngIf="postResult?.totalPages !== 0 && postResult?.totalPages === postResult?.page + 1">
+    <h3>That's all folks.</h3>
+  </ng-container>
+  <ng-container *ngIf="postResult?.totalPages === 0">
+    <h3>It's so lonely here</h3>
+    <p>Be the first to post.</p>
+    <img src="assets/Lonely Island.png">
+  </ng-container>
 </div>

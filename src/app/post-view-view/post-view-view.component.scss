@@ -1,0 +1,23 @@
+// .post-view-scroll-zone {
+    //     display: flex;
+    //     max-height: calc(100vh - 161px);
+    //     overflow-y: auto;
+    //     flex-direction: column;
+    //     flex: 1 100;
+    //     @media (max-width: 599px) {
+    //         max-height: calc(100vh - 52px);
+    //     }
+    //     .post-chip-list {
+    //         padding-right: 60px;
+    //     }
+    // }
+
+.post-view-scroll-zone.post-card-title {
+    margin-bottom: 16px;
+}
+
+button.dense-button {
+    margin: 0 2px;
+    padding: 0;
+    min-width: 32px;
+}

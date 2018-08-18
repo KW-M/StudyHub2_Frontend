@@ -1,0 +1,63 @@
+{
+  "index": "/index.html",
+  "assetGroups": [
+    {
+      "name": "app",
+      "installMode": "prefetch",
+      "resources": {
+        "files": [
+          "/favicon.ico",
+          "/index.html",
+          "/*.bundle.css",
+          "/*.bundle.js",
+          "/*.chunk.js"
+        ]
+      }
+    },
+    {
+      "name": "assets",
+      "installMode": "lazy",
+      "updateMode": "prefetch",
+      "resources": {
+        "files": [
+          "/assets/**"
+        ],
+        "urls": [
+          "https://fonts.googleapis.com/**"
+        ]
+      }
+    }
+  ],
+  "dataGroups": [
+    {
+      "name": "linkPreviewImages",
+      "version": 0,
+      "urls": [
+        "https://docs.google.com/a/york.org/feeds/vt**",
+        "https://lh3.googleusercontent.com/*s540",
+        "https://www.google.com/s2/favicons?**",
+        "https://www.googleapis.com/pagespeedonline/v2/runPagespeed?**"
+      ],
+      "cacheConfig": {
+        "strategy": "performance",
+        "maxSize": 120,
+        "maxAge": "20d",
+        "timeout": "2s"
+      }
+    },
+    {
+      "name": "firebase-long-data",
+      "version": 0,
+      "urls": [
+        "**/yorkClasses.json",
+        "**/yorkGroups.json"
+      ],
+      "cacheConfig": {
+        "strategy": "performance",
+        "maxSize": 6,
+        "maxAge": "20d",
+        "timeout": "2s"
+      }
+    }
+  ]
+}

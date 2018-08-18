@@ -6,8 +6,13 @@
 /tmp
 /out-tsc
 
+# private files (keys etc..) IMPORTANT - don't make public, ask me if you need them.
+**/private_stuff/**
+**/serviceAccountKey.json
+# ^^^^^^^^^^ IMPORTANT ^^^^^^^^^^
+
 # dependencies
-/node_modules
+**/node_modules/**
 
 # IDEs and editors
 /.idea

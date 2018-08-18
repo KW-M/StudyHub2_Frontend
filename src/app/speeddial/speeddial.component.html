@@ -4,13 +4,13 @@
     <mat-icon class="fab-icon create">create</mat-icon>
     <mat-icon class="fab-icon add">add</mat-icon>
   </button>
-  <button class="sh-fab sh-fab-mini fab-num1" (click)="newRost()" matRipple>
+  <button class="sh-fab sh-fab-mini fab-num1" (click)="openUploadPicker()" matRipple>
     <mat-icon>file_upload</mat-icon>
   </button>
-  <button class="sh-fab sh-fab-mini fab-num2" matRipple>
-    <img style="width:22px; height:22px;" src="http://studyhub.york.org/images/drive_icon.svg">
+  <button class="sh-fab sh-fab-mini fab-num2" matRipple (click)="openDrivePicker()">
+    <img style="width:22px; height:22px;" src="assets/Drive_Icon.svg">
   </button>
-  <button class="sh-fab sh-fab-mini fab-num3" matRipple>
+  <!-- <button class="sh-fab sh-fab-mini fab-num3" matRipple>
     <mat-icon>camera</mat-icon>
-  </button>
+  </button> -->
 </div>

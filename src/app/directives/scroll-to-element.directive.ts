@@ -23,7 +23,6 @@ export class ScrollToElementDirective {
       Element.nativeElement.addEventListener('touchend', () => {
         window.addEventListener("resize", () => {
           setTimeout(() => {
-            console.log('resize');
             this.scrollIntoView();
           }, 500);
         })

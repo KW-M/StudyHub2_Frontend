@@ -46,24 +46,46 @@ import { ExternalApisService } from "../services/external-apis.service";
   ],
 })
 export class PostModalFrameComponent {
+  hidden: boolean;
   modalOpenState: string = 'closed';
   postAction: string = '';
   inputPost;
   constructor(public EventBoard: EventBoardService, public componentElem: ElementRef, private changeDetector: ChangeDetectorRef) {
     EventBoard.postModal$.subscribe(inputPostObj => {
-      this.inputPost = inputPostObj.postObj || {};
-      this.postAction = inputPostObj.action;
-      console.log(inputPostObj.action, this.inputPost)
-      if (this.postAction === 'close') {
-        if (document.activeElement) {
-          (document.activeElement as HTMLElement).blur()
+      if (this.modalOpenState === 'closed' && inputPostObj.postObj !== undefined) {
+        this.inputPost = Object.assign({
+          "id": null,
+          "title": "",
+          "link": "",
+          "description": "",
+          "likeUsers": [],//<-
+          "viewCount": 0,//<-
+          "ranking": 0,//<-
+          "labels": [],
+          "classes": [],
+          "creator": {
+            "email": null,
+            "name": null,
+          },
+          "attachmentName": null,
+          "flagged": false,
+          "creationDate": new Date().getTime(),
+          "updateDate": new Date().getTime(),
+        }, inputPostObj.postObj || {});
+        this.postAction = inputPostObj.action;
+        this.hidden = false;
+        if (this.postAction === 'edit' && !this.inputPost['id']) {
+          this.modalOpenState = 'open-docked'
+        } else {
+          this.modalOpenState = 'open-centered'
         }
+      } else if (inputPostObj.action === 'close' || inputPostObj.action === 'hide') {
         this.modalOpenState = 'closed'
-      } else if (this.postAction === 'edit') {
-        if (this.inputPost['id']) { this.modalOpenState = 'open-centered' } else { this.modalOpenState = 'open-docked' }
-      } else {
-        this.modalOpenState = 'open-centered'
+        this.hidden = inputPostObj.action === 'hide'
+        this.postAction = inputPostObj.action;
+        if (document.activeElement) (document.activeElement as HTMLElement).blur()
       }
+      console.log(inputPostObj.action, this.inputPost)
       this.changeDetector.detectChanges();
     });
   }

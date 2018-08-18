@@ -18,26 +18,30 @@ $app-theme: mat-light-theme($angular-material-primary, $angular-material-accent,
 // that you are using.
 @include angular-material-theme($app-theme);
 html {
+    height: 100%;
     outline: none;
     user-select: none;
 }
 
 body {
     margin: 0;
+    height: 100%;
     font-family: 'Roboto', 'Helvetica Neue', sans-serif;
 }
 
 app-root {
     display: flex;
+    height: 100%;
 }
 
 *,
 *:before,
 *:after {
-    //box-sizing: inherit;
+    -webkit-overflow-scrolling: touch; //box-sizing: inherit;
     outline: inherit;
     user-select: inherit;
     -webkit-tap-highlight-color: transparent;
+    -ms-overflow-style: -ms-autohiding-scrollbar;
 }
 
 input,

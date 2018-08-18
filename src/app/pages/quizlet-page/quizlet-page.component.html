@@ -1,0 +1,28 @@
+<div class="no-posts-area">
+    <ng-container *ngIf="quizletUsername">
+        <button (click)="openQuizlet()" mat-button color="accent">Go to York Quizlet
+            <mat-icon>open_in_new</mat-icon>
+        </button>
+        <button (click)="editUsername()" mat-button style="margin-top:50px">
+            <mat-icon>edit</mat-icon> Edit Your Quizlet username
+
+        </button>
+    </ng-container>
+    <ng-container *ngIf="!quizletUsername">
+        <h4>
+            <ng-container *ngIf="quizletUserAutocomplete.length === 0 && usernameSearch">Can't find that username, check your spelling</ng-container>.
+        </h4>
+        <mat-form-field style="width: 100%;">
+            <input type="text" placeholder="Enter your Quizlet username" [(ngModel)]="usernameSearch" aria-label="Number" (ngModelChange)="onInput($event)"
+                matInput [matAutocomplete]="quizletselector">
+            <mat-autocomplete #quizletselector="matAutocomplete" (optionSelected)="onSubmit($event.option.value)">
+                <mat-option *ngFor="let user of quizletUserAutocomplete" [value]="user.username">
+                    <mat-icon style="vertical-align: middle;">arrow_forward</mat-icon>
+                    <img style="vertical-align: middle;margin-right: 6px;width: 40px;height: 40px;border-radius: 50%;" [src]="user?.profile_image">
+                    <span matLine>{{ user.username }}</span>
+                </mat-option>
+            </mat-autocomplete>
+        </mat-form-field>
+        <p>Auto share your public quizlet sets, and get access to all York student sets.</p>
+    </ng-container>
+</div>

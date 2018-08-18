@@ -5,6 +5,9 @@ import { WindowService } from "../services/window.service";
 import { EventBoardService } from "../services/event-board.service";
 import { DataHolderService } from "../services/data-holder.service";
 import { StudyhubServerApisService } from '../services/studyhub-server-apis.service';
+import { Router } from '@angular/router';
+import { first } from 'rxjs/operators';
+
 @Component({
   selector: 'app-sidenav',
   templateUrl: './sidenav.component.html',
@@ -19,6 +22,7 @@ export class SidenavComponent implements OnInit {
   sideNavElm;
   sideNavOverlayElm;
   sideNavContainerElm;
+
   sideNavDimensions;
   @ViewChild('stickyHeader') stickyHeaderElm: ElementRef;
 
@@ -29,36 +33,39 @@ export class SidenavComponent implements OnInit {
   classSearchText: string;
 
   signedinUser: any;
-  filteredClasses: Array<any> = [];
-  filteredGroups: Array<any> = [];
+  yorkGroups = {};
+  formattedYorkClasses: Array<any> = [];
   favoriteClasses: Array<any> = [];
   throttleTimer = {
 
   };
 
-  constructor(private EventBoard: EventBoardService, private ServerAPIs: StudyhubServerApisService, private DataHolder: DataHolderService, public sideNavComponentElem: ElementRef, private zone: NgZone, private changeDetector: ChangeDetectorRef) {
+  constructor(private EventBoard: EventBoardService, private ServerAPIs: StudyhubServerApisService, private DataHolder: DataHolderService, public sideNavComponentElem: ElementRef, private zone: NgZone, private ChangeDetector: ChangeDetectorRef, private Router: Router) {
     //Get notified by the event board service of the sideNavOpen Observable and set it to the local variable sidenavOpen.
     EventBoard.sideNavOpen$.subscribe((open) => {
       this.sidenavOpen = open;
-      this.changeDetector.detectChanges();
+      this.ChangeDetector.detectChanges();
     });
 
-    DataHolder.classAndGroupState$.subscribe((classesAndGroups) => {
-      if (this.filteredClasses.length === 0) {
-        this.showAllClasses = false;
-        this.filteredClasses = classesAndGroups['classes'];
-        this.filteredGroups = classesAndGroups['groups'];
-      }
-      this.favoriteClasses = classesAndGroups['favorites'];
-      this.changeDetector.detectChanges();
+    DataHolder.classAndGroupState$.pipe(first()).toPromise().then((classesAndGroups) => {
+      this.formattedYorkClasses = classesAndGroups['formattedClasses'];
+      this.yorkGroups = classesAndGroups['groups'];
+      this.ChangeDetector.detectChanges();
     });
+
+    DataHolder.currentUserState$.subscribe((user) => {
+      if (user) {
+        this.favoriteClasses = user['favorites'] || {};
+        this.ChangeDetector.detectChanges();
+      }
+    })
   }
 
 
   ngOnInit() {
     this.EventBoard.setSideNavOpen(window.matchMedia("(min-width: 960px)").matches) //sync the initial state with the eventboard service
     window.matchMedia("(min-width: 960px)").addListener((event) => {
-      this.EventBoard.setSideNavOpen(event.matches)
+      if (window.location.pathname !== "/Search") this.EventBoard.setSideNavOpen(event.matches)
     });
     //Establish Element refrences.
     this.sideNavContainerElm = this.sideNavComponentElem.nativeElement.children[0];
@@ -66,7 +73,7 @@ export class SidenavComponent implements OnInit {
     this.sideNavOverlayElm = this.sideNavContainerElm.children[1];
     this.zone.runOutsideAngular(() => {
       // Watch for touchStarts on the left 20px of screen (left edge drag).
-      document.ontouchstart = (event) => {
+      document.ontouchstart = (event: any) => {
         if (event.touches[0].clientX < 20) this.touchStart(event);
       };
       document.ontouchmove = (event) => {
@@ -130,26 +137,21 @@ export class SidenavComponent implements OnInit {
     }
   }
 
-  setFavorite(classObj) {
+  setFavorite(className) {
     const serverSync = () => {
-      this.ServerAPIs.setFavorites(this.favoriteClasses).toPromise().then((serverResponse) => {
+      this.ServerAPIs.setFavorites(this.favoriteClasses).then((serverResponse) => {
+        this.DataHolder.updateCurrentUserObserver({ favorites: this.favoriteClasses })
         console.log(serverResponse)
-        if (serverResponse['errors'] === 0 && serverResponse['changes'][0]) {
-          if (this.favoriteClasses != serverResponse['changes'][0].new_val.favorites) {
-            this.DataHolder.updateFavorites(this.favoriteClasses)
-          } else {
-            serverSync();
-          }
-        }
+      }).catch((e) => {
+        console.warn(e);
+        serverSync();
       })
     }
     if (this.editingFavorites) {
-      if (classObj.userFavorite === true) {
-        classObj.userFavorite = false;
-        this.favoriteClasses.splice(this.favoriteClasses.indexOf(classObj.name), 1);
+      if (this.favoriteClasses[className]) {
+        delete this.favoriteClasses[className];
       } else {
-        classObj.userFavorite = true
-        this.favoriteClasses.push(classObj.name);
+        this.favoriteClasses[className] = true;
       }
       clearTimeout(this.throttleTimer['onFavorite']);
       this.throttleTimer['onFavorite'] = setTimeout(serverSync, 1000)
@@ -160,16 +162,44 @@ export class SidenavComponent implements OnInit {
     const searchText = event.target.value;
     if (searchText !== this.classSearchText) {
       this.classSearchText = searchText;
+      this.formattedYorkClasses.forEach(category => {
+        category.classes.forEach(function (classObj) {
+          if (classObj.name.toLowerCase().indexOf(searchText.toLowerCase()) === -1) {
+            classObj.hidden = true;
+          } else {
+            classObj.hidden = undefined;
+          }
+        })
+      });
+      for (const groupName in this.yorkGroups) {
+        if (groupName.toLowerCase().indexOf(searchText.toLowerCase()) === -1) {
+          this.yorkGroups[groupName].hidden = true;
+        } else {
+          delete this.yorkGroups[groupName].hidden;
+        }
+      }
       if (this.showAllClasses === false) this.showAllClasses = true
       if (this.showAllGroups === false) this.showAllGroups = true
-      this.filteredClasses = this.DataHolder.yorkClasses.filter(function (classObj) {
-        return !(classObj.name.toLowerCase().indexOf(searchText.toLowerCase()) === -1)
-      })
-      this.filteredGroups = this.DataHolder.yorkGroups.filter(function (group) {
-        return !(group.toLowerCase().indexOf(searchText.toLowerCase()) === -1)
-      })
     }
     //clearTimeout(this.throttleTimer['onLabelAndClassSearchInput']);
+  }
+
+  openQuizlet() {
+    if (this.DataHolder.quizletUsername) {
+      window.open('https://quizlet.com/join/nVZb4UAU9')
+    }
+  }
+
+  addGroup() {
+    var groupName = prompt("Enter a name for this group", "");
+    if (groupName != null && groupName.length !== 0) {
+      this.ServerAPIs.addGroup(groupName).then((resp) => {
+        console.log(this.DataHolder.yorkGroups);
+        this.DataHolder.yorkGroups[groupName] = { creator: "Me" }
+        this.yorkGroups[groupName] = { creator: "Me" }
+        this.ChangeDetector.detectChanges()
+      }).catch(console.warn)
+    }
   }
 
   closeSideNav() {

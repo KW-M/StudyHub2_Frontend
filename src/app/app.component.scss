@@ -1,16 +1,21 @@
 app-toolbar {
     position: fixed;
-    width:100vw;
+    width: 100vw;
     z-index: 10;
 }
 
 .main-content {
+    position: relative;
+    display: flex;
     margin-top: 64px;
+    width: auto;
+    min-width: 0;
+    height: auto;
     flex: 1;
 }
 
 app-sidenav {
-    z-index:8;
+    z-index: 8;
 }
 
 app-speeddial {
@@ -25,8 +30,63 @@ app-post-modal-frame {
     z-index: 11;
 }
 
-app-class-page {
+app-feed-page,
+app-class-page,
+app-search-page,
+app-quizlet-page {
+    display: flex;
+    width: 100%;
+    flex-direction: column;
+}
+
+.cdk-overlay-container {
+    z-index: 2147493645;
+}
+
+.highest-z-layer {
+    z-index: 2147493646;
+}
+
+.shr-c-shr-d-shr-ac-shr-r,
+.shr-c-shr-d-shr-x-shr-r,
+.shr-c-shr-d-shr-r {
+    overflow: hidden;
+}
+
+.shr-c-shr-d-shr-ac-shr-r:before,
+.shr-c-shr-d-shr-x-shr-r:before,
+.shr-c-shr-d-shr-r:before {
+    position: absolute;
     display: block;
+    top: -134px;
+    right: -113px;
+    width: 356px;
+    height: 356px;
+    border-radius: 50%;
+    background: radial-gradient(#0000 12%, #44ad48cc 1%);
+    content: '';
+    pointer-events: none;
+}
+
+.algolia-credit {
+    position: absolute;
+    top: 3px;
+    right: 3px;
+    z-index: 5;
+    span {
+        vertical-align: middle;
+        font-size: 13px;
+        cursor: pointer;
+    }
+    a {
+        position: relative;
+        display: inline-block;
+        height: 18px;
+        vertical-align: middle;
+        img {
+            height: 18px;
+        }
+    }
 }
 
 @media (max-width: 600px) {

@@ -1,10 +1,11 @@
-import { Component, ViewEncapsulation, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import { Component, ViewEncapsulation, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef, OnInit } from '@angular/core';
 
 import { WindowService } from "../../services/window.service";
 import { EventBoardService } from "../../services/event-board.service";
 import { GoogleSigninService } from "../../services/google-signin.service";
 import { DataHolderService } from "../../services/data-holder.service";
 import { StudyhubServerApisService } from '../../services/studyhub-server-apis.service';
+import { first, map } from 'rxjs/operators';
 
 @Component({
   selector: 'app-feed-page',
@@ -13,25 +14,78 @@ import { StudyhubServerApisService } from '../../services/studyhub-server-apis.s
   encapsulation: ViewEncapsulation.None,
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class FeedPageComponent implements OnDestroy {
-  visiblePostsObserver: any;
+export class FeedPageComponent implements OnInit, OnDestroy {
+  // visiblePostsObserver: any;
+  currentUserObserver;
   windowSize: any;
+  classSearchText = "";
   windowSizeObserver;
   classAndGroupObserver;
-  currentPostsGrid;
+  selectedFavorites = [];
+  recentPosts = [];
+  currentPostsGrid = [];
 
-  constructor(public EventBoard: EventBoardService, private DataHolder: DataHolderService, public WindowFrame: WindowService, private ChangeDetector: ChangeDetectorRef) {
+  constructor(public EventBoard: EventBoardService, private DataHolder: DataHolderService, public WindowFrame: WindowService, private ChangeDetector: ChangeDetectorRef, private ServerAPIs: StudyhubServerApisService) {
     this.windowSize = this.WindowFrame.getMediaQueries(null);
     this.windowSizeObserver = WindowFrame.mdWindowSize$.subscribe((sizes) => {
       this.windowSize = sizes;
     });
-    // this.classAndGroupObserver = this.DataHolder.classAndGroupState$.subscribe((classAndGroup) => { })
-    this.visiblePostsObserver = this.DataHolder.feedPostsState$.subscribe((posts) => {
-      console.log("feed posts from server", posts);
-      if (posts[0][0]) {
-        this.currentPostsGrid = posts;
+  }
+
+  ngOnInit() {
+    this.currentUserObserver = this.DataHolder.currentUserState$.subscribe((userObj: any) => {
+      if (userObj && userObj.recentlyViewed && userObj.recentlyViewed.length != 0) {
+        this.DataHolder.getRecentlyViewedPosts().then((posts) => {
+          this.recentPosts = posts.filter((post) => {
+            return (post.title && post.title.length != 0);
+          })
+          this.ChangeDetector.detectChanges();
+        }).catch(console.warn)
+      } else {
+        this.recentPosts = null;
+        this.ChangeDetector.markForCheck();
+      }
+      if (userObj && userObj.favorites && Object.keys(userObj.favorites).length !== 0) {
+        this.DataHolder.startupCompleteState$.pipe(first()).toPromise().then(() => {
+          this.DataHolder.getFeedPosts().then((postGrid) => {
+            var counter = 0
+            for (const favClass in userObj.favorites) {
+              if (userObj.favorites.hasOwnProperty(favClass)) {
+                postGrid[counter] = { className: favClass, posts: postGrid[counter].content.hits.map(this.DataHolder.convertAlgoliaHitToPost) }
+                counter++
+              }
+            }
+            console.log(postGrid);
+            this.currentPostsGrid = postGrid
+            this.ChangeDetector.detectChanges();
+          }).catch(console.warn)
+        })
+      } else {
+        console.log('startupNullcurposts')
+        this.currentPostsGrid = null;
         this.ChangeDetector.detectChanges();
       }
+      this.ChangeDetector.detectChanges();
+    });
+  }
+
+  updateSelectedFavorites(favs) {
+    console.log(favs);
+    this.selectedFavorites = favs;
+    this.ChangeDetector.detectChanges();
+  }
+
+  setFavorites() {
+    var tempFavs = {}
+    this.selectedFavorites.forEach((fav) => {
+      tempFavs[fav] = true;
+    })
+    console.log(tempFavs)
+    if (this.selectedFavorites.length !== 0) this.ServerAPIs.setFavorites(tempFavs).then((serverResponse) => {
+      console.log(serverResponse)
+      this.DataHolder.updateCurrentUserObserver({ favorites: tempFavs })
+    }).catch((e) => {
+      console.warn(e);
     })
   }
 
@@ -41,8 +95,7 @@ export class FeedPageComponent implements OnDestroy {
 
   ngOnDestroy() {
     this.windowSizeObserver.unsubscribe();
-    this.visiblePostsObserver.unsubscribe();
-    // this.classAndGroupObserver.unsubscribe()
+    this.currentUserObserver.unsubscribe();
   }
 
 }

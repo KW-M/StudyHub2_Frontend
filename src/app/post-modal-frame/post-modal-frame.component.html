@@ -1,7 +1,12 @@
 <div class="modal-container" [ngClass]="modalOpenState">
   <div class="modal-container modal-bg"></div>
   <div class="post-modal-frame mat-elevation-z10" cdkTrapFocus [@modalTransitions]="modalOpenState">
-    <app-post-edit-view *ngIf="postAction === 'edit'"  [input-post]="inputPost"></app-post-edit-view>
+    <ng-container *ngIf="postAction === 'edit' || hidden === true">
+      <app-post-edit-view [input-post]="inputPost"></app-post-edit-view>
+    </ng-container>
+    <ng-container *ngIf="postAction === 'view'">
+      <app-post-view-view [input-post]="inputPost"></app-post-view-view>
+    </ng-container>
     <!-- <button (click)="modalOpenState = modalOpenState === 'open-centered' ? 'open-docked' : 'open-centered'"></button> -->
   </div>
 </div>

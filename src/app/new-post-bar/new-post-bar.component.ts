@@ -1,4 +1,6 @@
 import { Component, OnInit, ViewEncapsulation, ChangeDetectionStrategy } from '@angular/core';
+import { ExternalApisService } from "../services/external-apis.service";
+import { EventBoardService } from '../services/event-board.service';
 
 @Component({
   selector: 'app-new-post-bar',
@@ -7,11 +9,25 @@ import { Component, OnInit, ViewEncapsulation, ChangeDetectionStrategy } from '@
   encapsulation: ViewEncapsulation.None,
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class NewPostBarComponent implements OnInit {
+export class NewPostBarComponent {
 
-  constructor() { }
+  constructor(private ExternalAPIs: ExternalApisService, private EventBoard: EventBoardService) {
 
-  ngOnInit() {
+  }
+  newPost() {
+    this.EventBoard.openPostModal({}, 'edit')
   }
 
+  openDrivePicker() {
+    this.ExternalAPIs.openDriveFilePicker().then((selectedFile) => {
+      console.log(selectedFile);
+      if (selectedFile) this.EventBoard.openPostModal(selectedFile, 'edit')
+    })
+  }
+  openUploadPicker() {
+    this.ExternalAPIs.openFileUploadPicker().then((selectedFile) => {
+      console.log(selectedFile);
+      if (selectedFile) this.EventBoard.openPostModal(selectedFile, 'edit')
+    })
+  }
 }

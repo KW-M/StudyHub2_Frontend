@@ -1,3 +1,17 @@
-<p>
-  post-card-mini works!
-</p>
+<div class="post-card-mini mat-elevation-z3" matRipple (click)="viewPost()" [ngStyle]="{'background-color':'hsl('+currentPost?.color?.h+','+currentPost?.color?.s+'%,'+currentPost?.color?.l+'%)'}">
+  <section class="post-card-mini-header" *ngIf="currentPost.link">
+    <img [src]="currentLinkPreview?.thumbnail" style="width: 100%" *ngIf="currentLinkPreview?.thumbnail">
+    <div class="post-header-overlay bottom-overlay">
+      <div class="link-chip">
+        <img [src]="currentLinkPreview?.icon || 'https://drive-thirdparty.googleusercontent.com/16/type/application/pdf'" class="link-favicon">
+        <span class="link-name">{{currentPost.attachmentName}}</span>
+      </div>
+    </div>
+  </section>
+  <section class="post-card-mini-text-content">
+    <div class="post-card-mini-title">{{currentPost.title}}</div>
+    <div class="post-card-mini-subtitle">{{currentPost.creator.name}}</div>
+    <div class="post-card-mini-body-text" *ngIf="!currentPost.link" [innerHTML]="currentPost.description"></div>
+    <button mat-button disableRipple style="position: absolute; bottom: 8px;right:8px;">MORE</button>
+  </section>
+</div>

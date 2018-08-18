@@ -1,6 +1,12 @@
+app-feed-page {
+    display: flex;
+    flex-direction: column;
+}
 
 .top-posts-text {
-    margin: -6px 0 8px 0;
+    margin: -6px 0 6px 18px;
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 18px;
 }
 
 .feed-header {
@@ -8,7 +14,7 @@
     padding-top: 16px;
     padding-bottom: 23px;
     overflow: visible;
-    background-color: rgb(147, 162, 236);
+    background-color: #424249;
 }
 
 .top-posts-container.feed-header-padding {
@@ -20,7 +26,7 @@
 }
 
 .feed-header-padding {
-    padding: 0 46px;
+    padding: 0 36px;
 }
 
 .class-preview-posts-grid-container {
@@ -35,7 +41,6 @@
     margin: 0 6px;
     min-width: 312px;
     flex: 1 1 300px;
-
     .class-preview-title {
         margin: 24px 0 -18px 12px;
         color: rgba(0, 0, 0, 0.87);
@@ -45,13 +50,32 @@
         -moz-osx-font-smoothing: grayscale;
         -webkit-font-smoothing: antialiased;
     }
-
     .class-preview-more-button {
         position: relative;
         margin: 6px;
         button {
             width: 100%;
         }
+    }
+}
+
+.no-posts-area {
+    display: flex;
+    margin: 24px;
+    padding: 12px;
+    min-height: 100px;
+    flex-direction: column;
+    flex: 1;
+    vertical-align: middle;
+    align-items: center;
+    justify-content: center;
+    p,
+    h3 {
+        margin: 2px;
+    }
+    img {
+        padding-top: 8px;
+        width: 280px;
     }
 }
 

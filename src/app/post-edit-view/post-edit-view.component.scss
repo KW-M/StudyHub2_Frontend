@@ -1,241 +1,220 @@
-.post-card-scroll-zone {
-    display: flex;
-    max-height: calc(100vh - 161px);
-    overflow-y: auto;
-    flex-direction: column;
-    flex: 1 100;
-    @media (max-width: 599px) {
-        max-height: calc(100vh - 52px);
-    }
-}
-
-.post-header-overlay * {
-    pointer-events: all;
-}
-
-// .post-card-header-condensed {
-//     height: 52px;
-//     z-index: 10;
-//     display: flex;
-//     position: absolute;
-//     top: 0;
-//     right: 0;
-//     left: 0;
-// }
-// .post-card-header-condensed .post-header-overlay {
-//     flex-direction: row;
-// }
-.post-header-middle {
-    position: absolute;
-    display: flex;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    pointer-events: none;
-    align-items: center;
-    justify-content: center;
-    button {
-        margin: -32px 6px 0 6px;
-        pointer-events: all;
-    }
-}
-
-.post-card-header .link-input {
-    position: absolute;
-    display: block;
-    padding: 0 10px 9px 10px;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    width: auto;
-    flex: 1;
-    background: rgba(255, 255, 255, 0.6);
-    mat-form-field {
-        margin: -6px 0 0 0;
-        width: 100%;
-        height: 47px;
-    }
-    mat-progress-bar {
-        position: relative;
-        margin-top: -2px;
-        margin-top: -2.5px;
-        height: 2px;
-    }
-}
-
-.post-card-labels-container {
-    position: relative;
-    display: flex;
-    height: 54px;
-    overflow: hidden;
-    flex: 0 0 auto;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.12);
-    transition: height 225ms cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.class-selector-area {
-    position: absolute;
-    padding-bottom: 40px;
-    width: 266px;
-    height: 100%;
-    box-sizing: border-box;
-    z-index: 2;
-    overflow-y: auto;
-    border-right: 1px solid rgba(0, 0, 0, 0.12);
-    background: white;
-    box-shadow: 0 3px 3px -2px rgba(0, 0, 0, 0.2), 0 3px 4px 0 rgba(0, 0, 0, 0.14), 0 1px 8px 0 rgba(0, 0, 0, 0.12);
-    transform: translateX(-280px);
-    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-    transition-duration: 220ms;
-    transition-property: transform;
-}
-
-.class-selector-backdrop {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    z-index: 1;
-    background: rgb(0, 0, 0);
-    opacity: 0;
-    transition-timing-function: ease-in-out; //cubic-bezier(0.25, 0.8, 0.25, 1);
-    transition-duration: 300ms;
-    transition-property: opacity;
-    pointer-events: none;
-}
-
-.class-catagory-header {
-    height: 49px;
-    border-top: 1px solid rgba(0, 0, 0, 0.12);
-}
-
-.label-selector-area {
-    padding: 4px;
-    width: 100%;
-    box-sizing: border-box;
-    overflow: scroll;
-    mat-chip:not(.mat-basic-chip) {
-        margin: 4px !important;
-        white-space: nowrap;
-        cursor: pointer;
-    }
-    mat-chip.mat-chip-selected {
-        order: -2;
-    }
-}
-
-.class-label-search-area {
-    position: absolute;
-    top: 189px;
-    left: 3px;
-    right: 96px;
-    height: 40px;
-    z-index: 6;
-    overflow: hidden;
-    border-radius: 8px 24px 24px 6px;
-    background: white;
-    box-shadow: 0 6px 10px 1px rgba(0, 0, 0, 0.2), 0 6px 10px 1px rgba(0, 0, 0, 0.14), 0 1px 18px 0 rgba(0, 0, 0, 0.12);
-    mat-icon {
-        padding: 8px;
-        color: #757575;
-        pointer-events: none;
-    }
-    button.dense-button {
+.post-view-scroll-zone {
+    .post-header-middle {
         position: absolute;
-        padding: 0 18px;
-        top: 4px;
-        right: 4px;
-        border-radius: 20px;
-        background: white; //margin: 4px 0px 4px 4px;
-        line-height: 32px; //vertical-align: top;
-    }
-    input {
-        position: absolute;
-        padding-left: 40px;
+        display: flex;
         top: 0;
         left: 0;
+        right: 0;
         bottom: 0;
-        width: 100%;
-        box-sizing: border-box;
-        z-index: -1;
-        outline: none;
-        border: none; // border-radius: 0 0 36px 36px;
-        background-color: white; // #e0e0e0;
-        font-size: 16px;
+        pointer-events: none;
+        align-items: center;
+        justify-content: center;
+        button {
+            margin: -32px 6px 0 6px;
+            pointer-events: all;
+        }
     }
-}
-
-.expand-button-container {
-    position: absolute;
-    top: 0;
-    right: 0;
-    width: 52px;
-    height: 54px;
-    z-index: 3;
-    border-radius: 30px 0 0 30px;
-    background: white;
-    transition: transform 225ms cubic-bezier(0.4, 0, 0.2, 1); //transition: border-radius 225ms cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.expand-button {
-    margin: 7px;
-    transform: none;
-    transition: transform 225ms cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.class-expand-button {
-    order: -4;
-    button {
-        padding: 0 7px 0 9px;
+    .post-header .link-input {
+        position: absolute;
+        display: block;
+        padding: 0 10px 9px 10px;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        width: auto;
+        flex: 1;
+        background: rgba(255, 255, 255, 0.6);
+        mat-form-field {
+            margin: -6px 0 0 0;
+            width: 100%;
+            height: 47px;
+        }
+        mat-progress-bar {
+            position: relative;
+            margin-top: -2px;
+            margin-top: -2.5px;
+            height: 2px;
+        }
     }
-}
-
-.post-card-labels-container.expanded {
-    height: 232px;
-    .expand-button-container {
-        display: none;
-        transform: translateX(60px); //border-radius: 0 0 30px 30px;
+    .post-edit-labels-container {
+        position: relative;
+        display: flex;
+        height: 54px;
+        overflow: hidden;
+        flex: 0 0 auto;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+        transition: height 225ms cubic-bezier(0.4, 0, 0.2, 1);
     }
-    .expand-button {
-        // transform: rotate(180deg);
-    }
-    .label-selector-area {
-        padding-bottom: 40px;
-    }
-}
-
-.post-card-labels-container.class-chooser-expanded {
     .class-selector-area {
-        transform: translateX(0px);
+        position: absolute;
+        padding-bottom: 40px;
+        width: 266px;
+        height: 100%;
+        box-sizing: border-box;
+        z-index: 2;
+        overflow-y: auto;
+        border-right: 1px solid rgba(0, 0, 0, 0.12);
+        background: white;
+        box-shadow: 0 3px 3px -2px rgba(0, 0, 0, 0.2), 0 3px 4px 0 rgba(0, 0, 0, 0.14), 0 1px 8px 0 rgba(0, 0, 0, 0.12);
+        transform: translateX(-280px);
+        transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+        transition-duration: 220ms;
+        transition-property: transform;
     }
     .class-selector-backdrop {
-        opacity: 0.6;
-        pointer-events: all;
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 1;
+        background: rgb(0, 0, 0);
+        opacity: 0;
+        transition-timing-function: ease-in-out; //cubic-bezier(0.25, 0.8, 0.25, 1);
+        transition-duration: 300ms;
+        transition-property: opacity;
+        pointer-events: none;
+    }
+    .class-category-header {
+        height: 49px;
+        border-top: 1px solid rgba(0, 0, 0, 0.12);
     }
     .label-selector-area {
-        margin-left: 200px;
+        padding: 4px;
+        width: 100%;
+        box-sizing: border-box;
+        overflow: scroll;
     }
-}
-
-.post-card-title {
-    margin-bottom: 16px;
-}
-
-.post-card-body-text {
-    user-select: all;
-    user-select: text;
-}
-
-.post-card-body-text:empty:before {
-    left: 20px;
-    color: #757575;
-    content: 'Say something';
-    font-size: small;
-    font-family: 'Roboto Slab', 'Roboto', 'Helvetica' sans-serif;
-    line-height: 15px;
-    user-select: none;
+    .class-label-search-area {
+        position: absolute;
+        top: 189px;
+        left: 3px;
+        right: 4px;
+        height: 40px;
+        z-index: 6;
+        overflow: hidden;
+        border-radius: 8px 8px 6px 6px;
+        background: white;
+        box-shadow: 0 6px 10px 1px rgba(0, 0, 0, 0.2), 0 6px 10px 1px rgba(0, 0, 0, 0.14), 0 1px 18px 0 rgba(0, 0, 0, 0.12);
+        mat-icon {
+            padding: 8px;
+            color: #757575;
+            pointer-events: none;
+        }
+        button.dense-button {
+            position: absolute;
+            padding: 0 18px;
+            top: 4px;
+            right: 4px;
+            border-radius: 20px;
+            background: white; //margin: 4px 0px 4px 4px;
+            line-height: 32px; //vertical-align: top;
+        }
+        input {
+            position: absolute;
+            padding-left: 40px;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            width: 100%;
+            height: 100%;
+            box-sizing: border-box;
+            z-index: -1;
+            outline: none;
+            border: none; // border-radius: 0 0 36px 36px;
+            background-color: white; // #e0e0e0;
+            font-size: 16px;
+        }
+    }
+    .expand-button-container {
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 52px;
+        height: 54px;
+        z-index: 3;
+        border-radius: 30px 0 0 30px;
+        background: white;
+        transition: transform 225ms cubic-bezier(0.4, 0, 0.2, 1); //transition: border-radius 225ms cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .expand-button {
+        margin: 7px;
+        transform: none;
+        transition: transform 225ms cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    #class_expand_button {
+        padding: 0 7px 0 9px;
+        min-width: 0;
+        max-width: 100%;
+        flex: none;
+        white-space: normal;
+    }
+    .post-edit-labels-container.expanded {
+        height: 232px;
+        .expand-button-container {
+            display: none;
+            transform: translateX(60px); //border-radius: 0 0 30px 30px;
+        }
+        // .expand-button {
+        //     // transform: rotate(180deg);
+        // }
+        .label-selector-area {
+            padding-bottom: 40px;
+        }
+    }
+    .post-edit-labels-container.class-chooser-expanded {
+        .class-selector-area {
+            transform: translateX(0px);
+        }
+        .class-selector-backdrop {
+            opacity: 0.6;
+            pointer-events: all;
+        }
+        .label-selector-area {
+            margin-left: 200px;
+        }
+    }
+    .post-body-text:empty:before {
+        left: 20px;
+        color: #757575;
+        content: 'Say something';
+        font-size: small;
+        font-family: 'Roboto Slab', 'Roboto', 'Helvetica' sans-serif;
+        line-height: 15px;
+        user-select: none;
+    }
+    .post-chip-list {
+        padding: 4px 8px;
+        width: 100%;
+        height: 100%;
+        box-sizing: border-box;
+        .mat-chip:not(.mat-chip-selected) {
+            box-shadow: unset;
+        }
+        .mat-chip:not(.mat-chip-selected):hover {
+            box-shadow: 0 3px 3px -2px rgba(0, 0, 0, 0.2), 0 3px 4px 0 rgba(0, 0, 0, 0.14), 0 1px 8px 0 rgba(0, 0, 0, 0.12);
+        }
+        .mat-chip {
+            box-shadow: 0 3px 3px -2px rgba(0, 0, 0, 0.2), 0 3px 4px 0 rgba(0, 0, 0, 0.14), 0 1px 8px 0 rgba(0, 0, 0, 0.12);
+            .mat-chip-remove {
+                margin-right: -4px;
+                margin-left: 6px;
+                width: 1em;
+                height: 1em;
+                color: white;
+                opacity: 0.4;
+                cursor: pointer;
+            }
+        }
+    }
+    .post-edit-labels-container.expanded .post-chip-list {
+        margin-bottom: 40px;
+        height: auto;
+        overflow-x: hidden;
+        overflow-y: scroll;
+        flex-wrap: wrap;
+        align-items: flex-start;
+    }
 }
 
 button.dense-button {
@@ -260,21 +239,12 @@ button.formatting-button:hover {
     color: black;
 }
 
-.formatting-divider {
-    margin: 0 6px;
-    width: 1px;
-    height: 28px;
-    background-color: rgba(0, 0, 0, 0.1);
-}
-
-.post-card-labels-container .mat-chip-list-wrapper {
-    height: 100%;
-    white-space: nowrap;
-    align-items: center;
-    flex-wrap: nowrap;
-}
-
-.post-card-labels-container.expanded .mat-chip-list-wrapper {
-    height: auto;
-    flex-wrap: wrap;
+.overlay-spinner{
+    position: absolute;
+    margin: auto;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 30;
 }

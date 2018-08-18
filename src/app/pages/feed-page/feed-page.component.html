@@ -1,22 +1,50 @@
-<div class="feed-header">
+<div class="feed-header" *ngIf="recentPosts !== null">
   <div class="top-posts-text feed-header-padding">
-    Top Posts
+    Quick Access
   </div>
+  <mat-progress-spinner mode="indeterminate" style="margin:auto" color="accent" diameter="36" *ngIf=" recentPosts && recentPosts.length === 0"></mat-progress-spinner>
   <div class="top-posts-container feed-header-padding">
-    <!-- <app-post-card-mini *ngFor="let post of allPosts;" [input-post]="post"></app-post-card-mini> -->
+    <app-post-card-mini *ngFor="let post of recentPosts" [input-post]="post"></app-post-card-mini>
   </div>
 </div>
 <app-new-post-bar></app-new-post-bar>
-<div class="class-preview-posts-grid-container">
-  <div class="class-preview-posts" *ngFor="let classBlock of currentPostsGrid; let i = index">
-    <span class="class-preview-title">Class Name {{i}}</span>
-    <app-post-card *ngFor="let post of classBlock" [input-post]="post"></app-post-card>
+<div class="posts-grid-container">
+  <div class="posts-grid-column" *ngFor="let classBlock of currentPostsGrid; let i = index">
+    <span class="class-preview-title">{{classBlock.className}}</span>
+    <app-post-card *ngFor="let post of classBlock.posts" [input-post]="post"></app-post-card>
+    <h4 *ngIf="classBlock.posts.length === 0" style="width: 100%;text-align: center">No posts for this class yet.
+      <br>Add one!</h4>
     <div class="class-preview-more-button">
-      <button color="accent" mat-button>MORE</button>
+      <button color="accent" mat-button [routerLink]="'/'+classBlock.className" *ngIf="classBlock.posts.length === 4">MORE</button>
     </div>
   </div>
   <!-- spacer grid items at the end keep the other grid items equal width trackBy:trackByPostIdFn -->
-  <div class="class-preview-posts"></div>
-  <div class="class-preview-posts"></div>
-  <div class="class-preview-posts"></div>
+  <div class="posts-grid-column"></div>
+  <div class="posts-grid-column"></div>
+  <div class="posts-grid-column"></div>
+</div>
+<div class="no-posts-area">
+  <ng-container *ngIf="currentPostsGrid && currentPostsGrid.length === 0">
+    <mat-progress-spinner mode="indeterminate" color="accent" diameter="36"></mat-progress-spinner>
+  </ng-container>
+  <ng-container *ngIf="currentPostsGrid === null">
+    <h3 style="margin:2px">To get started,</h3>
+    <p style="margin:2px">Choose which classes show up in your feed.</p>
+    <div style="margin:8px">
+      <button mat-button style="background-color: rgba(0,0,0,.12);white-space: normal" [matMenuTriggerFor]="favMenu">{{selectedFavorites.length === 0 ? 'Favorite Classes': selectedFavorites.join(', ')}}
+        <mat-icon style="font-size: 24px">arrow_drop_down</mat-icon>
+      </button>
+      <button mat-button color="accent" (click)="setFavorites()">Done</button>
+    </div>
+    <mat-menu #favMenu="matMenu" overlapTrigger="false" (closed)="classSearchText = ''" class="search-class-filter-menu">
+      <app-class-selector (click)="$event.stopPropagation()" (selection-change)="updateSelectedFavorites($event)" [filter-search]="classSearchText"
+        style="max-height: 50vh;width:100%;display: block;overflow:auto"></app-class-selector>
+      <div>
+        <input [(ngModel)]="classSearchText" (click)="$event.stopPropagation()" placeholder="Search Classes" style="width: 100%; font-size:16px; padding: 16px;box-sizing: border-box;border:none"
+          class="mat-elevation-z3">
+        <mat-icon *ngIf="classSearchText !== ''" style="padding: 16px;background:white; cursor:pointer;font-size: 18px;height: 18px;width: 18px;color:black;opacity:0.6;position: absolute;right: 0;bottom: 0;"
+          (click)="$event.stopPropagation();classSearchText = ''">cancel</mat-icon>
+      </div>
+    </mat-menu>
+  </ng-container>
 </div>

@@ -7,9 +7,7 @@
       "resources": {
         "files": [
           "/favicon.ico",
-          "/index.html"
-        ],
-        "versionedFiles": [
+          "/index.html",
           "/*.bundle.css",
           "/*.bundle.js",
           "/*.chunk.js"
@@ -57,7 +55,7 @@
       "cacheConfig": {
         "strategy": "performance",
         "maxSize": 6,
-        "maxAge": "30d",
+        "maxAge": "20d",
         "timeout": "2s"
       }
     }

@@ -61,7 +61,7 @@ export class GoogleSigninService {
             // Build Firebase credential with the Google ID token.
             var credential = firebase.auth.GoogleAuthProvider.credential(this.getGUserToken());
             // Sign in with credential from the Google user.
-            firebase.auth().signInWithCredential(credential).catch(function (error) {
+            firebase.auth().signInAndRetrieveDataWithCredential(credential).catch(function (error) {
               console.warn(error);
             });
           } else {
@@ -94,7 +94,12 @@ export class GoogleSigninService {
   }
 
   handleSignInClick() {
-    gapi.auth2.getAuthInstance().signIn();
+    gapi.auth2.getAuthInstance().signIn({
+      prompt: "select_account",
+    }).then(function (output) { console.log("signin triggered: ", output) });
+    setTimeout(() => {
+      console.log(gapi.auth2.getAuthInstance(), gapi.auth2.getAuthInstance().currentUser.get())
+    }, 16000)
     // Ideally the button should only show up after gapi.client.init finishes, so that this handler won't be called before OAuth is initialized.
   }
 
@@ -105,6 +110,7 @@ export class GoogleSigninService {
       logout.setAttribute("src", "https://mail.google.com/mail/u/0/?logout&hl=en");
       logout.style.display = "none";
       var logoutImg = document.body.appendChild(logout);
+      window.location.reload();
     });
 
   }

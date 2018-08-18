@@ -37,6 +37,10 @@
         <mat-icon>delete</mat-icon>
         <span>Delete</span>
       </button>
+      <button mat-menu-item (click)="copyPostURL(currentPost)">
+        <mat-icon>link</mat-icon>
+        <span>Get Link</span>
+      </button>
       <button mat-menu-item (click)="debugPost(currentPost)">
         <mat-icon>bug_report</mat-icon>
         <span>Debug</span>

@@ -69,13 +69,14 @@ export class PostEditViewComponent implements OnInit, OnDestroy {
       },
       "attachmentName": null,
       "flagged": false,
-      "creationDate": new Date(),
-      "updateDate": new Date(),
+      "creationDate": new Date().getTime(),
+      "updateDate": new Date().getTime(),
     }
     let backupPost = window.localStorage.getItem("postDraftBackup")
+    var backupPostObj = JSON.parse(backupPost)
+    console.log(backupPost)
     let snackBarAction = null
-    if (backupPost && !this.currentPost.id) {
-      let backupPostObj = JSON.parse(backupPost);
+    if (backupPost && this.currentPost.id == backupPostObj.id) {
       let snackBar = this.snackBar.open('Unsaved Draft Found', 'Restore', {
         duration: 8000,
         horizontalPosition: "center"
@@ -84,7 +85,7 @@ export class PostEditViewComponent implements OnInit, OnDestroy {
       snackBar.afterDismissed().toPromise().then((action) => {
         snackBarAction = action;
         if (action.dismissedByAction === true) {
-          this.currentPost = JSON.parse(backupPost);
+          this.currentPost = backupPostObj;
           this.onLinkInput(this.currentPost.link)
           this.ChangeDetector.detectChanges();
         }
@@ -93,7 +94,7 @@ export class PostEditViewComponent implements OnInit, OnDestroy {
     this.backupSetIntervalRef = setInterval(() => {
       this.currentPost.description = this.descriptionElm.nativeElement.innerHTML;
       console.log(this.currentPost);
-      if ((!this.currentSnackBarRef || snackBarAction) && !this.currentPost.id && (this.currentPost.title || this.currentPost.description || this.currentPost.link)) window.localStorage.setItem("postDraftBackup", JSON.stringify(this.currentPost));
+      if (!this.submitting && (!this.currentSnackBarRef || snackBarAction) && (this.currentPost.title || this.currentPost.description || this.currentPost.link)) window.localStorage.setItem("postDraftBackup", JSON.stringify(this.currentPost));
     }, 25000)
   }
 
@@ -246,6 +247,7 @@ export class PostEditViewComponent implements OnInit, OnDestroy {
         }
         tempLabels = undefined
         console.log("submitting post: ", tempPost)
+        tempPost._highlightResult = undefined;
         this.ServerAPIs.submitPost(tempPost).then((response: any) => {
           console.log(response);
           window.localStorage.removeItem("postDraftBackup")
@@ -284,6 +286,8 @@ export class PostEditViewComponent implements OnInit, OnDestroy {
   }
 
   closeModal() {
+    this.currentPost.description = this.descriptionElm.nativeElement.innerHTML;
+    if (!this.submitting && (!this.currentSnackBarRef) && (this.currentPost.title || this.currentPost.description || this.currentPost.link)) window.localStorage.setItem("postDraftBackup", JSON.stringify(this.currentPost));
     this.EventBoard.closePostModal()
   }
 

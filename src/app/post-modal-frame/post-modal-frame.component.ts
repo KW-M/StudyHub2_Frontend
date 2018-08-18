@@ -69,8 +69,8 @@ export class PostModalFrameComponent {
           },
           "attachmentName": null,
           "flagged": false,
-          "creationDate": new Date(),
-          "updateDate": new Date(),
+          "creationDate": new Date().getTime(),
+          "updateDate": new Date().getTime(),
         }, inputPostObj.postObj || {});
         this.postAction = inputPostObj.action;
         this.hidden = false;

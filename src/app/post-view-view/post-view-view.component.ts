@@ -51,8 +51,8 @@ export class PostViewViewComponent implements OnInit, OnDestroy {
       },
       "attachmentName": null,
       "flagged": false,
-      "creationDate": new Date(),
-      "updateDate": new Date(),
+      "creationDate": new Date().getTime(),
+      "updateDate": new Date().getTime(),
     }
     this.signedinUserObserver = this.DataHolder.currentUserState$.subscribe((userObj) => {
       this.signedinUser = userObj;

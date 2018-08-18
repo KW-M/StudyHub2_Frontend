@@ -55,6 +55,8 @@ exports.reRankPosts = functions.https.onCall((data, context) => {
         }).catch((error) => {
             console.warn("Error retrieving lastReRankDate: ", error);
         })
+        var postCountDoc = firebaseAdmin.firestore().collection('users').doc('ygtkmJxeXP7vsG0NWbqp');
+        postCountDoc.update({ data: { title: "postCount: 3" } })
     }
 });
 

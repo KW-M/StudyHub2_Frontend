@@ -58,7 +58,21 @@ export class DataHolderService {
         private Router: Router,
         public snackBar: MatSnackBar) {
         //constructor functions
-
+        (<any>window).getMissingSyncPosts = (name) => {
+            var idList = this.currentPosts.map((post) => { return post.id })
+            console.log(idList);
+            this.ServerAPIs.getPostsFromIds(idList).then((list) => {
+                var templist = []
+                list.forEach((value, index) => {
+                    if (value.title === undefined) {
+                        templist.push({ wrongId: idList[index], name: this.currentPosts[index].title, post: this.currentPosts[index] });
+                        (<any>window).getPost(this.currentPosts[index].title)
+                    }
+                })
+                console.log(templist)
+                console.log()
+            });
+        }
         FirebaseAuth.authState.subscribe((signedIn) => {
             if (signedIn != null && signedIn.email) {
                 this.ServerAPIs.getUserFromServer(signedIn.email).then((userObj) => {
@@ -287,6 +301,17 @@ export class DataHolderService {
             }
         }
         return output;
+    }
+    copyString(string) {
+        var copyText: any = document.getElementById("clipboard_copy_area");
+        copyText.value = string;
+        copyText.select();
+        document.execCommand("copy");
+        copyText.textContent;
+        this.snackBar.open("Copied to clipboard", null, {
+            duration: 1000,
+            horizontalPosition: "start"
+        })
     }
     arrayToObj(input, preserveOrder) {
         var output = {}

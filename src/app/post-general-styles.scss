@@ -243,6 +243,7 @@ section.post-header {
     align-content: flex-start;
     align-items: center;
     mat-chip.mat-chip {
+        position: relative;
         display: inline-flex;
         margin: 3px 4px;
         padding: 7px 12px;

@@ -18,7 +18,23 @@ export class StudyhubServerApisService {
     private FireDB: AngularFireDatabase,
     private FireAuth: AngularFireAuth,
     private FireStore: AngularFirestore) {
-    FireStore.firestore.app.firestore().settings({ timestampsInSnapshots: true });
+    //FireStore.firestore.app.firestore().settings({ timestampsInSnapshots: true });
+    (<any>window).getPostByTitle = (name) => {
+      console.log(name)
+      return this.FireStore.collection("posts", (ref) => {
+        let query: firebase.firestore.CollectionReference | firebase.firestore.Query = ref;
+        query = query.where("title", "==", name)
+        return query.limit(2);
+      }).snapshotChanges().pipe(map(actions => {
+        console.log(actions);
+        return actions.map((changeSnapshot) => {
+          const data: any = changeSnapshot.payload.doc.data();
+          data.id = changeSnapshot.payload.doc.id;
+          console.log(data, changeSnapshot);
+          return data
+        });
+      })).subscribe()
+    }
   }
 
   getUserFromServer(email) {
@@ -81,8 +97,8 @@ export class StudyhubServerApisService {
       return actions.map((changeSnapshot) => {
         const data: any = changeSnapshot.payload.doc.data();
         data.id = changeSnapshot.payload.doc.id;
-        data.updateDate = data.updateDate.toDate();
-        data.creationDate = data.creationDate.toDate();
+        data.updateDate = new Date(data.updateDate);
+        data.creationDate = new Date(data.creationDate);
         console.log(data, changeSnapshot);
         return data
       })
@@ -104,12 +120,12 @@ export class StudyhubServerApisService {
       return actions.map((changeSnapshot) => {
         const data: any = changeSnapshot.payload.doc.data();
         data.id = changeSnapshot.payload.doc.id;
-        data.updateDate = data.updateDate.toDate();
-        data.creationDate = data.creationDate.toDate();
+        data.updateDate = new Date(data.updateDate);
+        data.creationDate = new Date(data.creationDate);
         console.log(data, changeSnapshot);
         return data
       });
-    }))
+    }));
   }
 
   getUserBookmarks(email) {
@@ -136,8 +152,9 @@ export class StudyhubServerApisService {
         const data: any = changeSnapshot.payload.data();
         if (data) {
           data.id = changeSnapshot.payload.id;
-          data.updateDate = data.updateDate.toDate();
-          data.creationDate = data.creationDate.toDate();
+          console.log(data.updateDate)
+          data.updateDate = new Date(data.updateDate);
+          data.creationDate = new Date(data.creationDate);
           console.log(data, changeSnapshot);
         }
         return data || {}
@@ -175,12 +192,12 @@ export class StudyhubServerApisService {
     var convertedPost: any = {}
     convertedPost = Object.assign({}, postObj);
     delete convertedPost.id;
-    convertedPost.updateDate = firebase.firestore.FieldValue.serverTimestamp()
+    convertedPost.updateDate = new Date().getTime()
     console.log(convertedPost);
     if (postObj.id) {
       return this.FireStore.collection('posts').doc(postObj.id).set(convertedPost) as any;
     } else {
-      convertedPost.creationDate = firebase.firestore.FieldValue.serverTimestamp()
+      convertedPost.creationDate = new Date().getTime()
       return this.FireStore.collection('posts').add(convertedPost)
     }
   }

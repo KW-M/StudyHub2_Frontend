@@ -41,8 +41,8 @@ export class PostCardMiniComponent implements OnInit, OnDestroy {
         "name": null,
       },
       "flagged": false,
-      "creationDate": new Date(),
-      "updateDate": new Date(),
+      "creationDate": new Date().getTime(),
+      "updateDate": new Date().getTime(),
     }, this.inputPost);
     this.currentPost['color'] = this.dataHolder.getClassObj(this.currentPost.classes[0]).color;
     if (this.currentPost.link) this.ExternalAPIs.getPreview(this.currentPost.link).then((websitePreview) => {

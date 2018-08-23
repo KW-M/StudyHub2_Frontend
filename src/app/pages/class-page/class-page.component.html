@@ -30,11 +30,22 @@
     <mat-progress-spinner mode="indeterminate" color="accent" diameter="36"></mat-progress-spinner>
   </ng-container>
   <ng-container *ngIf="postResult?.totalPages !== 0 && postResult?.totalPages === postResult?.page + 1">
-    <h3>That's all folks.</h3>
+    <h3>But wait, there's more!</h3>
+    <p>Search
+      <a (click)="openQuizlet()">York Quizlet</a> with over 2000 more York-Made flashcard sets!</p>
+    <a (click)="openQuizlet()">
+      <img src="/assets/York Quizlet.png">
+      <mat-icon>launch</mat-icon>
+    </a>
   </ng-container>
   <ng-container *ngIf="postResult?.totalPages === 0">
     <h3>It's so lonely here</h3>
-    <p>Be the first to post.</p>
     <img src="assets/Lonely Island.png">
+    <p style="font-weight: bold">Be the first to contribute. 😀
+      <!-- <span style="    transform: translateY(3px) translateX(3px);display: inline-block;font-size: 30px;">✎</span> -->
+    </p>
+    <p>OR</p>
+    <p>Search
+      <a (click)="openQuizlet()">York Quizlet</a> with over 2000 more York-Made flashcard sets!</p>
   </ng-container>
 </div>

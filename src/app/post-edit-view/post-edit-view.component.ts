@@ -1,7 +1,6 @@
 import { Component, ViewEncapsulation, Input, ViewChild, ViewChildren, ElementRef, ChangeDetectionStrategy, ChangeDetectorRef, OnDestroy, OnInit } from '@angular/core';
 import { MatSnackBar } from '@angular/material';
 
-import { WindowService } from "../services/window.service";
 import { EventBoardService } from "../services/event-board.service";
 import { DataHolderService } from "../services/data-holder.service";
 import { ExternalApisService } from "../services/external-apis.service";
@@ -247,7 +246,7 @@ export class PostEditViewComponent implements OnInit, OnDestroy {
         }
         tempLabels = undefined
         console.log("submitting post: ", tempPost)
-        tempPost._highlightResult = undefined;
+        delete tempPost._highlightResult;
         this.ServerAPIs.submitPost(tempPost).then((response: any) => {
           console.log(response);
           window.localStorage.removeItem("postDraftBackup")

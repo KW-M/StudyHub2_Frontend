@@ -1,10 +1,7 @@
 import { Component, OnInit, ElementRef, ViewEncapsulation, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { trigger, state, style, animate, transition, query } from '@angular/animations';
 
-import { WindowService } from "../services/window.service";
 import { EventBoardService } from "../services/event-board.service";
-import { GoogleSigninService } from "../services/google-signin.service";
-import { ExternalApisService } from "../services/external-apis.service";
 
 
 @Component({

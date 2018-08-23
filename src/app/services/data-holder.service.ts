@@ -1,12 +1,11 @@
-import { Injectable, OnInit, Output } from "@angular/core";
-import { Router, NavigationEnd, ActivatedRoute, RouterState } from '@angular/router';
-import { ReplaySubject, Observable } from 'rxjs';
+import { Injectable } from "@angular/core";
+import { Router, NavigationEnd } from '@angular/router';
+import { ReplaySubject } from 'rxjs';
 import { EventBoardService } from "../services/event-board.service";
 import { GoogleSigninService } from "../services/google-signin.service";
 import { ExternalApisService } from "../services/external-apis.service";
 import { StudyhubServerApisService } from '../services/studyhub-server-apis.service';
 import { AngularFireAuth } from "angularfire2/auth";
-import * as firebase from 'firebase/app';
 import { MatSnackBar } from "@angular/material";
 import { AlgoliaApisService } from "./algolia-apis.service";
 import { filter, first } from "rxjs/operators";
@@ -109,7 +108,9 @@ export class DataHolderService {
                     /// 86400000 is the number of miliseconds in a day.
                     //if ((new Date().getTime() - startupInfo.lastReRankDate) > 86400000) ServerAPIs.runReRankCloudFunction()
                 })
-                this.ServerAPIs.getQuizletUsername(signedIn.displayName).then((username) => { this.quizletUsername = username; })
+                this.ServerAPIs.getQuizletUsername(signedIn.displayName).then((username) => {
+                    this.quizletUsername = username;
+                })
             } else {
                 console.log('Fire Not Signed In');
                 this.signedinUser = null;
@@ -137,28 +138,33 @@ export class DataHolderService {
                 page: searchResult.page,
                 totalPages: searchResult.nbPages,
             }
-            this.visiblePostsStateSource.next({
-                posts: this.currentPosts,
-                page: searchResult.page,
-                totalPages: searchResult.nbPages,
-                facets: {
-                    creators: searchResult.getFacetValues('creator.name') || [],
-                    labels: searchResult.getFacetValues('labels') || []
+            console.log(searchResult.getFacetValues('labels'))
+            setTimeout(() => {
+                this.visiblePostsStateSource.next({
+                    posts: this.currentPosts,
+                    page: searchResult.page,
+                    totalPages: searchResult.nbPages,
+                    facets: {
+                        creators: searchResult.getFacetValues('creator.name') || [],
+                        labels: searchResult.getFacetValues('labels') || []
+                    }
+                })
+                if (searchResult.page < searchResult.nbPages - 1 && window.document.body.scrollHeight === window.document.body.clientHeight) {
+                    this.loadingPosts = true;
+                    this.AlgoliaApis.searchHelper.nextPage()
+                    this.AlgoliaApis.runSearch()
                 }
-            })
-            if (searchResult.page < searchResult.nbPages - 1 && window.document.body.scrollHeight === window.document.body.clientHeight) {
-                this.loadingPosts = true;
-                this.AlgoliaApis.searchHelper.nextPage()
-                this.AlgoliaApis.runSearch()
-            }
+            }, 100);
         }
 
         Router.events.pipe(filter(event => event instanceof NavigationEnd)).subscribe((newRoute) => {
             this.startupCompleteState$.pipe(first()).toPromise().then(() => {
                 this.currentPage = this.Router.routerState.snapshot.root.firstChild.url[0].path;
+                console.log(this.currentPage)
                 if (this.currentPage && this.signedinUser) this.updateVisiblePosts();
                 console.log(this.Router.routerState.snapshot.root)
                 if (this.Router.routerState.snapshot.root.fragment) {
+                    console.log(this.Router.routerState.snapshot.root.fragment);
                     this.ServerAPIs.getPostsFromIds([this.Router.routerState.snapshot.root.fragment]).then((posts) => {
                         console.log(posts);
                         this.EventBoard.openPostModal(posts[0], 'view')
@@ -181,6 +187,7 @@ export class DataHolderService {
             }
         }
     }
+
 
 
     updateVisiblePosts() {
@@ -319,5 +326,9 @@ export class DataHolderService {
             output[input[arrayIndex]] = preserveOrder ? arrayIndex : true;
         }
         return output;
+    }
+
+    routerGoToPage(page) {
+        this.Router.navigate(["/" + page]);
     }
 }

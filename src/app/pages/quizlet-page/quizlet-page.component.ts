@@ -1,4 +1,4 @@
-import { Component, ViewEncapsulation, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef, ViewChild, ElementRef } from '@angular/core';
+import { Component, ViewEncapsulation, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { ExternalApisService } from '../../services/external-apis.service';
 import { StudyhubServerApisService } from '../../services/studyhub-server-apis.service';
 import { DataHolderService } from '../../services/data-holder.service';
@@ -27,6 +27,7 @@ export class QuizletPageComponent implements OnDestroy {
       this.DataHolder.currentUserState$.pipe(first()).toPromise().then((userObj) => {
         setTimeout(() => {
           this.quizletUsername = this.DataHolder.quizletUsername;
+
           this.ChangeDetector.detectChanges()
         }, 1200)
       })
@@ -49,11 +50,20 @@ export class QuizletPageComponent implements OnDestroy {
   }
 
   onSubmit(username) {
-    if (window.confirm("Is " + username + " your York Quizlet account?")) console.log('submittedUserName', username)
-    this.ServerAPIs.setQuizletUsername(username).then(() => {
-      this.quizletUsername = username
-      this.ChangeDetector.detectChanges()
-    })
+    if (window.confirm("Is " + username + " your York Quizlet account?")) {
+      console.log('submittedUserName', username)
+      this.ServerAPIs.setQuizletUsername(username).then(() => {
+        this.quizletUsername = username
+        this.ChangeDetector.detectChanges()
+      })
+      this.openQuizlet()
+    }
+  }
+
+  deleteUsername() {
+    if (window.confirm("Are you sure? York Quizlet is helpful because students like you keep sharing their flashcards.")) this.ServerAPIs.setQuizletUsername("").then((() => {
+      alert("Sharing Paused.")
+    }))
   }
 
   openQuizlet() {

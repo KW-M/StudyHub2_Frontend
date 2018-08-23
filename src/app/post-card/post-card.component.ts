@@ -97,7 +97,7 @@ export class PostCardComponent implements OnInit, OnDestroy {
   }
 
   copyPostURL(currentPost) {
-    this.dataHolder.copyString('https://studyhub.york.org/#' + currentPost.id)
+    this.dataHolder.copyString('https://studyhub.york.org/Feed#' + currentPost.id)
   }
 
   editPost(post) {

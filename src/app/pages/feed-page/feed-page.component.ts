@@ -2,10 +2,9 @@ import { Component, ViewEncapsulation, OnDestroy, ChangeDetectionStrategy, Chang
 
 import { WindowService } from "../../services/window.service";
 import { EventBoardService } from "../../services/event-board.service";
-import { GoogleSigninService } from "../../services/google-signin.service";
 import { DataHolderService } from "../../services/data-holder.service";
 import { StudyhubServerApisService } from '../../services/studyhub-server-apis.service';
-import { first, map } from 'rxjs/operators';
+import { first } from 'rxjs/operators';
 
 @Component({
   selector: 'app-feed-page',
@@ -43,7 +42,7 @@ export class FeedPageComponent implements OnInit, OnDestroy {
         }).catch(console.warn)
       } else {
         this.recentPosts = null;
-        this.ChangeDetector.markForCheck();
+        this.ChangeDetector.detectChanges();
       }
       if (userObj && userObj.favorites && Object.keys(userObj.favorites).length !== 0) {
         this.DataHolder.startupCompleteState$.pipe(first()).toPromise().then(() => {

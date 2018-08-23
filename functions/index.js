@@ -14,6 +14,11 @@ firebaseAdmin.initializeApp({
     databaseURL: "https://studyhub-2.firebaseio.com"
 });
 
+const firestore = firebaseAdmin.firestore()
+firestore.settings({ timestampsInSnapshots: true })
+// request library for easy http requests
+const request = require('request');
+
 // Updates the search index when new posts are created or updated.
 exports.searchIndexEntry = functions.firestore.document('posts/{postId}').onWrite((change, context) => {
     const index = searchClient.initIndex('Posts');
@@ -30,13 +35,16 @@ exports.searchIndexEntry = functions.firestore.document('posts/{postId}').onWrit
     return 'done'
 });
 
-exports.reRankPosts = functions.https.onCall((data, context) => {
-    if (context.auth.token.email.indexOf("@york.org") !== -1) {
-        firebaseAdmin.database().ref('/startupInfo/lastReRankDate').once('value').then((snapshot) => {
-            if (snapshot.val() && (new Date().getTime() - snapshot.val()) > 86000000) {
-                var tempList = []
-                firebaseAdmin.firestore().collection("posts").where("flagged", "==", false).get().then((querySnapshot) => {
-                    firebaseAdmin.database().ref('/startupInfo/lastReRankDate').set(new Date().getTime());
+exports.reRankPosts = functions.https.onRequest((req, res) => {
+    var token = req.query.token;
+    if (token) {
+        request.get('https://www.googleapis.com/oauth2/v1/userinfo?access_token=' + req.query.token, (error, response, body) => {
+            var bodyObj = JSON.parse(body)
+            console.log("error+body", { body: bodyObj, error: error })
+            console.log("email" + bodyObj.email, body && bodyObj.email && bodyObj.email.indexOf("@york.org") !== -1)
+            if (body && bodyObj.email && bodyObj.email.indexOf("@york.org") !== -1) {
+                firestore.collection("posts").where("flagged", "==", false).get().then((querySnapshot) => {
+                    var tempList = []
                     querySnapshot.forEach((doc) => {
                         tempList.push({
                             objectID: doc.id,
@@ -44,19 +52,22 @@ exports.reRankPosts = functions.https.onCall((data, context) => {
                         })
                     });
                     searchClient.initIndex('Posts').partialUpdateObjects(tempList, false, (result) => {
-                        console.log("reRanking Posts Completed", result)
+                        firebaseAdmin.database().ref('/startupInfo/lastReRankDate').set(new Date().getTime());
                     })
+                    res.status(200).send("Done reRanking");
                     return null
                 }).catch((error) => {
                     console.warn("Error listing firestore documents: ", error);
+                    res.status(418).send("reRanking error. See cloud function logs");
                 });
+                var postCountDoc = firestore.collection('posts').doc('ygtkmJxeXP7vsG0NWbqp');
+                postCountDoc.update({ description: "lastReRankDate: " + new Date().toDateString() }).then().catch(console.warn)
+            } else {
+                res.status(418).send(JSON.stringify(body));
             }
-            return null
-        }).catch((error) => {
-            console.warn("Error retrieving lastReRankDate: ", error);
-        })
-        var postCountDoc = firebaseAdmin.firestore().collection('users').doc('ygtkmJxeXP7vsG0NWbqp');
-        postCountDoc.update({ data: { title: "postCount: 3" } })
+        });
+    } else {
+        res.status(418).send("No Token");
     }
 });
 
@@ -68,7 +79,7 @@ function addOrUpdateSearchIndexRecord(index, post, postId) {
     // Add or update object
     index.saveObject(post, (err, content) => {
         if (err) throw err;
-        console.log('Firebase->Algolia post saved', post);
+        console.log('Firebase->Algolia post saved', "title:" + post.title + "id:" + postId);
     });
 }
 

@@ -1,6 +1,4 @@
 import { Injectable } from '@angular/core';
-import { Subject } from "rxjs";
-import { first } from 'rxjs/operators';
 import { Router } from '@angular/router';
 import { HttpClient, HttpParams, HttpHeaders } from "@angular/common/http";
 import * as algoliasearch from 'algoliasearch'
@@ -99,7 +97,7 @@ export class AlgoliaApisService {
       console.log(classNames[filterIndex])
       this.searchHelper.addDisjunctiveFacetRefinement('classes', classNames[filterIndex]);
     }
-    console.log(this.searchHelper.getState().getQueryParameter('disjunctiveFacetsRefinements'))
+    console.warn(this.searchHelper.getState().getQueryParameter('disjunctiveFacetsRefinements'))
   }
   toggleLabelFilter(labelText) {
     if (labelText) this.searchHelper.toggleFacetRefinement('labels', labelText)

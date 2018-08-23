@@ -1,7 +1,6 @@
 import { Component, OnInit, ViewEncapsulation, ChangeDetectionStrategy, Input, Output, EventEmitter, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { DataHolderService } from '../services/data-holder.service';
 import { Subscription } from 'rxjs';
-import { first } from 'rxjs/operators';
 
 @Component({
   selector: 'app-class-selector',
@@ -29,7 +28,8 @@ export class ClassSelectorComponent implements OnInit, OnDestroy {
   };
 
   constructor(private DataHolder: DataHolderService, private ChangeDetector: ChangeDetectorRef) {
-    this.DataHolder.classAndGroupState$.pipe(first()).toPromise().then((classesAndGroups) => {
+    this.classAndGroupObserver = this.DataHolder.classAndGroupState$.subscribe((classesAndGroups) => {
+      this.classAndGroupObserver.unsubscribe();
       this.formattedYorkClasses = classesAndGroups['formattedClasses'];
       this.yorkGroups = classesAndGroups['groups'];
       this.signedinUserObserver = this.DataHolder.currentUserState$.subscribe((userObj: any) => {
@@ -50,8 +50,10 @@ export class ClassSelectorComponent implements OnInit, OnDestroy {
   }
   @Output('selection-change') selectionChange = new EventEmitter();
   set selection(value) {
-    this.selectionValue = value;
-    this.selectionChange.emit(this.selectionValue);
+    if (this.selectionValue != value) {
+      this.selectionValue = value;
+      this.selectionChange.emit(this.selectionValue);
+    }
   }
 
   ngOnInit() {
@@ -68,6 +70,7 @@ export class ClassSelectorComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
+    this.classAndGroupObserver.unsubscribe();
     if (this.signedinUserObserver) this.signedinUserObserver.unsubscribe()
   }
 }

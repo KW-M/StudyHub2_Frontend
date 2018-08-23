@@ -12,4 +12,51 @@
     mat-form-field {
         flex: 1;
     }
+    .search-class-selector {
+        border: 1px #949494 solid;
+    }
+}
+
+.no-posts-area {
+    display: flex;
+    margin: 24px;
+    padding: 12px;
+    min-height: 100px;
+    flex-direction: column;
+    flex: none;
+    vertical-align: middle;
+    align-items: center;
+    justify-content: center;
+    p,
+    h3 {
+        margin: 2px;
+    }
+    img {
+        padding-top: 8px;
+        width: 100%;
+        max-width: 280px;
+    }
+    a {
+        position: relative;
+        color: darkblue;
+        text-decoration: none;
+        font-weight: bold;
+        cursor: pointer;
+        img {
+            width: 100%;
+            max-width: 500px;
+        }
+        mat-icon {
+            position: absolute;
+            margin: 0 auto;
+            top: 170px;
+            left: 0;
+            right: 0;
+            width: 250px;
+            height: 250px;
+            color: black;
+            text-shadow: 0 0 50px #00000066;
+            font-size: 250px;
+        }
+    }
 }

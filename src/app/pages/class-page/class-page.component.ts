@@ -122,6 +122,15 @@ export class ClassPageComponent implements OnInit, OnDestroy {
     })
   }
 
+  openQuizlet() {
+    console.log(this.DataHolder.quizletUsername)
+    if (this.DataHolder.quizletUsername) {
+      window.open("https://quizlet.com/join/nVZb4UAU9")
+    } else {
+      this.DataHolder.routerGoToPage("Quizlet")
+    }
+  }
+
   ngOnDestroy() {
     // for me I was detecting changes inside "subscribe" so was enough for me to just unsubscribe;
     this.visiblePostsObserver.unsubscribe();

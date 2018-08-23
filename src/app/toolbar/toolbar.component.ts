@@ -1,11 +1,10 @@
 //Component uses onPush change detection, things may not update automatically.
-import { Component, OnInit, ViewEncapsulation, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import { Component, ViewEncapsulation, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { EventBoardService } from "../services/event-board.service";
 import { GoogleSigninService } from "../services/google-signin.service";
 import { DataHolderService } from '../services/data-holder.service';
 import { WindowService } from "../services/window.service";
 import { Router, NavigationEnd } from '@angular/router';
-import { ExternalApisService } from '../services/external-apis.service';
 import { AlgoliaApisService } from '../services/algolia-apis.service';
 import { filter, first } from 'rxjs/operators';
 
@@ -93,7 +92,8 @@ export class ToolbarComponent {
       } else {
         this.AlgoliaApis.clearFilter('classes')
       }
-      this.Router.navigate(['Search'], { queryParamsHandling: 'preserve' }).then(() => { this.AlgoliaApis.updateURLQueryParams() })
+      this.Router.navigate(['Search'], { queryParamsHandling: 'preserve' }).then(() => { //this.AlgoliaApis.updateURLQueryParams()
+      })
     } else if (open === false) {
       this.clearSearch()
       console.log(this.lastState)

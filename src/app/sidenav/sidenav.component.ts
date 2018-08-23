@@ -1,7 +1,6 @@
 //Component uses onPush change detection, things may not update automatically.
 import { Component, OnInit, ElementRef, ViewChild, NgZone, ViewEncapsulation, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 
-import { WindowService } from "../services/window.service";
 import { EventBoardService } from "../services/event-board.service";
 import { DataHolderService } from "../services/data-holder.service";
 import { StudyhubServerApisService } from '../services/studyhub-server-apis.service';

@@ -1,8 +1,7 @@
 import { Injectable } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
-import { Subject } from "rxjs";
-import { HttpClient, HttpHeaders } from "@angular/common/http";
-import { map, filter, scan, first } from 'rxjs/operators';
+import { HttpClient } from "@angular/common/http";
+import { map, first } from 'rxjs/operators';
 import { MatSnackBar } from '@angular/material';
 import * as Queue from 'p-queue'
 import { GoogleSigninService } from './google-signin.service';

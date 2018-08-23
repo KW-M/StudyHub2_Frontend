@@ -1,5 +1,6 @@
 <div class="search-filters">
-  <button mat-button [matMenuTriggerFor]="menu">{{classFilters.length === 0 ? 'Filter by Class': classFilters.join(', ')}}
+  <button mat-button [matMenuTriggerFor]="menu" class="search-class-selector">{{classFilters.length === 0 ? 'Filter by Class':
+    classFilters.join(', ')}}
     <mat-icon *ngIf="classFilters.length === 0" style="font-size: 24px">arrow_drop_down</mat-icon>
     <mat-icon *ngIf="classFilters.length !== 0" style="padding: 6px 0 6px 6px;font-size: 18px;height: 18px;width: 18px;color:black;opacity:0.6"
       (click)="classFilters = [];filterByClass([])">cancel</mat-icon>
@@ -14,9 +15,9 @@
         (click)="$event.stopPropagation();classSearchText = ''">cancel</mat-icon>
     </div>
   </mat-menu>
-  <mat-form-field>
+  <mat-form-field style="max-width: 300px;">
     <div style="position:relative;">
-      <input type="text" placeholder="Creator" [(ngModel)]="creatorFilter" aria-label="Number" (ngModelChange)="onCreatorFilterInput($event)"
+      <input type="text" placeholder="Author" [(ngModel)]="creatorFilter" aria-label="Number" (ngModelChange)="onCreatorFilterInput($event)"
         matInput [matAutocomplete]="creatorselector">
       <mat-icon *ngIf="creatorFilter !== ''" style="background:white; cursor:pointer;font-size: 18px;height: 18px;width: 18px;color:black;opacity:0.6;position: absolute;right: 0;bottom: 0;"
         (click)="creatorFilter = ''; onCreatorFilterInput(null)">cancel</mat-icon>
@@ -60,4 +61,27 @@
   <!-- spacer grid items at the end keep the other grid items equal width -->
   <div class="posts-grid-column"></div>
   <div class="posts-grid-column"></div>
+</div>
+<div class="no-posts-area">
+  <ng-container *ngIf="!postsGrid || (pages.totalPages !== 0 && pages.totalPages > pages.currentPage + 1)">
+    <mat-progress-spinner mode="indeterminate" color="accent" diameter="36"></mat-progress-spinner>
+  </ng-container>
+  <ng-container *ngIf="pages.totalPages !== 0 && pages.totalPages === pages.currentPage + 1">
+    <h3>But wait, there's more!</h3>
+    <p>Search
+      <a (click)="openQuizlet()">York Quizlet</a> with over 2000 more York-Made flashcard sets!</p>
+    <a (click)="openQuizlet()">
+      <img src="/assets/York Quizlet.png">
+      <mat-icon>launch</mat-icon>
+    </a>
+  </ng-container>
+  <ng-container *ngIf="pages.totalPages === 0">
+    <h3>There's nothing to find here. =(</h3>
+    <p>But you could search
+      <a href="https://quizlet.com/class/4249751/">York Quizlet</a> with over 2000 more York-Made flashcard sets!</p>
+    <a href="https://quizlet.com/class/4249751/">
+      <img src="/assets/York Quizlet.png">
+      <mat-icon>launch</mat-icon>
+    </a>
+  </ng-container>
 </div>

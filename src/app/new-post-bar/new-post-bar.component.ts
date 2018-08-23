@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation, ChangeDetectionStrategy } from '@angular/core';
+import { Component, ViewEncapsulation, ChangeDetectionStrategy } from '@angular/core';
 import { ExternalApisService } from "../services/external-apis.service";
 import { EventBoardService } from '../services/event-board.service';
 

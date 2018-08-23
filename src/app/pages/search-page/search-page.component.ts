@@ -1,8 +1,7 @@
-import { Component, ViewEncapsulation, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef, ElementRef } from '@angular/core';
+import { Component, ViewEncapsulation, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef, ElementRef, OnInit } from '@angular/core';
 
 import { WindowService } from "../../services/window.service";
 import { EventBoardService } from "../../services/event-board.service";
-import { GoogleSigninService } from "../../services/google-signin.service";
 import { DataHolderService } from "../../services/data-holder.service";
 import { AlgoliaApisService } from '../../services/algolia-apis.service';
 import { first } from 'rxjs/operators';
@@ -15,7 +14,7 @@ import { first } from 'rxjs/operators';
   encapsulation: ViewEncapsulation.None,
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class SearchPageComponent implements OnDestroy {
+export class SearchPageComponent implements OnDestroy, OnInit {
   creatorList: any = [];
   favoriteClasses: any;
   formattedYorkClasses: any;
@@ -23,16 +22,18 @@ export class SearchPageComponent implements OnDestroy {
   labels: any = [];
   posts: any = [];
   postsGrid;
+  pages: any = { totalPages: null, currentPage: 0 };
   gridColumns;
   numOfColumns;
   columnWidth;
   visiblePostsObserver;
   sideNavOpenObserver;
   findTags;
-  classFilters = [];
+  classFilters: any = []
   classSearchText = '';
   creatorFilter = '';
   findClass = '';
+  currentUserObserver: any;
 
   constructor(public EventBoard: EventBoardService,
     private DataHolder: DataHolderService,
@@ -75,6 +76,11 @@ export class SearchPageComponent implements OnDestroy {
             result: result,
             grid: this.postsGrid
           });
+          this.pages = {
+            totalPages: result.totalPages,
+            currentPage: result.page
+          }
+          console.log(this.labels)
           this.ChangeDetector.detectChanges();
           this.DataHolder.loadingPosts = false;
         } else {
@@ -85,6 +91,7 @@ export class SearchPageComponent implements OnDestroy {
       })
 
       var refinements = this.AlgoliaApis.searchHelper.getQueryParameter('disjunctiveFacetsRefinements')
+      console.log(refinements)
       this.classFilters = refinements.classes || [];
       this.creatorFilter = (refinements['creator.name'] || [''])[0];
       this.ChangeDetector.detectChanges();
@@ -93,7 +100,7 @@ export class SearchPageComponent implements OnDestroy {
       this.formattedYorkClasses = classesAndGroups['formattedClasses'];
       this.ChangeDetector.detectChanges();
       //only put here so that york classes must have loaded>
-      this.DataHolder.currentUserState$.subscribe((user: any) => {
+      this.currentUserObserver = this.DataHolder.currentUserState$.subscribe((user: any) => {
         if (user) {
           this.favoriteClasses = []
           for (const favClass in user.favorites) {
@@ -161,13 +168,14 @@ export class SearchPageComponent implements OnDestroy {
   }
 
   filterByClass(classNames) {
-    this.classFilters = classNames;
-    if (this.AlgoliaApis.searchHelper) {
-      this.AlgoliaApis.setClassFilter(classNames)
-      this.AlgoliaApis.updateURLQueryParams()
-      this.AlgoliaApis.runSearch()
-    }
+    // this.classFilters = classNames;
+    // if (this.AlgoliaApis.searchHelper) {
+    //   this.AlgoliaApis.setClassFilter(classNames)
+    //   this.AlgoliaApis.updateURLQueryParams()
+    //   this.AlgoliaApis.runSearch()
+    // }
   }
+
   filterByCreator(creatorName) {
     if (this.AlgoliaApis.searchHelper) {
       this.AlgoliaApis.setCreatedByFilter(creatorName)
@@ -183,9 +191,29 @@ export class SearchPageComponent implements OnDestroy {
     }
   }
 
+  openQuizlet() {
+    if (this.DataHolder.quizletUsername) {
+      window.open("https://quizlet.com/join/nVZb4UAU9")
+    } else {
+      this.DataHolder.routerGoToPage("Quizlet")
+    }
+  }
+
+  ngOnInit() {
+    this.filterByClass = (classNames) => {
+      this.classFilters = classNames;
+      if (this.AlgoliaApis.searchHelper) {
+        this.AlgoliaApis.setClassFilter(classNames)
+        this.AlgoliaApis.updateURLQueryParams()
+        this.AlgoliaApis.runSearch()
+      }
+    }
+  }
+
   ngOnDestroy() {
     console.log('searchDestoryed')
     // for me I was detecting changes inside "subscribe" so was enough for me to just unsubscribe;
+    this.currentUserObserver.unsubscribe()
     this.visiblePostsObserver.unsubscribe()
     this.sideNavOpenObserver.unsubscribe()
   }

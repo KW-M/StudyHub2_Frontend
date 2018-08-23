@@ -3,17 +3,25 @@
         <button (click)="openQuizlet()" mat-button color="accent">Go to York Quizlet
             <mat-icon>open_in_new</mat-icon>
         </button>
-        <button (click)="editUsername()" mat-button style="margin-top:50px">
+        <img src="/assets/York Quizlet.png" (click)="openQuizlet()">
+        <button (click)="editUsername()" mat-button>
             <mat-icon>edit</mat-icon> Edit Your Quizlet username
-
+        </button>
+        OR
+        <button (click)="deleteUsername()" mat-button>
+            <mat-icon>pause</mat-icon> Pause Syncing of Your Quizlet Sets.
         </button>
     </ng-container>
     <ng-container *ngIf="!quizletUsername">
+        <img src="/assets/York Quizlet.png" width="400">
         <h4>
-            <ng-container *ngIf="quizletUserAutocomplete.length === 0 && usernameSearch">Can't find that username, check your spelling</ng-container>.
+            <ng-container *ngIf="quizletUserAutocomplete.length === 0 && usernameSearch; else notSearching">Can't find that username, check your spelling</ng-container>
+            <ng-template #notSearching>
+                York Quizlet
+            </ng-template>
         </h4>
         <mat-form-field style="width: 100%;">
-            <input type="text" placeholder="Enter your Quizlet username" [(ngModel)]="usernameSearch" aria-label="Number" (ngModelChange)="onInput($event)"
+            <input type="text" placeholder="Your Quizlet Username:" [(ngModel)]="usernameSearch" aria-label="Number" (ngModelChange)="onInput($event)"
                 matInput [matAutocomplete]="quizletselector">
             <mat-autocomplete #quizletselector="matAutocomplete" (optionSelected)="onSubmit($event.option.value)">
                 <mat-option *ngFor="let user of quizletUserAutocomplete" [value]="user.username">
@@ -23,6 +31,11 @@
                 </mat-option>
             </mat-autocomplete>
         </mat-form-field>
-        <p>Auto share your public quizlet sets, and get access to all York student sets.</p>
+        <p style="text-align: center">Share your Quizlet Username. Join the York Quizlet Class, and get access to 2000+ York student flashcard sets.
+            <br>This tool will automatically add any
+            <em>
+                <b>public</b>
+            </em> quizlet sets you create to York Quizlet.
+        </p>
     </ng-container>
 </div>

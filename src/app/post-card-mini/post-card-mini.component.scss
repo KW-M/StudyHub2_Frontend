@@ -18,8 +18,7 @@
     position: relative;
     height: 100px;
     overflow: hidden; // background-size: cover;
-    background: #42424956;
-    // background-repeat: no-repeat;
+    background: #42424956; // background-repeat: no-repeat;
 }
 
 // .post-header-overlay {
@@ -66,6 +65,7 @@
 }
 
 .post-card-mini-title {
+    overflow: hidden;
     color: rgba(0, 0, 0, 0.87);
     font-size: 1rem;
     line-height: 1.6rem;
@@ -83,6 +83,7 @@
     height: 100px;
     box-sizing: border-box;
     overflow: hidden;
+    border-bottom-right-radius: 20px;
     color: rgba(0, 0, 0, 0.87);
     letter-spacing: 0.04em;
     font-size: 0.875rem;

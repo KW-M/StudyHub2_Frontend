@@ -2,9 +2,8 @@ import { Injectable } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
 import { AngularFireDatabase } from 'angularfire2/database';
 import { AngularFirestore } from 'angularfire2/firestore';
-import { Subject } from "rxjs";
 import { first, map } from 'rxjs/operators';
-import { HttpClient, HttpParams, HttpHeaders } from "@angular/common/http";
+import { HttpClient, HttpParams } from "@angular/common/http";
 import { AngularFireAuth } from 'angularfire2/auth';
 import * as firebase from 'firebase/app';
 import '@firebase/functions'
@@ -224,24 +223,29 @@ export class StudyhubServerApisService {
   }
 
   viewPost(postId) {
+    var docRef = this.FireStore.firestore.collection("posts").doc(postId)
+    console.log(docRef)
     return this.FireStore.firestore.runTransaction((transaction) => {
       // This code may get re-run multiple times if there are conflicts.
-      return transaction.get(this.FireStore.collection("posts").doc(postId).ref).then((post) => {
+      return transaction.get(docRef).then((post) => {
         if (!post.exists) {
           throw "Document does not exist!";
         }
-        transaction.update(this.FireStore.collection("posts").doc(postId).ref, { viewCount: post.data().viewCount + 1 || 0 });
+        var newViewCount = (post.data().viewCount || 0) + 1
+        return transaction.update(docRef, {
+          viewCount: newViewCount
+        });
       });
     }).then(() => {
-      return this.FireDB.object('users/' + this.removeFirebaseKeyIllegalChars(this.FireAuth.auth.currentUser.email) + '/recentlyViewed').query.ref.transaction(recents => {
-        recents = recents || []
+      return this.FireDB.object('users/' + this.removeFirebaseKeyIllegalChars(this.FireAuth.auth.currentUser.email) + "/recentlyViewed").query.ref.transaction(recents => {
+        var recents = recents || []
         var indexOf = recents.indexOf(postId)
         if (indexOf !== -1) recents.splice(indexOf, 1)
         recents.splice(0, 0, postId)
         if (recents.length > 5) { recents.pop(1) }
         return recents;
       })
-    })
+    }).then().catch(console.warn)
   }
 
   getQuizletUsername(name) {
@@ -249,7 +253,7 @@ export class StudyhubServerApisService {
   }
 
   setQuizletUsername(userName) {
-    return this.FireDB.object('quizletUsers/' + this.removeFirebaseKeyIllegalChars(this.FireAuth.auth.currentUser.email) + "/username").set(userName)
+    return this.FireDB.object('quizletUsers/' + this.FireAuth.auth.currentUser.displayName + "/username").set(userName)
   }
 
   setFavorites(favoritesObj) {

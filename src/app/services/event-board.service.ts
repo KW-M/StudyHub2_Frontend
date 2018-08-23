@@ -1,12 +1,11 @@
 import { Injectable } from "@angular/core";
-import { Router, NavigationEnd } from '@angular/router';
+import { Router } from '@angular/router';
 import { Subject } from "rxjs";
-import { filter } from 'rxjs/operators';
 
 @Injectable()
 export class EventBoardService {
   constructor(private router: Router) {
-    // router.events.filter(event => event instanceof NavigationEnd).subscribe((newRoute) => {});
+
   }
   sideNavOpen: boolean = true;
   private sideNavOpenSource = new Subject<boolean>();

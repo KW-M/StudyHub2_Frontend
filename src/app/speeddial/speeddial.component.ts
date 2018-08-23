@@ -1,5 +1,5 @@
 //Component uses onPush change detection, things may not update automatically.
-import { Component, OnInit, ViewEncapsulation, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { EventBoardService } from "../services/event-board.service";
 import { ExternalApisService } from '../services/external-apis.service';
 

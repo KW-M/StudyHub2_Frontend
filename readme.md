@@ -1,10 +1,9 @@
-<span style="font-size: 16pt; line-height:1em;  color: rgb(161, 10, 25); font-weight: 700;">StudyHub 2</br> Documentation</span>
----
----
+StudyHub 2<br> Documentation (WIP)
+---------
 Project Objectives
 ------------------
 
-*   Centralize study resources and peer help across York School.
+*   Centralize study resources and pe er help across York School.
 
 *   Increase and encourage sharing across York.
 
@@ -22,7 +21,13 @@ Helpful Development Resources
 
 [Material Design](https://www.google.com/design/spec/material-design/introduction.html)
 
-[Google Drive API](https://developers.google.com/drive/web/about-sdk)
+[Angular Docs](https://angular.io/docs)
+
+[Firebase Docs](https://firebase.google.com/docs/reference/js/)
+
+[Google Signin & API Docs](https://developers.google.com/api-client-library/javascript/reference/referencedocs)
+
+[Google Drive API](https://developers.google.com/drive/web/about-sdk) & [APIS Explorer](https://developers.google.com/apis-explorer/)
 
 Plugins and Frameworks
 ----------------------
@@ -50,26 +55,28 @@ For most up-to-date list see: [package.json](https://github.com/KW-M/StudyHub2_F
 Conventions
 -----------
 
-HTML ids: Capitalized words separated by underscores.
+HTML ids: Capitalized words separated by underscores. Example:  
+```HTML
+<img id=”Example_Id” />
+```
 
-Example:  <<span style=" color: rgb(241, 194, 50);">img</span> <span style=" color: rgb(147, 196, 125);">id=”</span><span style="font-weight: 700;">Example_Id</span><span style=" color: rgb(147, 196, 125);">”</span> />
+CSS classes: lowercase words separated by dashes. Example:
+```HTML
+<img class=”example-class” />
+```
 
-CSS classes:</span> lowercase words separated by dashes.</span>
-
-Example:  <<span style=" color: rgb(241, 194, 50);">img</span> <span style=" color: rgb(106, 168, 79);">class=”</span><span style="font-weight: 700;">example-class</span><span style=" color: rgb(147, 196, 125);">”</span> />
-
-JS variables:</span> camelCase with first word NOT capitalized.</span>
-
-Example:  </span><span style=" color: rgb(103, 78, 167);">var</span> <span style="font-weight: 700;">exampleVariable</span> <span style=" ">=</span> <span style=" color: rgb(166, 77, 121);">null</span>;
-
-JS functions:</span> camelCase with first word NOT capitalized.</span>
-
-Example:  </span><span style=" color: rgb(60, 120, 216);">function</span> <span style="font-weight: 700;">exampleFunction</span> <span style=" ">()</span>
-
-JS object properties:</span> camelCase with first word NOT capitalized.</span>
-
-Example:  {</span> <span style="font-weight: 700;">exampleProperty</span> <span style=" ">:</span> <span style=" color: rgb(166, 77, 121);">null</span> <span style=" ">}</span>
-
+JS variables: camelCase with first word NOT capitalized. Example:  
+```javascript
+exampleVariable = null;
+```
+JS functions: camelCase with first word NOT capitalized. Example:  
+```javascript
+function exampleFunction()
+```
+JS object properties: camelCase with first word NOT capitalized. Example:
+```javascript
+ { exampleProperty: null}
+```
 Data Formats
 ------------
 

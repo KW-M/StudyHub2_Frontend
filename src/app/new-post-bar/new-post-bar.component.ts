@@ -20,13 +20,13 @@ export class NewPostBarComponent {
 
   openDrivePicker() {
     this.ExternalAPIs.openDriveFilePicker().then((selectedFile) => {
-      console.log(selectedFile);
+      console.log('Selected Google Drive File: ', selectedFile);
       if (selectedFile) this.EventBoard.openPostModal(selectedFile, 'edit')
     })
   }
   openUploadPicker() {
     this.ExternalAPIs.openFileUploadPicker().then((selectedFile) => {
-      console.log(selectedFile);
+      console.log('Uploaded File: ', selectedFile);
       if (selectedFile) this.EventBoard.openPostModal(selectedFile, 'edit')
     })
   }

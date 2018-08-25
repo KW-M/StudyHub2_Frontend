@@ -35,15 +35,13 @@ export class QuizletPageComponent implements OnDestroy {
   }
 
   onInput(inputValue) {
-    console.log(inputValue)
     clearTimeout(this.debounce)
     this.debounce = setTimeout(() => {
       if (inputValue) this.ExternalAPIs.quizletUserSearch(inputValue).then((searchResult: any) => {
-        console.log(searchResult);
+        console.log('Quizlet API Search Result: ', searchResult)
         this.quizletUserAutocomplete = searchResult.items.filter(element => {
           return element.type === "user"
         })
-        console.log(this.quizletUserAutocomplete)
         this.ChangeDetector.detectChanges()
       });
     }, 300)
@@ -51,8 +49,8 @@ export class QuizletPageComponent implements OnDestroy {
 
   onSubmit(username) {
     if (window.confirm("Is " + username + " your York Quizlet account?")) {
-      console.log('submittedUserName', username)
       this.ServerAPIs.setQuizletUsername(username).then(() => {
+        console.log('Submitted Quizlet Username: ', username)
         this.quizletUsername = username
         this.ChangeDetector.detectChanges()
       })
@@ -77,7 +75,5 @@ export class QuizletPageComponent implements OnDestroy {
 
   ngOnDestroy() {
     // for me I was detecting changes inside "subscribe" so was enough for me to just unsubscribe;
-    //https://api.quizlet.com/2.0/users/Kyle_Worcester-Moore?client_id=ZvJPu87NPA&whitespace=1
-    //https://api.quizlet.com/2.0/search/universal
   }
 }

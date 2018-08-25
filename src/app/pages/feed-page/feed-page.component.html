@@ -24,14 +24,18 @@
   <div class="posts-grid-column"></div>
 </div>
 <div class="no-posts-area">
+  <ng-container *ngIf="currentPostsGrid && currentPostsGrid.length !== 0">
+    <p>Click EDIT in the side bar to edit your favorites.</p>
+  </ng-container>
   <ng-container *ngIf="currentPostsGrid && currentPostsGrid.length === 0">
     <mat-progress-spinner mode="indeterminate" color="accent" diameter="36"></mat-progress-spinner>
   </ng-container>
-  <!-- <ng-container *ngIf="currentPostsGrid === null">
+  <ng-container *ngIf="currentPostsGrid === null">
     <h3 style="margin:2px">To get started,</h3>
     <p style="margin:2px">Choose which classes show up in your feed.</p>
     <div style="margin:8px">
-      <button mat-button style="background-color: rgba(0,0,0,.12);white-space: normal" [matMenuTriggerFor]="favMenu">{{selectedFavorites.length === 0 ? 'Favorite Classes': selectedFavorites.join(', ')}}
+      <button mat-button style="background-color: rgba(0,0,0,.12);white-space: normal" [matMenuTriggerFor]="favMenu">{{selectedFavorites.length
+        === 0 ? 'Favorite Classes': selectedFavorites.join(', ')}}
         <mat-icon style="font-size: 24px">arrow_drop_down</mat-icon>
       </button>
       <button mat-button color="accent" (click)="setFavorites()">Done</button>
@@ -46,5 +50,5 @@
           (click)="$event.stopPropagation();classSearchText = ''">cancel</mat-icon>
       </div>
     </mat-menu>
-  </ng-container> -->
+  </ng-container>
 </div>

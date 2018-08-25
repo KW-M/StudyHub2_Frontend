@@ -1,24 +1,33 @@
-<mat-selection-list [ngModel]="selection" (ngModelChange)="selection = $event" *ngIf="searchText === ''">
-  <h3 matSubheader>Favorites</h3>
-  <mat-list-option [value]="favClass.name" *ngFor="let favClass of favoriteClasses; trackBy:trackByClassNameFn" [ngStyle]="{'color': getClassColorString(favClass.name)}"
-    (keydown)="$event.stopPropagation()">
-    <h4 mat-line>{{favClass.name}}</h4>
-  </mat-list-option>
-</mat-selection-list>
-<mat-selection-list [ngModel]="selectionValue" (ngModelChange)="selection = $event" style="padding-top: 0">
+<mat-selection-list style="padding-top: 0;display: flex;flex-direction: column" [ngModel]="selectionValue">
+  <h3 matSubheader style="order:-5" *ngIf="searchText === ''; else classHeader">Favorites</h3>
+  <ng-template #classHeader>
+    <h3 matSubheader>Classes</h3>
+  </ng-template>
   <ng-container *ngFor="let category of formattedYorkClasses">
     <div class="class-category-header" *ngIf="searchText === ''">
       <h3 mat-subheader [ngStyle]="{'background': 'linear-gradient(152deg,hsl('+category?.color.h+','+category?.color.s+'%,'+category?.color.l+'%), white)'}"
         style="margin-top: 0;">{{category.category}}</h3>
     </div>
-    <mat-list-option [value]="class.name" *ngFor="let class of category.classes; trackBy:trackByClassNameFn" [style.display]="class.hidden === true ? 'none':'block'">
-      <h4 mat-line [ngStyle]="{'color': 'hsl('+category?.color.h+','+category?.color.s+'%,40%)'}">{{class.name}}</h4>
+    <ng-container *ngFor="let class of category.classes">
+      <mat-list-option [value]="class.name" [style.display]="class.hidden === true ? 'none':'block'" (click)="toggleSelected(class)"
+        (keydown)="$event.stopPropagation()" [selected]="class.selected == true">
+        <h4 mat-line [ngStyle]="{'color': 'hsl('+category?.color.h+','+category?.color.s+'%,40%)'}">{{class.name}}</h4>
+      </mat-list-option>
+      <mat-list-option [value]="class.name" style="order:-1" *ngIf="favorites[class.name] !== undefined && searchText === ''" (click)="toggleSelected(class)"
+        (keydown)="$event.stopPropagation()" [selected]="class.selected == true">
+        <h4 mat-line [ngStyle]="{'color': 'hsl('+category?.color.h+','+category?.color.s+'%,40%)'}">{{class.name}}</h4>
+      </mat-list-option>
+    </ng-container>
+  </ng-container>
+  <h3 matSubheader>Groups</h3>
+  <ng-container *ngFor="let group of yorkGroups">
+    <mat-list-option [value]="group.name" [style.display]="group.hidden === true ? 'none':'block'" (click)="toggleSelected(group)"
+      (keydown)="$event.stopPropagation()" [selected]="group.selected == true">
+      <h4 mat-line>{{group.name}}</h4>
+    </mat-list-option>
+    <mat-list-option [value]="group.name" style="order:-1" *ngIf="favorites[group.name] !== undefined && searchText === ''" (click)="toggleSelected(group)"
+      (keydown)="$event.stopPropagation()" [selected]="group.selected == true">
+      <h4 mat-line>{{group.name}}</h4>
     </mat-list-option>
   </ng-container>
-</mat-selection-list>
-<mat-selection-list [ngModel]="selection" (ngModelChange)="selection = $event">
-  <h3 matSubheader>Groups</h3>
-  <mat-list-option [value]="group" *ngFor="let group of yorkGroups | objKeys" (keydown)="$event.stopPropagation()">
-    <h4 mat-line>{{group}}</h4>
-  </mat-list-option>
 </mat-selection-list>

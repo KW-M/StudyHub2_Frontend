@@ -80,7 +80,6 @@ export class SearchPageComponent implements OnDestroy, OnInit {
             totalPages: result.totalPages,
             currentPage: result.page
           }
-          console.log(this.labels)
           this.ChangeDetector.detectChanges();
           this.DataHolder.loadingPosts = false;
         } else {
@@ -91,7 +90,6 @@ export class SearchPageComponent implements OnDestroy, OnInit {
       })
 
       var refinements = this.AlgoliaApis.searchHelper.getQueryParameter('disjunctiveFacetsRefinements')
-      console.log(refinements)
       this.classFilters = refinements.classes || [];
       this.creatorFilter = (refinements['creator.name'] || [''])[0];
       this.ChangeDetector.detectChanges();
@@ -99,7 +97,7 @@ export class SearchPageComponent implements OnDestroy, OnInit {
     this.DataHolder.classAndGroupState$.pipe(first()).toPromise().then((classesAndGroups) => {
       this.formattedYorkClasses = classesAndGroups['formattedClasses'];
       this.ChangeDetector.detectChanges();
-      //only put here so that york classes must have loaded>
+      //only put here so that york classes must have loaded >
       this.currentUserObserver = this.DataHolder.currentUserState$.subscribe((user: any) => {
         if (user) {
           this.favoriteClasses = []
@@ -168,12 +166,13 @@ export class SearchPageComponent implements OnDestroy, OnInit {
   }
 
   filterByClass(classNames) {
-    // this.classFilters = classNames;
-    // if (this.AlgoliaApis.searchHelper) {
-    //   this.AlgoliaApis.setClassFilter(classNames)
-    //   this.AlgoliaApis.updateURLQueryParams()
-    //   this.AlgoliaApis.runSearch()
-    // }
+    this.classFilters = classNames;
+    console.log(this.classFilters);
+    if (this.AlgoliaApis.searchHelper) {
+      this.AlgoliaApis.setClassFilter(classNames)
+      this.AlgoliaApis.updateURLQueryParams()
+      this.AlgoliaApis.runSearch()
+    }
   }
 
   filterByCreator(creatorName) {

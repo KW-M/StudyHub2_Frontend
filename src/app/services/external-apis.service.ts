@@ -156,6 +156,7 @@ export class ExternalApisService {
         this.driveFilePickerRef.setVisible(true);
       } else {
         const createDrivePicker = () => {
+          console.log('creating Drive picker')
           //var uploadView = new google.picker.DocsUploadView().setParent("0B5NVuDykezpkUGd0LTRGc2hzM2s");
           var docsView = new google.picker.DocsView(google.picker.ViewId.DOCS).setIncludeFolders(true).setSelectFolderEnabled(true).setParent("root");
           var sharedView = new google.picker.DocsView(google.picker.ViewId.DOCS).setIncludeFolders(true).setSelectFolderEnabled(true).setOwnedByMe(false);
@@ -167,9 +168,15 @@ export class ExternalApisService {
             .setOrigin(window.location.protocol + '//' + window.location.host)
             .setOAuthToken(gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse().access_token)
             .setCallback((data) => {
+              console.log(data)
               var action = data[google.picker.Response.ACTION];
               if (action == google.picker.Action.PICKED) {
                 var doc = data[google.picker.Response.DOCUMENTS][0];
+                console.log({
+                  link: doc[google.picker.Document.URL],
+                  title: doc[google.picker.Document.NAME],
+                  attachmentName: doc[google.picker.Document.NAME],
+                })
                 resolve({
                   link: doc[google.picker.Document.URL],
                   title: doc[google.picker.Document.NAME],

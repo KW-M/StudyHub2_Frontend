@@ -54,13 +54,22 @@ export class FeedPageComponent implements OnInit, OnDestroy {
                 counter++
               }
             }
-            console.log(postGrid);
-            this.currentPostsGrid = postGrid
+            this.currentPostsGrid = postGrid.sort((a, b) => {
+
+              console.log(b.posts, a.posts)
+              console.log(b.posts.length, a.posts.length)
+              var al = parseInt(a.posts.length || 0)
+              var bl = parseInt(b.posts.length || 0)
+              if (a.posts && b.posts) {
+                return bl - al
+              } else {
+                return 0
+              }
+            })
             this.ChangeDetector.detectChanges();
           }).catch(console.warn)
         })
       } else {
-        console.log('startupNullcurposts')
         this.currentPostsGrid = null;
         this.ChangeDetector.detectChanges();
       }
@@ -69,7 +78,6 @@ export class FeedPageComponent implements OnInit, OnDestroy {
   }
 
   updateSelectedFavorites(favs) {
-    console.log(favs);
     this.selectedFavorites = favs;
     this.ChangeDetector.detectChanges();
   }
@@ -79,9 +87,7 @@ export class FeedPageComponent implements OnInit, OnDestroy {
     this.selectedFavorites.forEach((fav) => {
       tempFavs[fav] = true;
     })
-    console.log(tempFavs)
     if (this.selectedFavorites.length !== 0) this.ServerAPIs.setFavorites(tempFavs).then((serverResponse) => {
-      console.log(serverResponse)
       this.DataHolder.updateCurrentUserObserver({ favorites: tempFavs })
     }).catch((e) => {
       console.warn(e);

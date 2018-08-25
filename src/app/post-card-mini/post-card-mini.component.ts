@@ -45,12 +45,12 @@ export class PostCardMiniComponent implements OnInit, OnDestroy {
       "updateDate": new Date().getTime(),
     }, this.inputPost);
     this.currentPost['color'] = this.dataHolder.getClassObj(this.currentPost.classes[0]).color;
-    if (this.currentPost.link) this.ExternalAPIs.getPreview(this.currentPost.link).then((websitePreview) => {
-      this.currentLinkPreview.thumbnail = websitePreview['thumbnail'];
-      this.currentLinkPreview.icon = websitePreview['icon'];
-      this.currentPost.attachmentName = websitePreview['title'] || this.currentPost.attachmentName;
-      this.changeDetector.detectChanges();
-    }, (err) => { console.warn(err) })
+    // if (this.currentPost.link) this.ExternalAPIs.getPreview(this.currentPost.link).then((websitePreview) => {
+    //   this.currentLinkPreview.thumbnail = websitePreview['thumbnail'];
+    //   this.currentLinkPreview.icon = websitePreview['icon'];
+    //   this.currentPost.attachmentName = websitePreview['title'] || this.currentPost.attachmentName;
+    //   this.changeDetector.detectChanges();
+    // }, (err) => { console.warn(err) })
   }
   viewPost() {
     this.ServerAPIS.viewPost(this.currentPost.id).then(console.log).catch(console.warn)

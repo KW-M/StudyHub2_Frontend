@@ -34,7 +34,7 @@ export class GoogleSigninService {
           gapi.auth2.getAuthInstance().isSignedIn.listen((isSignedIn) => this.updateGAuthSigninStatus(isSignedIn));
         }).catch((err) => {
           console.warn(err);
-          alert("signin error, try again with your york.org account")
+          alert("Signin error. Please try again with your @york.org account.")
         })
       }, 3)
     })
@@ -42,12 +42,9 @@ export class GoogleSigninService {
 
   updateGAuthSigninStatus(isSignedIn) {
     isSignedIn = isSignedIn || false
-    console.log("Signedin: ", isSignedIn);
+    console.log("GoogleSignedin: ", isSignedIn);
     this.zone.run(() => { //need to get back into angular's detection zone since this function was called from outside (gapi context)
       this.signinStateSource.next(isSignedIn);
-      console.log({
-        position: 'isSignedIn' + isSignedIn
-      }, gapi.auth2.getAuthInstance().currentUser.get());
       if (isSignedIn === true) {
         // We need to register an Observer on Firebase Auth to make sure auth is initialized.
         var authStateUnsubscribe = this.FirebaseAuth.auth.onAuthStateChanged((firebaseUser) => {
@@ -96,7 +93,10 @@ export class GoogleSigninService {
   handleSignInClick() {
     gapi.auth2.getAuthInstance().signIn({
       prompt: "select_account",
-    }).then(function (output) { console.log("signin triggered: ", output) });
+    }).then(function (output) { console.log("signin triggered: ", output) }).catch((err) => {
+      console.warn(err);
+      alert("Signin error. Please try again with your @york.org account.")
+    })
     setTimeout(() => {
       console.log(gapi.auth2.getAuthInstance(), gapi.auth2.getAuthInstance().currentUser.get())
     }, 16000)
@@ -109,7 +109,7 @@ export class GoogleSigninService {
       var logout = document.createElement("img");
       logout.setAttribute("src", "https://mail.google.com/mail/u/0/?logout&hl=en");
       logout.style.display = "none";
-      var logoutImg = document.body.appendChild(logout);
+      document.body.appendChild(logout);
       window.location.reload();
     });
 

@@ -123,7 +123,6 @@ export class ClassPageComponent implements OnInit, OnDestroy {
   }
 
   openQuizlet() {
-    console.log(this.DataHolder.quizletUsername)
     if (this.DataHolder.quizletUsername) {
       window.open("https://quizlet.com/join/nVZb4UAU9")
     } else {

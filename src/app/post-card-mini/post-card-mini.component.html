@@ -1,6 +1,6 @@
 <div class="post-card-mini mat-elevation-z3" matRipple (click)="viewPost()" [ngStyle]="{'background-color':'hsl('+currentPost?.color?.h+','+currentPost?.color?.s+'%,'+currentPost?.color?.l+'%)'}">
   <section class="post-card-mini-header" *ngIf="currentPost.link">
-    <img [src]="currentLinkPreview?.thumbnail" style="width: 100%" *ngIf="currentLinkPreview?.thumbnail" onerror="this.src='assets/Material_Backgrounds/50.png'">
+    <img [src]="currentLinkPreview?.thumbnail" style="width: 100%;" *ngIf="currentLinkPreview?.thumbnail" onerror="this.src=''">
     <div class="post-header-overlay bottom-overlay">
       <div class="link-chip">
         <img [src]="currentLinkPreview?.icon || 'https://drive-thirdparty.googleusercontent.com/16/type/application/pdf'" class="link-favicon">

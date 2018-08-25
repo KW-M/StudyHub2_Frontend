@@ -33,8 +33,6 @@ export class AlgoliaApisService {
     return algoliasearchHelper.url.getUnrecognizedParametersInQueryString(window.location.search);
   }
   getSearchQuery() {
-    console.log(this.searchHelper.getState());
-
     return this.searchHelper.getState().getQueryParameter('query')
   }
   getCurrentPage() {
@@ -61,7 +59,6 @@ export class AlgoliaApisService {
     // "disjunctiveFacets": ["classes", "creator.name"],
     // "facetsRefinements": { "labels": ["Notes"] },
     // "disjunctiveFacetsRefinements": { "classes": ["English IV"], "creator.name": ["Jared AldapeDuron"] },
-    console.log(Object.assign(blankParams, searchParams));
     return this.searchHelper.searchOnce(Object.assign(blankParams, searchParams))
   }
   runIsolatedFacetSearch(facet, query, searchParams) {
@@ -80,7 +77,6 @@ export class AlgoliaApisService {
     // "facetsRefinements": undefined,
     // "disjunctiveFacetsRefinements": undefined,
     // "numericFilter": dateRange ? ["updateDate>=" + (new Date(Date.now() + -67 * 24 * 3600 * 1000))] : undefined
-    console.log(searchParams, Object.assign(blankParams, searchParams))
     return this.searchHelper.searchForFacetValues(facet, query, 100, Object.assign(blankParams, searchParams))
   }
   searchFacet(facet, query) {
@@ -91,13 +87,10 @@ export class AlgoliaApisService {
     if (creatorName) this.searchHelper.addDisjunctiveFacetRefinement('creator.name', creatorName)
   }
   setClassFilter(classNames) {
-    //this.searchHelper.getState().getQueryParameter('disjunctiveFacetsRefinements')
-    if (classNames.length === 0) this.searchHelper.clearRefinements('classes')
+    this.searchHelper.clearRefinements('classes')
     for (let filterIndex = 0; filterIndex < classNames.length; filterIndex++) {
-      console.log(classNames[filterIndex])
       this.searchHelper.addDisjunctiveFacetRefinement('classes', classNames[filterIndex]);
     }
-    console.warn(this.searchHelper.getState().getQueryParameter('disjunctiveFacetsRefinements'))
   }
   toggleLabelFilter(labelText) {
     if (labelText) this.searchHelper.toggleFacetRefinement('labels', labelText)

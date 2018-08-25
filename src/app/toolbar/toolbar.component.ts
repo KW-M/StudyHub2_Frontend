@@ -18,7 +18,7 @@ import { filter, first } from 'rxjs/operators';
 })
 export class ToolbarComponent {
   mobileSearchOpen: boolean = false;
-  currentPage;
+  currentPage = null;
   lastState = {
     sideNavOpen: true,
     page: "Feed"
@@ -56,13 +56,18 @@ export class ToolbarComponent {
       var newPath = this.Router.routerState.snapshot.root.firstChild.url[0].path || "Feed";
       if (newPath !== this.currentPage) this.lastState = {
         page: this.currentPage || "Feed",
-        sideNavOpen: this.EventBoard.sideNavOpen,
+        sideNavOpen: this.EventBoard.sideNavOpen || true,
       };
-      if (newPath === 'Search') this.EventBoard.setSideNavOpen(false)
+      if (newPath === 'Search') {
+        this.EventBoard.setSideNavOpen(false)
+      }
+      const firstpage = this.currentPage
       this.currentPage = newPath
       this.DataHolder.startupCompleteState$.pipe(first()).toPromise().then(() => {
         this.searchText = this.AlgoliaApis.getSearchQuery() || '';
+        if (newPath === 'Search' && firstpage === null) this.AlgoliaApis.runSearch()
       })
+
       ChangeDetector.detectChanges()
     });
     this.DataHolder.startupCompleteState$.pipe(first()).toPromise().then(() => {

@@ -26,7 +26,7 @@ exports.searchIndexEntry = functions.firestore.document('posts/{postId}').onWrit
     const newDocument = change.after.exists ? change.after.data() : null;
     // Get an object with the previous document value (for update or delete)
     const oldDocument = change.before.exists ? change.before.data() : null;
-    console.log('document', { newDoc: newDocument, oldDoc: oldDocument, change: change, index: index })
+    //console.log('document', { newDoc: newDocument, oldDoc: oldDocument, change: change, index: index })
     if (newDocument !== null) {
         addOrUpdateSearchIndexRecord(index, newDocument, change.after.id)
     } else if (oldDocument) {
@@ -40,8 +40,6 @@ exports.reRankPosts = functions.https.onRequest((req, res) => {
     if (token) {
         request.get('https://www.googleapis.com/oauth2/v1/userinfo?access_token=' + req.query.token, (error, response, body) => {
             var bodyObj = JSON.parse(body)
-            console.log("error+body", { body: bodyObj, error: error })
-            console.log("email" + bodyObj.email, body && bodyObj.email && bodyObj.email.indexOf("@york.org") !== -1)
             if (body && bodyObj.email && bodyObj.email.indexOf("@york.org") !== -1) {
                 firestore.collection("posts").where("flagged", "==", false).get().then((querySnapshot) => {
                     var tempList = []

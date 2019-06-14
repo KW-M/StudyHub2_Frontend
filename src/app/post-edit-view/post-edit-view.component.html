@@ -1,7 +1,9 @@
-<div [ngStyle]="{'background-color':'hsl('+selectedClassObj?.color?.h+','+selectedClassObj?.color?.s+'%,'+ (selectedClassObj?.color?.l)+'%)'}">
+<div
+  [ngStyle]="{'background-color':'hsl('+selectedClassObj?.color?.h+','+selectedClassObj?.color?.s+'%,'+ (selectedClassObj?.color?.l)+'%)'}">
   <section class="post-view-scroll-zone">
     <div class="overlay-spinner" style="background-color:  #ffffff8f;" *ngIf="submitting">
-      <mat-progress-spinner mode="indeterminate" class="overlay-spinner" color="accent" diameter="48" *ngIf="!buttonShown"></mat-progress-spinner>
+      <mat-progress-spinner mode="indeterminate" class="overlay-spinner" color="accent" diameter="48"
+        *ngIf="!buttonShown"></mat-progress-spinner>
     </div>
 
     <div class="floating-close-button" (click)="closeModal()">
@@ -28,47 +30,56 @@
       </div>
       <div class="link-input" *ngIf="linkURL != currentPost.link || linkURL == ''">
         <mat-form-field floatPlaceholder="never">
-          <input matInput placeholder="http://" type="url" [(ngModel)]="linkURL" (input)="onLinkInput(linkURL)" appScrollToElement="end"
-            id="post_link_input">
+          <input matInput placeholder="http://" type="url" [(ngModel)]="linkURL" (input)="onLinkInput(linkURL)"
+            appScrollToElement="end" id="post_link_input">
         </mat-form-field>
-        <mat-progress-bar color="primary" mode="indeterminate" *ngIf="linkURL != '' && linkURL != currentPost.link && currentPost.attachmentName == null">
+        <mat-progress-bar color="primary" mode="indeterminate"
+          *ngIf="linkURL != '' && linkURL != currentPost.link && currentPost.attachmentName == null">
         </mat-progress-bar>
       </div>
-      <div class="post-header-overlay bottom-overlay" *ngIf="linkURL === currentPost.link && currentPost.attachmentName !== null">
+      <div class="post-header-overlay bottom-overlay"
+        *ngIf="linkURL === currentPost.link && currentPost.attachmentName !== null">
         <div class="link-chip">
-          <img [src]="currentLinkPreview?.icon || 'https://drive-thirdparty.googleusercontent.com/16/type/image/jpg'" class="link-favicon">
+          <img [src]="currentLinkPreview?.icon || 'https://drive-thirdparty.googleusercontent.com/16/type/image/jpg'"
+            class="link-favicon">
           <span class="link-name">{{currentPost.attachmentName}}</span>
           <mat-icon class="link-chip-remove" (click)="onLinkInput('')">cancel</mat-icon>
         </div>
       </div>
     </section>
-    <section class="post-edit-labels-container" [ngClass]="{'expanded':labelAreaExpanded,'class-chooser-expanded':classChooserExpanded}">
+    <section class="post-edit-labels-container"
+      [ngClass]="{'expanded':labelAreaExpanded,'class-chooser-expanded':classChooserExpanded}">
       <div class="expand-button-container mat-elevation-z2">
-        <button mat-icon-button class="expand-button" (click)="labelAreaExpanded = !labelAreaExpanded;classChooserExpanded = false">
+        <button mat-icon-button class="expand-button"
+          (click)="labelAreaExpanded = !labelAreaExpanded;classChooserExpanded = false">
           <mat-icon>keyboard_arrow_down</mat-icon>
         </button>
       </div>
       <div class="class-selector-backdrop" (click)="classChooserExpanded = false"></div>
       <div class="class-selector-area">
-        <app-class-selector [selection]="currentPost.classes" (selection-change)="classSelected($event)" [filter-search]="labelAndClassSearchText"
-          style="height: 100%;width:100%;display: block;overflow:auto"></app-class-selector>
+        <app-class-selector [selection]="currentPost.classes" (selection-change)="classSelected($event)"
+          [filter-search]="labelAndClassSearchText" style="height: 100%;width:100%;display: block;overflow:auto">
+        </app-class-selector>
 
       </div>
       <div class="post-chip-list">
-        <button mat-button color="primary" id="class_expand_button" *ngIf="!classChooserExpanded" (click)="labelAreaExpanded = true;classChooserExpanded = true">
+        <button mat-button color="primary" id="class_expand_button" *ngIf="!classChooserExpanded"
+          (click)="labelAreaExpanded = true;classChooserExpanded = true">
           <span>{{currentPost.classes.join(', ') || 'CLASS'}}</span>
           <mat-icon *ngIf="currentPost.classes.length === 0" style="font-size: 24px">arrow_drop_down</mat-icon>
-          <mat-icon *ngIf="currentPost.classes.length !== 0" style="padding: 6px 0 6px 6px;font-size: 18px;height: 18px;width: 18px;color:black;opacity:0.6"
+          <mat-icon *ngIf="currentPost.classes.length !== 0"
+            style="padding: 6px 0 6px 6px;font-size: 18px;height: 18px;width: 18px;color:black;opacity:0.6"
             (click)="currentPost.classes = []">cancel</mat-icon>
         </button>
-        <mat-chip color="primary" *ngFor="let label of currentPost.labels | objKeys" (click)="toggleLabel(label)" selected="true">
+        <mat-chip color="primary" *ngFor="let label of currentPost.labels | objKeys" (click)="toggleLabel(label)"
+          selected="true">
           {{label}}
           <mat-icon class="mat-chip-remove">cancel</mat-icon>
         </mat-chip>
         <span class="formatting-divider" style="flex:none; margin: 5px 6px;"></span>
         <ng-container *ngFor="let label of labels;">
-          <mat-chip color="primary" #labelChip="matChip" (click)="toggleLabel(label.value)" [value]="label.value" selected="false"
-            *ngIf="!currentPost.labels[label.value] && !label.hidden">{{label?.value}}</mat-chip>
+          <mat-chip color="primary" #labelChip="matChip" (click)="toggleLabel(label.value)" [value]="label.value"
+            selected="false" *ngIf="!currentPost.labels[label.value] && !label.hidden">{{label?.value}}</mat-chip>
         </ng-container>
         <span *ngIf="labelMissing">
           <button mat-button (click)="createLabel(labelAndClassSearchText)">
@@ -80,15 +91,22 @@
       </div>
       <div class="class-label-search-area">
         <mat-icon>search</mat-icon>
-        <input placeholder="Search Classes and Groups" appScrollToElement="end" (input)="onLabelAndClassSearchInput($event.target.value)"
-          [(ngModel)]="labelAndClassSearchText">
-        <button mat-button color="accent" class="dense-button" (click)="labelAreaExpanded = false;classChooserExpanded = false;onLabelAndClassSearchInput('')">Done</button>
+        <input placeholder="Search Classes and Groups" appScrollToElement="end"
+          (input)="onLabelAndClassSearchInput($event.target.value)" [(ngModel)]="labelAndClassSearchText">
+        <button mat-button color="accent" class="dense-button"
+          (click)="labelAreaExpanded = false;classChooserExpanded = false;onLabelAndClassSearchInput('')">Done</button>
       </div>
     </section>
-    <input class="post-title" Placeholder="Title" appScrollToElement="center" [(ngModel)]="currentPost.title">
-    <p class="post-body-text" #descriptionHTML contenteditable="true" appScrollToElement="center" [innerHTML]="currentPost.description"></p>
+    <!-- <input class="post-title" Placeholder="Title" appScrollToElement="center" [(ngModel)]="currentPost.title"> -->
+    <!-- [innerHTML]="currentPost.description" -->
+    <p class="post-body-text" #descriptionHTML contenteditable="false" style="margin: 120px auto"
+      appScrollToElement="center"> Adding to StudyHub
+      has been paused due to low activity. If you'd like to add more, just <a
+        href="mailto:25kylworc@gmail.com?body=Please%20enable%20adding%20to%20StudyHub%20again.%0A%28Note%3A%20if%20you%20have%20a%20single%20post%2C%20add%20it%20to%20this%20email%2C%20and%20I%20can%20put%20it%20on%20StudyHub%20manually%29&subject=Un-Pause%20Studyhub">Ask
+        Me</a> and I'll try to
+      un-pause it as soon as I can.</p>
   </section>
-  <section class="post-actions">
+  <!-- <section class="post-actions">
     <button mat-raised-button color="accent" raised="true" (click)="submitPost()" style="margin-right: 6px">SAVE</button>
     <button mat-button class="dense-button formatting-button" color="light">
       <mat-icon>format_bold</mat-icon>
@@ -115,5 +133,5 @@
       <mat-icon *ngIf="currentPost.id">close</mat-icon>
       <mat-icon *ngIf="currentPost.id === null">delete</mat-icon>
     </button>
-  </section>
+  </section> -->
 </div>

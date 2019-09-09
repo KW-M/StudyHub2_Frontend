@@ -1,15 +1,16 @@
 <!-- FAB: a Floating Action Button. In this case, we need our own to alow the mini-fabs to be shown on hover -->
-<div class="studyhub-fab" [ngClass]="{'fab-open':fab_open}" (mouseenter)="setFabOpen(true)" (mouseleave)="setFabOpen(false)">
+<div class="studyhub-fab" [ngClass]="{'fab-open':fab_open}" (mouseenter)="setFabOpen(true)"
+  (mouseleave)="setFabOpen(false)">
   <button class="fab-trigger sh-fab" (click)="newPost()" matRipple [matRippleColor]="'#ffffff4a'">
     <mat-icon class="fab-icon create">create</mat-icon>
     <mat-icon class="fab-icon add">add</mat-icon>
   </button>
-  <button class="sh-fab sh-fab-mini fab-num1" (click)="openUploadPicker()" matRipple>
+  <!-- <button class="sh-fab sh-fab-mini fab-num1" (click)="openUploadPicker()" matRipple>
     <mat-icon>file_upload</mat-icon>
-  </button>
-  <button class="sh-fab sh-fab-mini fab-num2" matRipple (click)="openDrivePicker()">
+  </button> -->
+  <!-- <button class="sh-fab sh-fab-mini fab-num2" matRipple (click)="openDrivePicker()">
     <img style="width:22px; height:22px;" src="assets/Drive_Icon.svg">
-  </button>
+  </button> -->
   <!-- <button class="sh-fab sh-fab-mini fab-num3" matRipple>
     <mat-icon>camera</mat-icon>
   </button> -->

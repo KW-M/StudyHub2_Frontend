@@ -29,7 +29,7 @@
     "@types/gapi": "0.0.36",
     "@types/gapi.auth2": "^0.0.47",
     "algoliasearch": "^3.30.0",
-    "algoliasearch-helper": "^2.26.1",
+    "algoliasearch-helper": "^3.6.2",
     "angularfire2": "^5.0.0-rc.11",
     "core-js": "^2.5.7",
     "firebase": "^5.4.0",
